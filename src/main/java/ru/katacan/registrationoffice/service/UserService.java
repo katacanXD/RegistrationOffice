@@ -7,9 +7,10 @@ public interface UserService {
     DoctorListDto searchDoctors(String search);
     PatientListDto searchPatients(String search);
     UserListDto searchUsers(String search);
-    User updateUser(Long userId, UpdateUserRequestDto request);
-    void deleteUser(Long userId);
-    boolean changePassword(Long userId, ChangePasswordRequestDto request);
+    UserInfoDto getUserById(Long userId);
+    UpdateUserResponseDto updateUser(Long userId, UpdateUserRequestDto request);
+    SuccessResponseDto deleteUser(Long userId);
+    SuccessResponseDto changePassword(Long userId, ChangePasswordRequestDto request);
     User saveUser(User user);
     PatientDashboardDto getDashboard(Long patientId);
     PolicyResponseDto updatePolicy(Long patientId, PolicyRequestDto request);

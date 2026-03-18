@@ -1,13 +1,15 @@
 package ru.katacan.registrationoffice.controller;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import ru.katacan.registrationoffice.dto.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import ru.katacan.registrationoffice.dto.PatientDashboardDto;
+import ru.katacan.registrationoffice.dto.PatientListDto;
+import ru.katacan.registrationoffice.dto.PolicyRequestDto;
 import ru.katacan.registrationoffice.mapper.AppointmentMapper;
 import ru.katacan.registrationoffice.mapper.UserMapper;
 import ru.katacan.registrationoffice.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import ru.katacan.registrationoffice.service.UserService;
 
 @RestController
@@ -15,10 +17,7 @@ import ru.katacan.registrationoffice.service.UserService;
 @RequiredArgsConstructor
 public class PatientController {
 
-    private final UserRepository userRepository;
     private final UserService userService;
-    private final UserMapper userMapper;
-    private final AppointmentMapper appointmentMapper;
 
     @GetMapping("/dashboard")
     public ResponseEntity<PatientDashboardDto> getDashboard(
@@ -37,7 +36,7 @@ public class PatientController {
                 .body(userService.updatePolicy(patientId, request));
     }
 
-    @GetMapping("/patients")
+    @GetMapping
     public ResponseEntity<PatientListDto> getAllPatients(
             @RequestParam(required = false) String search
     ) { //TODO добавить плагинацию

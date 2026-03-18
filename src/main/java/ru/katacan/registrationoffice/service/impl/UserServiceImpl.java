@@ -2,9 +2,13 @@ package ru.katacan.registrationoffice.service.impl;
 
 import ru.katacan.registrationoffice.dto.*;
 import ru.katacan.registrationoffice.entity.Appointment;
+import ru.katacan.registrationoffice.entity.DictRole;
 import ru.katacan.registrationoffice.entity.User;
+import ru.katacan.registrationoffice.exception.BadCredentialsException;
+import ru.katacan.registrationoffice.exception.BadRequestException;
 import ru.katacan.registrationoffice.exception.ResourceNotFoundException;
 import ru.katacan.registrationoffice.mapper.UserMapper;
+import ru.katacan.registrationoffice.repository.DictRoleRepository;
 import ru.katacan.registrationoffice.repository.UserRepository;
 import ru.katacan.registrationoffice.service.UserService;
 import ru.katacan.registrationoffice.repository.AppointmentRepository;
@@ -14,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final AppointmentRepository appointmentRepository;
     private final AppointmentMapper appointmentMapper;
+    private final DictRoleRepository dictRoleRepository;
 
     public UserListDto getAllUsers() {
         List<User> users = userRepository.findAll();
@@ -35,10 +39,6 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
 
         return userMapper.toUserList(userDtos);
-    }
-
-    private Optional<User> getUserById(Long userId) {
-        return userRepository.findById(userId);
     }
 
     private DoctorListDto getAllDoctors() {
@@ -107,44 +107,67 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(Long userId, UpdateUserRequestDto request) {
+    public UserInfoDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Пользователь с id " + userId + " не найден"));
+                .orElseThrow(() -> new ResourceNotFoundException("Пользователь с id " + userId + " не найден"));
+        return userMapper.toUserInfo(user);
+    }
 
-        if (request.getFio() != null) {
-            user.setFullName(request.getFio());
-        }
+    @Override
+    public UpdateUserResponseDto updateUser(Long userId, UpdateUserRequestDto request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Пользователь с id " + userId + " не найден"));
+
         if (request.getPolicyNumber() != null) {
             user.setPolicyNumber(request.getPolicyNumber());
         }
         if (request.getSpeciality() != null) {
             user.setSpeciality(request.getSpeciality());
         }
+        if (request.getRole() != null) {
+            DictRole role = dictRoleRepository.findByName(request.getRole())
+                    .orElseThrow(() -> new BadRequestException("Роль '" + request.getRole() + "' не найдена"));
+            user.setRole(role);
+        }
 
-        return userRepository.save(user);
+        User updatedUser = userRepository.save(user);
+        return UpdateUserResponseDto.builder()
+                .fio(updatedUser.getFullName())
+                .policyNumber(updatedUser.getPolicyNumber())
+                .speciality(updatedUser.getSpeciality())
+                .role(updatedUser.getRole() != null ? updatedUser.getRole().getName() : null)
+                .build();
     }
 
     @Override
-    public void deleteUser(Long userId) {
+    public SuccessResponseDto deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {
             throw new RuntimeException("Пользователь с id " + userId + " не найден");
         }
         userRepository.deleteById(userId);
+
+        return SuccessResponseDto.builder()
+                .success(true)
+                .message("Пользователь успешно удален")
+                .build();
     }
 
     @Override
-    public boolean changePassword(Long userId, ChangePasswordRequestDto request) {
+    public SuccessResponseDto changePassword(Long userId, ChangePasswordRequestDto request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));
 
         // Если ты еще не внедрил BCrypt, оставляем сравнение строк
         if (!user.getPassword().equals(request.getOldPassword())) {
-            return false;
+            throw new BadCredentialsException("Старый пароль неверный");
         }
 
         user.setPassword(request.getNewPassword());
         userRepository.save(user);
-        return true;
+        return SuccessResponseDto.builder()
+                .success(true)
+                .message("Пароль успешно изменен")
+                .build();
     }
 
 

@@ -1,15 +1,14 @@
 package ru.katacan.registrationoffice.controller;
 
-import ru.katacan.registrationoffice.dto.*;
-import ru.katacan.registrationoffice.dto.*;
-import ru.katacan.registrationoffice.service.AppointmentService;
-import ru.katacan.registrationoffice.service.UserService;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.bind.annotation.*;
+import ru.katacan.registrationoffice.dto.AppointmentDetailDto;
+import ru.katacan.registrationoffice.dto.AppointmentShortDto;
+import ru.katacan.registrationoffice.dto.CreateAppointmentRequestDto;
+import ru.katacan.registrationoffice.dto.UpdateAppointmentRequestDto;
+import ru.katacan.registrationoffice.service.AppointmentService;
 
 @RestController
 @RequestMapping("/api/v1/appointments")
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 public class AppointmentController {
 
     private final AppointmentService appointmentService;
-    private final UserService userService;
 
     @PostMapping("/create")
     public ResponseEntity<?> createAppointment(
