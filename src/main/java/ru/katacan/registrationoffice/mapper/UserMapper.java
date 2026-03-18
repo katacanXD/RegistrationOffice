@@ -1,7 +1,9 @@
 package ru.katacan.registrationoffice.mapper;
 
+import org.springframework.data.domain.Page;
 import ru.katacan.registrationoffice.dto.*;
 import ru.katacan.registrationoffice.entity.User;
+
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -79,23 +81,30 @@ public class UserMapper {
                 .build();
     }
 
-    public DoctorListDto toDoctorList(List<DoctorShortDto> doctorDtos) {
+    public DoctorListDto toDoctorList(List<DoctorShortDto> doctorDtos, org.springframework.data.domain.Page<ru.katacan.registrationoffice.entity.User> doctorPage) {
         return DoctorListDto.builder()
                 .doctors(doctorDtos)
-                .totalFound((long) doctorDtos.size())
+                .totalFound(doctorPage.getTotalElements())
+                .totalPages(doctorPage.getTotalPages())
+                .currentPage(doctorPage.getNumber())
                 .build();
     }
 
-    public UserListDto toUserList(List<UserInfoDto> userDtos) {
+    public UserListDto toUserList(List<UserInfoDto> dtos, Page<User> page) {
         return UserListDto.builder()
-                .users(userDtos)
-                .totalFound((long) userDtos.size())
+                .users(dtos)
+                .totalFound(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .currentPage(page.getNumber())
                 .build();
     }
 
-    public PatientListDto toPatientList(List<PatientListDto.PatientDto> patientDtos) {
+    public PatientListDto toPatientList(List<PatientListDto.PatientDto> dtos, Page<User> page) {
         return PatientListDto.builder()
-                .patients(patientDtos)
+                .patients(dtos)
+                .totalFound(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .currentPage(page.getNumber())
                 .build();
     }
 }

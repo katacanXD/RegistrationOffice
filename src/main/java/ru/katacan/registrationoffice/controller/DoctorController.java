@@ -1,6 +1,7 @@
 package ru.katacan.registrationoffice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +27,12 @@ public class DoctorController {
 
     @GetMapping()
     public ResponseEntity<DoctorListDto> getDoctors(
-            @RequestParam(required = false) String search
-    ) { //TODO добавить плагинацию
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String specialty,
+            Pageable pageable) {
+        // Теперь передаем ВСЕ ТРИ аргумента в сервис
         return ResponseEntity.status(HttpStatus.OK)
-                .body(userService.searchDoctors(search));
+                .body(userService.searchDoctors(search, specialty, pageable));
     }
 
     @GetMapping("/{doctorId}/slots")

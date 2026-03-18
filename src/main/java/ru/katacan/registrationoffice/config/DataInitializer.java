@@ -112,7 +112,10 @@ public class DataInitializer implements CommandLineRunner {
 
     private void initTestWorkSlots() {
         if (workSlotRepository.count() == 0) {
-            List<User> doctors = userRepository.findAllDoctors();
+            // Заменяем вызов на фильтрацию по роли вручную
+            List<User> doctors = userRepository.findAll().stream()
+                    .filter(u -> "doctor".equals(u.getRole().getName()))
+                    .toList();
             LocalDate today = LocalDate.now();
 
             for (User doctor : doctors) {
@@ -148,8 +151,19 @@ public class DataInitializer implements CommandLineRunner {
     private void initTestAppointments() {
         if (appointmentRepository.count() == 0) {
             DictStatus bookedStatus = statusRepository.findByName("booked").orElseThrow();
-            List<User> doctors = userRepository.findAllDoctors();
-            List<User> patients = userRepository.findAllPatients();
+
+// 1. Получаем ВООБЩЕ ВСЕХ пользователей из базы одним списком
+            List<User> allUsers = userRepository.findAll();
+
+            // 2. Фильтруем этот список в памяти, чтобы достать врачей
+            List<User> doctors = allUsers.stream()
+                    .filter(u -> u.getRole() != null && "doctor".equals(u.getRole().getName()))
+                    .toList();
+
+            // 3. Фильтруем этот же список, чтобы достать пациентов
+            List<User> patients = allUsers.stream()
+                    .filter(u -> u.getRole() != null && "patient".equals(u.getRole().getName()))
+                    .toList();
             LocalDate tomorrow = LocalDate.now().plusDays(1);
 
             if (!doctors.isEmpty() && !patients.isEmpty()) {

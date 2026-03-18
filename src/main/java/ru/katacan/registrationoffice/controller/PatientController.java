@@ -1,6 +1,7 @@
 package ru.katacan.registrationoffice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -38,9 +39,9 @@ public class PatientController {
 
     @GetMapping
     public ResponseEntity<PatientListDto> getAllPatients(
-            @RequestParam(required = false) String search
-    ) { //TODO добавить плагинацию
+            @RequestParam(required = false) String search,
+            Pageable pageable) { //TODO добавить плагинацию
         return ResponseEntity.status(HttpStatus.OK)
-                .body(userService.searchPatients(search));
+                .body(userService.searchPatients(search, pageable));
     }
 }

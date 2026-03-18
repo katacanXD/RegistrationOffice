@@ -6,6 +6,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import ru.katacan.registrationoffice.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -18,29 +26,33 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByPolicyNumber(String policyNumber);
 
-    List<User> findByRoleName(String roleName);
+    // --- МЕТОДЫ ДЛЯ ПАГИНАЦИИ ---
+
+    // Поиск врачей по ФИО и Специальности
+    @Query("SELECT u FROM User u WHERE u.role.name = 'doctor' " +
+            "AND (:search IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+            "AND (:specialty IS NULL OR LOWER(u.speciality) LIKE LOWER(CONCAT('%', :specialty, '%')))")
+    Page<User> searchDoctors(@Param("search") String search,
+                             @Param("specialty") String specialty,
+                             Pageable pageable);
+
+    // Поиск пациентов по ФИО или Полису
+    @Query("SELECT u FROM User u WHERE u.role.name = 'patient' " +
+            "AND (:search IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')) " +
+            "OR u.policyNumber LIKE CONCAT('%', :search, '%'))")
+    Page<User> searchPatients(@Param("search") String search, Pageable pageable);
+
+    // Общий поиск по всем пользователям
+    @Query("SELECT u FROM User u WHERE " +
+            ":search IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%'))")
+    Page<User> searchUsers(@Param("search") String search, Pageable pageable);
+
+    // --- СТАРЫЕ МЕТОДЫ (можно оставить, если они нужны в других частях кода) ---
+
+    @Query("SELECT u FROM User u WHERE u.role.name = 'doctor'")
+    Page<User> findAllDoctors(Pageable pageable);
 
     @Query("SELECT u FROM User u WHERE u.role.name = 'patient'")
-    List<User> findAllPatients();
-
-    @Query("SELECT u FROM User u " +
-            "WHERE (:roleName IS NULL OR u.role.name = :roleName) " +
-            "AND (LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')) " +
-            "OR LOWER(u.speciality) LIKE LOWER(CONCAT('%', :search, '%')))")
-    List<User> searchByRoleAndText(@Param("search") String search, @Param("roleName") String roleName);
-
-    default List<User> searchDoctors(String search) {
-        return searchByRoleAndText(search, "doctor");
-    }
-
-    default List<User> searchPatients(String search) {
-        return searchByRoleAndText(search, "patient");
-    }
-
-    default List<User> searchUsers(String search) {
-        return searchByRoleAndText(search, null);
-    }
-
-    @Query("SELECT u FROM User u WHERE u.role.name IN ('doctor')")
-    List<User> findAllDoctors();
+    Page<User> findAllPatients(Pageable pageable);
 }
+

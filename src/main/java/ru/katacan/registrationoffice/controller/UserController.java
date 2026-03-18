@@ -2,6 +2,7 @@ package ru.katacan.registrationoffice.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,10 +20,10 @@ public class UserController {
 
     @GetMapping()
     public ResponseEntity<UserListDto> getAllUsers(
-            @RequestParam(required = false) String search
-    ) {
+            @RequestParam(required = false) String search,
+            Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(userService.searchUsers(search));
+                .body(userService.searchUsers(search, pageable));
     }
 
     @GetMapping("/{userId}")

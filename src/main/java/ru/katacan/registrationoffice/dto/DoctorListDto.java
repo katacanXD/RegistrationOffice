@@ -11,5 +11,8 @@ import java.util.List;
 public class DoctorListDto {
     private List<DoctorShortDto> doctors;
     private Long totalFound;
+    private long totalElements; // Всего записей
+    private int totalPages;    // Всего страниц
+    private int currentPage;   // Текущая страница
 }
 

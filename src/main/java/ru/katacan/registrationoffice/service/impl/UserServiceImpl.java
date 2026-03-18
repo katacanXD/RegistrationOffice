@@ -1,3 +1,4 @@
+
 package ru.katacan.registrationoffice.service.impl;
 
 import ru.katacan.registrationoffice.dto.*;
@@ -20,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -31,81 +34,44 @@ public class UserServiceImpl implements UserService {
     private final AppointmentMapper appointmentMapper;
     private final DictRoleRepository dictRoleRepository;
 
-    public UserListDto getAllUsers() {
-        List<User> users = userRepository.findAll();
+    @Override
+    public UserListDto searchUsers(String search, Pageable pageable) {
+        // Если поиск пустой, можно передать пустую строку или null,
+        // репозиторий с LIKE %:search% вернет всех пользователей.
+        Page<User> userPage = userRepository.searchUsers(search != null ? search : "", pageable);
 
-        List<UserInfoDto> userDtos = users.stream()
+        List<UserInfoDto> userDtos = userPage.getContent().stream()
                 .map(userMapper::toUserInfo)
                 .collect(Collectors.toList());
 
-        return userMapper.toUserList(userDtos);
+        return userMapper.toUserList(userDtos, userPage);
     }
 
-    private DoctorListDto getAllDoctors() {
-        List<User> users = userRepository.findAllDoctors();
+    @Override
+    public PatientListDto searchPatients(String search, Pageable pageable) {
+        Page<User> patientPage = userRepository.searchPatients(search != null ? search : "", pageable);
 
-        List<DoctorShortDto> doctorDtos = users.stream()
-                .map(userMapper::toDoctorShort)
-                .collect(Collectors.toList());
-
-        return userMapper.toDoctorList(doctorDtos);
-    }
-
-    private PatientListDto getAllPatients() {
-        List<User> users = userRepository.findAll();
-
-        List<PatientListDto.PatientDto> patientDtos = users.stream()
+        List<PatientListDto.PatientDto> patientDtos = patientPage.getContent().stream()
                 .map(userMapper::toPatientDto)
                 .collect(Collectors.toList());
 
-        return userMapper.toPatientList(patientDtos);
+        return userMapper.toPatientList(patientDtos, patientPage);
     }
 
     @Override
-    public UserListDto searchUsers(String search) {
-        if (search == null || search.isEmpty()) {
-            return getAllUsers();
-        }
-        List<User> users = userRepository.searchUsers(search);
+    public DoctorListDto searchDoctors(String search, String specialty, Pageable pageable) {
+        // Добавляем обработку null для параметров, чтобы поиск не сломался
+        String searchParam = (search == null) ? "" : search;
+        String specialtyParam = (specialty == null) ? "" : specialty;
 
-        List<UserInfoDto> userDtos = users.stream()
-                .map(userMapper::toUserInfo)
-                .collect(Collectors.toList());
+        Page<User> doctorPage = userRepository.searchDoctors(searchParam, specialtyParam, pageable);
 
-        return userMapper.toUserList(userDtos);
-    }
-
-    @Override
-    public PatientListDto searchPatients(String search) {
-        if (search == null || search.isEmpty()) {
-            return getAllPatients();
-        }
-        List<User> users = userRepository.searchPatients(search);
-
-        List<PatientListDto.PatientDto> patientDtos = users.stream()
-                .map(userMapper::toPatientDto)
-                .collect(Collectors.toList());
-
-        return userMapper.toPatientList(patientDtos);
-    }
-
-    @Override
-    public DoctorListDto searchDoctors(String search) {
-        // Вызываем нужный метод репозитория в зависимости от наличия поисковой строки
-        if (search == null || search.isEmpty()) {
-            return getAllDoctors();
-        }
-        List<User> users = userRepository.searchDoctors(search);
-
-        // Преобразуем список пользователей в список DTO
-        List<DoctorShortDto> doctorDtos = users.stream()
+        List<DoctorShortDto> doctorDtos = doctorPage.getContent().stream()
                 .map(userMapper::toDoctorShort)
                 .collect(Collectors.toList());
 
-        // Возвращаем объект-обертку DoctorListDto
-        return userMapper.toDoctorList(doctorDtos);
+        return userMapper.toDoctorList(doctorDtos, doctorPage);
     }
-
     @Override
     public UserInfoDto getUserById(Long userId) {
         User user = userRepository.findById(userId)

@@ -10,4 +10,7 @@ import java.util.List;
 public class UserListDto {
     private List<UserInfoDto> users;
     private Long totalFound;
+    private long totalElements; // Всего записей
+    private int totalPages;    // Всего страниц
+    private int currentPage;   // Текущая страница
 }

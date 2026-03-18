@@ -10,6 +10,10 @@ import java.util.List;
 @Builder
 public class PatientListDto {
     public List<PatientDto> patients;
+    private long totalElements;
+    private long totalFound;
+    private int totalPages;
+    private int currentPage;
 
     @Data
     @Builder
@@ -17,5 +21,9 @@ public class PatientListDto {
         private Long userId;
         private String fio;
         private String policyNumber;
+        private long totalElements; // Всего записей
+        private int totalPages;    // Всего страниц
+        private int currentPage;
+
     }
 }
