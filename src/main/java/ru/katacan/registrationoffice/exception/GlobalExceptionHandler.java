@@ -59,3 +59,4 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponseDto.builder().message("Внутренняя ошибка сервера").build());
     }
 }
+//ПИРИВЕТ
