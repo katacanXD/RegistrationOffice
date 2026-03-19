@@ -1,10 +1,13 @@
 package ru.katacan.registrationoffice.service.impl;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.katacan.registrationoffice.dto.AuthRequestDto;
 import ru.katacan.registrationoffice.dto.LoginResponseDto;
 import ru.katacan.registrationoffice.dto.RegistrationResponseDto;
 import ru.katacan.registrationoffice.entity.DictRole;
 import ru.katacan.registrationoffice.entity.User;
+import ru.katacan.registrationoffice.exception.BadCredentialsException;
+import ru.katacan.registrationoffice.exception.BadRequestException;
 import ru.katacan.registrationoffice.mapper.UserMapper;
 import ru.katacan.registrationoffice.repository.DictRoleRepository;
 import ru.katacan.registrationoffice.repository.UserRepository;
@@ -23,9 +26,10 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final DictRoleRepository roleRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
-    public RegistrationResponseDto registerUser(AuthRequestDto request) {
+    public RegistrationResponseDto register(AuthRequestDto request) {
         if (userRepository.findByFullName(request.getFio()).isPresent()) {
             throw new RuntimeException("Пользователь с таким ФИО уже существует");
         }
@@ -35,7 +39,8 @@ public class AuthServiceImpl implements AuthService {
 
         User user = new User();
         user.setFullName(request.getFio());
-        user.setPassword(request.getPassword()); // В реальности нужно хэшировать!
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        user.setPassword(encodedPassword);
         user.setRole(patientRole);
 
         User savedUser = userRepository.save(user);
@@ -45,12 +50,17 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponseDto loginUser(AuthRequestDto request) {
-        Optional<User> userOptional = userRepository.findByFullNameAndPassword(
-                request.getFio(), request.getPassword());
+    public LoginResponseDto login(AuthRequestDto request) {
+        Optional<User> userOptional = userRepository.findByFullName(
+                request.getFio());
 
-        if (userOptional.isEmpty()) {
-            throw new RuntimeException("Неверные учетные данные");
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+                throw new BadCredentialsException("Неверные учетные данные");
+            }
+        } else {
+            throw new BadCredentialsException("Неверные учетные данные");
         }
 
         return userMapper.toLoginResponse(userOptional.get(), "dummy-token");

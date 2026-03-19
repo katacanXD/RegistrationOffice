@@ -5,6 +5,6 @@ import ru.katacan.registrationoffice.dto.LoginResponseDto;
 import ru.katacan.registrationoffice.dto.RegistrationResponseDto;
 
 public interface AuthService {
-    RegistrationResponseDto registerUser(AuthRequestDto request);
-    LoginResponseDto loginUser(AuthRequestDto request);
+    RegistrationResponseDto register(AuthRequestDto request);
+    LoginResponseDto login(AuthRequestDto request);
 }

@@ -11,7 +11,6 @@ public interface UserService {
     UpdateUserResponseDto updateUser(Long userId, UpdateUserRequestDto request);
     SuccessResponseDto deleteUser(Long userId);
     SuccessResponseDto changePassword(Long userId, ChangePasswordRequestDto request);
-    User saveUser(User user);
     PatientDashboardDto getDashboard(Long patientId);
     PolicyResponseDto updatePolicy(Long patientId, PolicyRequestDto request);
     //pageable

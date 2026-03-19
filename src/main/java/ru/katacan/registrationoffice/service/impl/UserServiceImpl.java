@@ -16,6 +16,7 @@ import ru.katacan.registrationoffice.repository.AppointmentRepository;
 import ru.katacan.registrationoffice.mapper.AppointmentMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -33,6 +34,7 @@ public class UserServiceImpl implements UserService {
     private final AppointmentRepository appointmentRepository;
     private final AppointmentMapper appointmentMapper;
     private final DictRoleRepository dictRoleRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserListDto searchUsers(String search, Pageable pageable) {
@@ -123,23 +125,16 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));
 
-        // Если ты еще не внедрил BCrypt, оставляем сравнение строк
-        if (!user.getPassword().equals(request.getOldPassword())) {
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new BadCredentialsException("Старый пароль неверный");
         }
 
-        user.setPassword(request.getNewPassword());
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
         return SuccessResponseDto.builder()
                 .success(true)
                 .message("Пароль успешно изменен")
                 .build();
-    }
-
-
-    @Override
-    public User saveUser(User user) {
-        return userRepository.save(user);
     }
 
     @Override

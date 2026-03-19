@@ -1,5 +1,6 @@
 package ru.katacan.registrationoffice.config;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import ru.katacan.registrationoffice.entity.*;
 import ru.katacan.registrationoffice.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,8 @@ public class DataInitializer implements CommandLineRunner {
     private final UserRepository userRepository;
     private final WorkSlotRepository workSlotRepository;
     private final AppointmentRepository appointmentRepository;
+
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -104,7 +107,7 @@ public class DataInitializer implements CommandLineRunner {
     private User createUser(String fullName, String password, String policyNumber, DictRole role) {
         User user = new User();
         user.setFullName(fullName);
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(password));
         user.setPolicyNumber(policyNumber);
         user.setRole(role);
         return userRepository.save(user);
