@@ -1,7 +1,9 @@
 package ru.katacan.registrationoffice.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -11,6 +13,8 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     @Bean
@@ -23,8 +27,8 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable);
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/v1/login", "/api/v1/registration").permitAll()
-                .requestMatchers("/api/v1/admins/**").hasRole("ADMIN")
-                .requestMatchers("/api/v1/users/**").hasAnyRole("ADMIN", "REGISTRAR")
+                .requestMatchers("/api/v1/admins/**").hasRole("admin")
+                .requestMatchers("/api/v1/users/**").hasAnyRole("admin", "registrar")
                 .anyRequest().authenticated()
         );
         return http.build();

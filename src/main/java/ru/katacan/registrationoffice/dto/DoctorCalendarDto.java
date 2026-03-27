@@ -2,6 +2,7 @@ package ru.katacan.registrationoffice.dto;
 
 import lombok.Builder;
 import lombok.Data;
+
 import java.util.List;
 
 @Data

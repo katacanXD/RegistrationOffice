@@ -31,7 +31,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public RegistrationResponseDto register(AuthRequestDto request) {
         if (userRepository.findByFullName(request.getFio()).isPresent()) {
-            throw new RuntimeException("Пользователь с таким ФИО уже существует");
+            throw new BadRequestException("Пользователь с таким ФИО уже существует");
         }
 
         DictRole patientRole = roleRepository.findByName("patient")

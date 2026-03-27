@@ -3,6 +3,7 @@ package ru.katacan.registrationoffice.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.katacan.registrationoffice.dto.AppointmentDetailDto;
 import ru.katacan.registrationoffice.dto.AppointmentShortDto;
@@ -17,6 +18,10 @@ public class AppointmentController {
 
     private final AppointmentService appointmentService;
 
+    @PreAuthorize(
+            "hasAuthority('registrar') or " +
+            "(hasAuthority('patient') and " +
+            "@appointmentAccess.isSelf(#appointmentRequestDto.patientId, authentication))")
     @PostMapping("/create")
     public ResponseEntity<?> createAppointment(
             @RequestBody CreateAppointmentRequestDto appointmentRequestDto

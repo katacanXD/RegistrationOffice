@@ -18,7 +18,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<UserListDto> getAllUsers(
             @RequestParam(required = false) String search,
             Pageable pageable) {
