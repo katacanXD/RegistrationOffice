@@ -1,4 +1,4 @@
-package ru.katacan.registrationoffice.security;
+package ru.katacan.registrationoffice.jwt;
 
 public record JwtUserPrincipal(Long userId, String fullName) {
 }

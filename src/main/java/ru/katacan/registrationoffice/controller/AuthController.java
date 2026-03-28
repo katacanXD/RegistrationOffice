@@ -16,7 +16,7 @@ import ru.katacan.registrationoffice.service.AuthService;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -54,5 +54,20 @@ public class AuthController {
         }
 
         return ResponseEntity.ok(userMapper.toUserInfo(currentUser.get()));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh() {
+        String token = "";
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(token);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout() {
+        // В Spring Security сессия будет автоматически завершена при вызове /logout, если настроить его в конфигурации безопасности.
+        // Здесь можно добавить дополнительную логику, если необходимо, например, для очистки токенов или других данных.
+        return ResponseEntity.status(HttpStatus.OK)
+                .body("Пользователь успешно вышел из системы");
     }
 }

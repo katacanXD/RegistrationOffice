@@ -1,0 +1,11 @@
+.git
+.gradle
+build
+out
+.idea
+*.iml
+
+# local env files
+.env
+.env.*
+
