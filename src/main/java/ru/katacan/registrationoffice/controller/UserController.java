@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.katacan.registrationoffice.dto.*;
-import ru.katacan.registrationoffice.mapper.UserMapper;
-import ru.katacan.registrationoffice.repository.UserRepository;
 import ru.katacan.registrationoffice.service.UserService;
 
 @RestController
@@ -18,6 +18,24 @@ public class UserController {
 
     private final UserService userService;
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/me")
+    public ResponseEntity<UserInfoDto> getMe(Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.getCurrentUser(authentication.getName()));
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/me/change-password")
+    public ResponseEntity<SuccessResponseDto> changeMyPassword(
+            Authentication authentication,
+            @RequestBody ChangePasswordRequestDto request
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.changeOwnPassword(authentication.getName(), request));
+    }
+
+    @PreAuthorize("hasAnyAuthority('admin', 'registrar')")
     @GetMapping
     public ResponseEntity<UserListDto> getAllUsers(
             @RequestParam(required = false) String search,
@@ -26,6 +44,7 @@ public class UserController {
                 .body(userService.searchUsers(search, pageable));
     }
 
+    @PreAuthorize("hasAnyAuthority('admin', 'registrar')")
     @GetMapping("/{userId}")
     public ResponseEntity<UserInfoDto> getUserById(
             @PathVariable Long userId
@@ -34,6 +53,7 @@ public class UserController {
                 .body(userService.getUserById(userId));
     }
 
+    @PreAuthorize("hasAuthority('admin')")
     @PatchMapping("/{userId}")
     public ResponseEntity<UpdateUserResponseDto> updateUser(
             @PathVariable Long userId,
@@ -43,6 +63,7 @@ public class UserController {
                 .body(userService.updateUser(userId, request));
     }
 
+    @PreAuthorize("hasAuthority('admin')")
     @DeleteMapping("/{userId}")
     public ResponseEntity<?> deleteUser(
             @PathVariable Long userId
@@ -51,12 +72,4 @@ public class UserController {
                 .body(userService.deleteUser(userId));
     }
 
-    @PostMapping("/{userId}/change-password")
-    public ResponseEntity<SuccessResponseDto> changePassword(
-            @PathVariable Long userId,
-            @RequestBody ChangePasswordRequestDto request
-    ) {
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(userService.changePassword(userId, request));
-    }
 }

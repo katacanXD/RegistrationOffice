@@ -5,13 +5,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import ru.katacan.registrationoffice.dto.AuthRequestDto;
+import ru.katacan.registrationoffice.dto.LoginRequestDto;
+import ru.katacan.registrationoffice.dto.LoginResponseDto;
+import ru.katacan.registrationoffice.dto.RegistrationRequestDto;
 import ru.katacan.registrationoffice.dto.RegistrationResponseDto;
 import ru.katacan.registrationoffice.dto.UserInfoDto;
 import ru.katacan.registrationoffice.entity.User;
 import ru.katacan.registrationoffice.mapper.UserMapper;
 import ru.katacan.registrationoffice.repository.UserRepository;
 import ru.katacan.registrationoffice.service.AuthService;
+import ru.katacan.registrationoffice.util.LoginNormalizer;
 
 import java.util.Optional;
 
@@ -26,15 +29,15 @@ public class AuthController {
 
     @PostMapping("/registration")
     public ResponseEntity<RegistrationResponseDto> register(
-            @RequestBody AuthRequestDto request
+            @RequestBody RegistrationRequestDto request
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(authService.register(request));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(
-            @RequestBody AuthRequestDto request
+    public ResponseEntity<LoginResponseDto> login(
+            @RequestBody LoginRequestDto request
     ) {
             return ResponseEntity.status(HttpStatus.OK)
                     .body(authService.login(request));
@@ -47,7 +50,8 @@ public class AuthController {
             return ResponseEntity.status(401).build();
         }
 
-        Optional<User> currentUser = userRepository.findByFullName(authentication.getName());
+        String normalizedLogin = LoginNormalizer.normalize(authentication.getName());
+        Optional<User> currentUser = userRepository.findByLoginIgnoreCase(normalizedLogin);
 
         if (currentUser.isEmpty()) {
             return ResponseEntity.status(401).build();

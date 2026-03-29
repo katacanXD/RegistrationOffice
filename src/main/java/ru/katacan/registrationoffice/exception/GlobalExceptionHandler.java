@@ -45,6 +45,13 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponseDto.builder().message(e.getMessage()).build());
     }
 
+    @ExceptionHandler(AccountLockedException.class)
+    public ResponseEntity<ErrorResponseDto> handleAccountLocked(AccountLockedException e) {
+        log.debug("Account temporarily locked: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(ErrorResponseDto.builder().message(e.getMessage()).build());
+    }
+
     @ExceptionHandler(SystemConfigurationException.class)
     public ResponseEntity<ErrorResponseDto> handleSystemConfig(SystemConfigurationException e) {
         log.error("System configuration error: {}", e.getMessage());

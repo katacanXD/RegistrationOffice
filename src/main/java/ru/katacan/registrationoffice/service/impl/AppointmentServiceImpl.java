@@ -1,15 +1,12 @@
 package ru.katacan.registrationoffice.service.impl;
 
 import jakarta.persistence.EntityNotFoundException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ru.katacan.registrationoffice.dto.*;
 import ru.katacan.registrationoffice.entity.Appointment;
 import ru.katacan.registrationoffice.entity.DictStatus;
 import ru.katacan.registrationoffice.entity.User;
 import ru.katacan.registrationoffice.exception.*;
 import ru.katacan.registrationoffice.mapper.AppointmentMapper;
-import ru.katacan.registrationoffice.mapper.UserMapper;
 import ru.katacan.registrationoffice.repository.AppointmentRepository;
 import ru.katacan.registrationoffice.repository.DictStatusRepository;
 import ru.katacan.registrationoffice.repository.UserRepository;
@@ -17,6 +14,7 @@ import ru.katacan.registrationoffice.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.katacan.registrationoffice.util.LoginNormalizer;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
@@ -28,17 +26,40 @@ import java.util.Optional;
 @Transactional
 public class AppointmentServiceImpl implements AppointmentService {
 
-    private static final Logger log = LoggerFactory.getLogger(AppointmentServiceImpl.class);
-
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
     private final DictStatusRepository statusRepository;
 
     private final AppointmentMapper appointmentMapper;
-    private final UserMapper userMapper;
 
     @Override
     public CreateAppointmentResponseDto createAppointment(CreateAppointmentRequestDto request) {
+        return createAppointmentInternal(request);
+    }
+
+    @Override
+    public CreateAppointmentResponseDto createOwnAppointment(String login, CreateOwnAppointmentRequestDto request) {
+        if (request == null) {
+            throw new BadRequestException("Не все обязательные поля заполнены");
+        }
+
+        String normalizedLogin = LoginNormalizer.normalize(login);
+        User currentUser = userRepository.findByLoginIgnoreCase(normalizedLogin)
+                .orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));
+
+        if (currentUser.getRole() == null || !"patient".equals(currentUser.getRole().getName())) {
+            throw new BadRequestException("Только пациент может создавать запись через /me");
+        }
+
+        CreateAppointmentRequestDto normalizedRequest = new CreateAppointmentRequestDto();
+        normalizedRequest.setDoctorId(request.getDoctorId());
+        normalizedRequest.setSlotDatetime(request.getSlotDatetime());
+        normalizedRequest.setPatientId(currentUser.getId());
+
+        return createAppointmentInternal(normalizedRequest);
+    }
+
+    private CreateAppointmentResponseDto createAppointmentInternal(CreateAppointmentRequestDto request) {
         // Валидация входных данных
         if (request.getDoctorId() == null || request.getPatientId() == null || request.getSlotDatetime() == null) {
             throw new BadRequestException("Не все обязательные поля заполнены");

@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
+import ru.katacan.registrationoffice.util.LoginNormalizer;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,6 +36,36 @@ public class UserServiceImpl implements UserService {
     private final AppointmentMapper appointmentMapper;
     private final DictRoleRepository dictRoleRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public UserListDto getAllUsers() {
+        List<User> users = userRepository.findAll();
+
+        List<UserInfoDto> userDtos = users.stream()
+                .map(userMapper::toUserInfo)
+                .collect(Collectors.toList());
+
+        return userMapper.toUserList(userDtos);
+    }
+
+    private DoctorListDto getAllDoctors() {
+        List<User> users = userRepository.findAllDoctors();
+
+        List<DoctorShortDto> doctorDtos = users.stream()
+                .map(userMapper::toDoctorShort)
+                .collect(Collectors.toList());
+
+        return userMapper.toDoctorList(doctorDtos);
+    }
+
+    private PatientListDto getAllPatients() {
+        List<User> users = userRepository.findAllPatients();
+
+        List<PatientListDto.PatientDto> patientDtos = users.stream()
+                .map(userMapper::toPatientDto)
+                .collect(Collectors.toList());
+
+        return userMapper.toPatientList(patientDtos);
+    }
 
     @Override
     public UserListDto searchUsers(String search, Pageable pageable) {
@@ -82,6 +113,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserInfoDto getCurrentUser(String login) {
+        User user = findByLogin(login);
+        return userMapper.toUserInfo(user);
+    }
+
+    @Override
     public UpdateUserResponseDto updateUser(Long userId, UpdateUserRequestDto request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Пользователь с id " + userId + " не найден"));
@@ -110,7 +147,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public SuccessResponseDto deleteUser(Long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new RuntimeException("Пользователь с id " + userId + " не найден");
+            throw new ResourceNotFoundException("Пользователь с id " + userId + " не найден");
         }
         userRepository.deleteById(userId);
 
@@ -121,9 +158,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public SuccessResponseDto changePassword(Long userId, ChangePasswordRequestDto request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));
+    public SuccessResponseDto changeOwnPassword(String login, ChangePasswordRequestDto request) {
+        User user = findByLogin(login);
 
         if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
             throw new BadCredentialsException("Старый пароль неверный");
@@ -138,34 +174,36 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PatientDashboardDto getDashboard(Long patientId) {
-        return userRepository.findById(patientId)
-                .map(patient -> {
-                    List<Appointment> appointments = appointmentRepository
-                            .findByPatientAndStatus_NameIn(patient, List.of("booked"));
+    public PatientDashboardDto getDashboardByLogin(String login) {
+        User patient = findByLogin(login);
 
-                    return PatientDashboardDto.builder()
-                            .user(userMapper.toPatientUserInfo(patient))
-                            .appointments(appointments.stream()
-                                    .map(appointmentMapper::toAppointmentShort)
-                                    .collect(Collectors.toList()))
-                            .build();
-                })
-                .orElseThrow(() -> new ResourceNotFoundException("Пациент с id " + patientId + " не найден"));
+        List<Appointment> appointments = appointmentRepository
+                .findByPatientAndStatus_NameIn(patient, List.of("booked"));
+
+        return PatientDashboardDto.builder()
+                .user(userMapper.toPatientUserInfo(patient))
+                .appointments(appointments.stream()
+                        .map(appointmentMapper::toAppointmentShort)
+                        .collect(Collectors.toList()))
+                .build();
     }
 
-    @Override
-    public PolicyResponseDto updatePolicy(Long patientId, PolicyRequestDto request) {
-        return userRepository.findById(patientId)
-                .map(patient -> {
-                    patient.setPolicyNumber(request.getPolicyNumber());
-                    userRepository.save(patient);
 
-                    return PolicyResponseDto.builder()
-                            .success(true)
-                            .message("Полис успешно привязан. Теперь вы можете записываться на прием.")
-                            .build();
-                })
-                .orElseThrow(() -> new ResourceNotFoundException("Пациент с id " + patientId + " не найден"));
+    @Override
+    public PolicyResponseDto updatePolicyByLogin(String login, PolicyRequestDto request) {
+        User patient = findByLogin(login);
+        patient.setPolicyNumber(request.getPolicyNumber());
+        userRepository.save(patient);
+
+        return PolicyResponseDto.builder()
+                .success(true)
+                .message("Полис успешно привязан. Теперь вы можете записываться на прием.")
+                .build();
+    }
+
+    private User findByLogin(String login) {
+        String normalizedLogin = LoginNormalizer.normalize(login);
+        return userRepository.findByLoginIgnoreCase(normalizedLogin)
+                .orElseThrow(() -> new ResourceNotFoundException("Пользователь не найден"));
     }
 }

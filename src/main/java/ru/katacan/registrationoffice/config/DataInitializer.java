@@ -5,8 +5,10 @@ import ru.katacan.registrationoffice.entity.*;
 import ru.katacan.registrationoffice.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import ru.katacan.registrationoffice.util.LoginNormalizer;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -15,6 +17,7 @@ import java.util.List;
 
 
 @Component
+@Profile("!test")
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
@@ -79,33 +82,34 @@ public class DataInitializer implements CommandLineRunner {
             DictRole adminRole = roleRepository.findByName("admin").orElseThrow();
 
             // Пациенты
-            createUser("Иванов Иван Иванович", "pass123", null, patientRole);
-            createUser("Петров Петр Петрович", "pass123", "1234567890123456", patientRole);
-            createUser("Сидорова Анна Сергеевна", "pass123", null, patientRole);
-            createUser("Козлов Дмитрий Николаевич", "pass123", "9876543210987654", patientRole);
+            createUser("patient_ivanov", "Иванов Иван Иванович", "pass123", null, patientRole);
+            createUser("patient_petrov", "Петров Петр Петрович", "pass123", "1234567890123456", patientRole);
+            createUser("patient_sidorova", "Сидорова Анна Сергеевна", "pass123", null, patientRole);
+            createUser("patient_kozlov", "Козлов Дмитрий Николаевич", "pass123", "9876543210987654", patientRole);
 
             // Врачи
-            createUser("Кеминова Екатерина Юрьевна", "doc123", null, doctorRole)
+            createUser("doctor_keminova", "Кеминова Екатерина Юрьевна", "doc123", null, doctorRole)
                     .setSpeciality("Терапевт");
-            createUser("Иванов Иван Иванович", "doc123", null, doctorRole)
+            createUser("doctor_ivanov", "Иванов Иван Иванович", "doc123", null, doctorRole)
                     .setSpeciality("Отоларинголог");
-            createUser("Ахметов Демеург Евгеньевич", "doc123", null, doctorRole)
+            createUser("doctor_ahmetov", "Ахметов Демеург Евгеньевич", "doc123", null, doctorRole)
                     .setSpeciality("Терапевт");
-            createUser("Смирнова Ольга Викторовна", "doc123", null, doctorRole)
+            createUser("doctor_smirnova", "Смирнова Ольга Викторовна", "doc123", null, doctorRole)
                     .setSpeciality("Офтальмолог");
 
             // Регистратор
-            createUser("Регистратор Регистратор Регистраторович", "reg123", null, registrarRole);
+            createUser("registrar_main", "Регистратор Регистратор Регистраторович", "reg123", null, registrarRole);
 
             // Админ
-            createUser("Администратор Админ Админович", "admin123", null, adminRole);
+            createUser("admin_main", "Администратор Админ Админович", "admin123", null, adminRole);
 
             userRepository.flush();
         }
     }
 
-    private User createUser(String fullName, String password, String policyNumber, DictRole role) {
+    private User createUser(String login, String fullName, String password, String policyNumber, DictRole role) {
         User user = new User();
+        user.setLogin(LoginNormalizer.normalize(login));
         user.setFullName(fullName);
         user.setPassword(passwordEncoder.encode(password));
         user.setPolicyNumber(policyNumber);

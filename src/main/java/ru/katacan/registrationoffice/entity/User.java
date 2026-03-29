@@ -1,7 +1,6 @@
 package ru.katacan.registrationoffice.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +15,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "f_users_id")
     private Long id;
+
+    @Column(name = "login", nullable = false, unique = true)
+    private String login;
 
     @Column(name = "f_fio", nullable = false)
     private String fullName;

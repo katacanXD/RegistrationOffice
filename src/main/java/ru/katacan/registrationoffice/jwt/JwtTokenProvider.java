@@ -1,15 +1,26 @@
 package ru.katacan.registrationoffice.jwt;
 
 /**
- * Alternative naming scaffold for token operations.
+ * Canonical scaffold for token operations.
  *
  * Purpose:
- * - keep an explicit place for token generation/validation logic;
- * - make JWT responsibility clear by class name;
- * - allow gradual migration from other provider naming if needed.
+ * - keep an explicit place for token generation and validation logic;
+ * - parse JWT claims into application principal representation;
+ * - isolate JWT library usage from service/controller layers.
  *
  * Implementation is intentionally not added yet.
  */
 public class JwtTokenProvider {
-}
 
+	public String generateToken(Long userId, String login, String roleName) {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	public boolean isTokenValid(String token) {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+
+	public JwtUserPrincipal extractPrincipal(String token) {
+		throw new UnsupportedOperationException("Not implemented yet");
+	}
+}
