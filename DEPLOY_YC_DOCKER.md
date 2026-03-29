@@ -44,7 +44,7 @@ Use values:
 DB_NAME=registration_office
 DB_USER=registration_user
 DB_PASS=<your_db_password>
-JWT_SECRET=<your_jwt_secret>
+SECURITY_JWT_SECRET=<your_jwt_secret>
 ```
 
 ## 3) Start containers

@@ -52,6 +52,13 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponseDto.builder().message(e.getMessage()).build());
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponseDto> handleBadCredentials(BadCredentialsException e) {
+        log.debug("Bad credentials: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ErrorResponseDto.builder().message("Требуется авторизация").build());
+    }
+
     @ExceptionHandler(SystemConfigurationException.class)
     public ResponseEntity<ErrorResponseDto> handleSystemConfig(SystemConfigurationException e) {
         log.error("System configuration error: {}", e.getMessage());

@@ -16,7 +16,7 @@ public class User {
     @Column(name = "f_users_id")
     private Long id;
 
-    @Column(name = "login", nullable = false, unique = true)
+    @Column(name = "f_login", nullable = false, unique = true)
     private String login;
 
     @Column(name = "f_fio", nullable = false)

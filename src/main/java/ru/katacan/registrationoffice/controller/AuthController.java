@@ -1,7 +1,11 @@
 package ru.katacan.registrationoffice.controller;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +21,7 @@ import ru.katacan.registrationoffice.service.AuthService;
 import ru.katacan.registrationoffice.util.LoginNormalizer;
 
 import java.util.Optional;
+import java.time.Duration;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -26,6 +31,21 @@ public class AuthController {
     private final AuthService authService;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+
+    @Value("${security.jwt.refresh-cookie-name:refresh_token}")
+    private String refreshCookieName;
+
+    @Value("${security.jwt.cookie-secure:true}")
+    private boolean cookieSecure;
+
+    @Value("${security.jwt.cookie-same-site:Lax}")
+    private String cookieSameSite;
+
+    @Value("${security.jwt.cookie-path:/api/v1/auth}")
+    private String cookiePath;
+
+    @Value("${security.jwt.refresh-ttl-seconds}")
+    private long refreshTtlSeconds;
 
     @PostMapping("/registration")
     public ResponseEntity<RegistrationResponseDto> register(
@@ -39,8 +59,12 @@ public class AuthController {
     public ResponseEntity<LoginResponseDto> login(
             @RequestBody LoginRequestDto request
     ) {
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(authService.login(request));
+        LoginResponseDto response = authService.login(request);
+        String refreshToken = response.getRefreshToken();
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header("Set-Cookie", buildRefreshCookie(refreshToken).toString())
+                .body(response);
     }
 
     @GetMapping("/me")
@@ -61,17 +85,59 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refresh() {
-        String token = "";
+    public ResponseEntity<LoginResponseDto> refresh(
+            HttpServletRequest request
+    ) {
+        String refreshToken = extractRefreshToken(request);
+        LoginResponseDto response = authService.refresh(refreshToken);
+        String nextRefreshToken = response.getRefreshToken();
+
         return ResponseEntity.status(HttpStatus.OK)
-                .body(token);
+                .header("Set-Cookie", buildRefreshCookie(nextRefreshToken).toString())
+                .body(response);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout() {
-        // В Spring Security сессия будет автоматически завершена при вызове /logout, если настроить его в конфигурации безопасности.
-        // Здесь можно добавить дополнительную логику, если необходимо, например, для очистки токенов или других данных.
+    public ResponseEntity<?> logout(
+            HttpServletRequest request
+    ) {
+        String refreshToken = extractRefreshToken(request);
+        authService.logout(refreshToken);
         return ResponseEntity.status(HttpStatus.OK)
+                .header("Set-Cookie", clearRefreshCookie().toString())
                 .body("Пользователь успешно вышел из системы");
+    }
+
+    private String extractRefreshToken(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+        for (Cookie cookie : cookies) {
+            if (refreshCookieName.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
+
+    private ResponseCookie buildRefreshCookie(String refreshToken) {
+        return ResponseCookie.from(refreshCookieName, refreshToken)
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .sameSite(cookieSameSite)
+                .path(cookiePath)
+                .maxAge(Duration.ofSeconds(refreshTtlSeconds))
+                .build();
+    }
+
+    private ResponseCookie clearRefreshCookie() {
+        return ResponseCookie.from(refreshCookieName, "")
+                .httpOnly(true)
+                .secure(cookieSecure)
+                .sameSite(cookieSameSite)
+                .path(cookiePath)
+                .maxAge(Duration.ZERO)
+                .build();
     }
 }
