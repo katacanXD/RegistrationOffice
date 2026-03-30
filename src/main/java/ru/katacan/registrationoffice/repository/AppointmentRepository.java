@@ -15,6 +15,15 @@ import java.util.Optional;
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END FROM Appointment a " +
+            "WHERE a.doctor = :doctor " +
+            "AND a.slotDateTime = :slotDateTime " +
+            "AND a.status.name <> 'canceled' " +
+            "AND a.id <> :id")
+    boolean existsActiveAppointment(@Param("doctor") User doctor,
+                                    @Param("slotDateTime") LocalDateTime slotDateTime,
+                                    @Param("id") Long id);
+
     List<Appointment> findByPatientOrderBySlotDateTimeDesc(User patient);
 
     List<Appointment> findByPatientAndStatus_NameIn(User patient, List<String> statuses);

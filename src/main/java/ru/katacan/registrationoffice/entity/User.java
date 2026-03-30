@@ -1,18 +1,23 @@
 package ru.katacan.registrationoffice.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "t_users")
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "f_users_id")
     private Long id;
+
+    @Column(name = "f_login", nullable = false, unique = true)
+    private String login;
 
     @Column(name = "f_fio", nullable = false)
     private String fullName;
@@ -24,8 +29,8 @@ public class User {
     private String policyNumber;
 
     @ManyToOne
-    @JoinColumn(name = "f_acl_name_id", nullable = false)
-    private DictAclName acl;
+    @JoinColumn(name = "f_role_id", nullable = false)
+    private DictRole role;
 
     @Column(name = "f_speciality_name")
     private String speciality;

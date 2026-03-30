@@ -2,11 +2,14 @@ package ru.katacan.registrationoffice.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "t_dict_status")
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 public class DictStatus {
     @Id

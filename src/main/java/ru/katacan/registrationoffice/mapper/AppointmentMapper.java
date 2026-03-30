@@ -1,9 +1,9 @@
 package ru.katacan.registrationoffice.mapper;
 
+import org.springframework.stereotype.Component;
 import ru.katacan.registrationoffice.dto.*;
 import ru.katacan.registrationoffice.entity.Appointment;
 import ru.katacan.registrationoffice.entity.User;
-import org.springframework.stereotype.Component;
 
 import java.time.format.DateTimeFormatter;
 
@@ -16,19 +16,42 @@ public class AppointmentMapper {
     public AppointmentShortDto toAppointmentShort(Appointment appointment) {
         return AppointmentShortDto.builder()
                 .appointmentId(appointment.getId())
-                .speciality(appointment.getDoctor() != null ? appointment.getDoctor().getSpeciality() : null)
-                .doctorFio(appointment.getDoctor() != null ? appointment.getDoctor().getFullName() : null)
+                .speciality(appointment.getDoctor() != null ?
+                        appointment.getDoctor().getSpeciality() : null)
+                .doctorFio(appointment.getDoctor() != null ?
+                        appointment.getDoctor().getFullName() : null)
                 .datetime(appointment.getSlotDateTime() != null ?
                         appointment.getSlotDateTime().format(dateTimeFormatter) : null)
                 .address(CLINIC_ADDRESS)
-                .status(appointment.getStatus() != null ? appointment.getStatus().getName() : null)
+                .status(appointment.getStatus() != null ?
+                        appointment.getStatus().getName() : null)
+                .build();
+    }
+
+    public AppointmentDetailDto toAppointmentDetail(Appointment appointment) {
+        return AppointmentDetailDto.builder()
+                .appointmentId(appointment.getId())
+                .datetime(appointment.getSlotDateTime() != null ?
+                        appointment.getSlotDateTime().format(dateTimeFormatter) : null)
+                .address(CLINIC_ADDRESS)
+                // Маппинг врача
+                .doctor(appointment.getDoctor() != null ?
+                        AppointmentDetailDto.DoctorInfoDto.builder()
+                                .fio(appointment.getDoctor().getFullName())
+                                .build() : null)
+                // Маппинг пациента
+                .patient(appointment.getPatient() != null ?
+                        AppointmentDetailDto.PatientInfoDto.builder()
+                                .fio(appointment.getPatient().getFullName())
+                                .policyNumber(appointment.getPatient().getPolicyNumber())
+                                .build() : null)
                 .build();
     }
 
     public CreateAppointmentResponseDto toCreateResponse(Appointment appointment, User doctor) {
         return CreateAppointmentResponseDto.builder()
                 .appointmentId(appointment.getId())
-                .message(String.format("Вы успешно записаны на %s",
+                .message(String.format("Запись успешно создана на %s",
                         appointment.getSlotDateTime().format(DateTimeFormatter.ofPattern("d MMMM, HH:mm"))))
                 .details(CreateAppointmentResponseDto.AppointmentDetailsDto.builder()
                         .doctorFio(doctor != null ? doctor.getFullName() : null)
@@ -46,12 +69,13 @@ public class AppointmentMapper {
                 .build();
     }
 
-    public AppointmentDetailDto toAppointmentDetail(Appointment appointment) {
-        return AppointmentDetailDto.builder()
-                .appointmentId(appointment.getId())
-                .datetime(appointment.getSlotDateTime() != null ?
-                        appointment.getSlotDateTime().format(dateTimeFormatter) : null)
-                .address(CLINIC_ADDRESS)
+    public UpdateAppointmentRequestDto toUpdateResponse(Appointment appointment) {
+        return UpdateAppointmentRequestDto.builder()
+                .doctorId(appointment.getDoctor().getId())
+                .slotDatetime(appointment.getSlotDateTime().format(DateTimeFormatter.ofPattern("d MMMM, HH:mm")))
+                .status(appointment.getStatus() != null ? appointment.getStatus().getName() : null)
+                .message(String.format("Запись к врачу (%s) отменена",
+                        appointment.getSlotDateTime().format(DateTimeFormatter.ofPattern("d MMMM, HH:mm"))))
                 .build();
     }
 }

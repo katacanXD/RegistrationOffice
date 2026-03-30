@@ -1,15 +1,15 @@
 package ru.katacan.registrationoffice.repository;
 
-import ru.katacan.registrationoffice.entity.DictAclName;
+import ru.katacan.registrationoffice.entity.DictRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface DictAclNameRepository extends JpaRepository<DictAclName, Long> {
+public interface DictRoleRepository extends JpaRepository<DictRole, Long> {
 
-    Optional<DictAclName> findByName(String name);
+    Optional<DictRole> findByName(String name);
 
     boolean existsByName(String name);
 }

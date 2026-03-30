@@ -1,197 +1,75 @@
 package ru.katacan.registrationoffice.controller;
 
-import ru.katacan.registrationoffice.dto.*;
-import ru.katacan.registrationoffice.entity.User;
-import ru.katacan.registrationoffice.mapper.UserMapper;
-import ru.katacan.registrationoffice.repository.UserRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import ru.katacan.registrationoffice.dto.*;
+import ru.katacan.registrationoffice.service.UserService;
 
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
+    private final UserService userService;
 
-    /**
-     * Получить всех пользователей
-     */
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/me")
+    public ResponseEntity<UserInfoDto> getMe(Authentication authentication) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.getCurrentUser(authentication.getName()));
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/me/change-password")
+    public ResponseEntity<SuccessResponseDto> changeMyPassword(
+            Authentication authentication,
+            @RequestBody ChangePasswordRequestDto request
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.changeOwnPassword(authentication.getName(), request));
+    }
+
+    @PreAuthorize("hasAnyAuthority('admin', 'registrar')")
     @GetMapping
-    public ResponseEntity<List<UserInfoDto>> getAllUsers() {
-        List<User> users = userRepository.findAll();
-        List<UserInfoDto> userDtos = users.stream()
-                .map(user -> UserInfoDto.builder()
-                        .userId(user.getId())
-                        .fio(user.getFullName())
-                        .aclName(user.getAcl() != null ? user.getAcl().getName() : null)
-                        .policyNumber(user.getPolicyNumber())
-                        .build())
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(userDtos);
+    public ResponseEntity<UserListDto> getAllUsers(
+            @RequestParam(required = false) String search,
+            Pageable pageable) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.searchUsers(search, pageable));
     }
 
-    /**
-     * Получить пользователя по ID
-     */
+    @PreAuthorize("hasAnyAuthority('admin', 'registrar')")
     @GetMapping("/{userId}")
-    public ResponseEntity<?> getUserById(@PathVariable Long userId) {
-        return userRepository.findById(userId)
-                .<ResponseEntity<?>>map(user -> ResponseEntity.ok(UserInfoDto.builder()
-                        .userId(user.getId())
-                        .fio(user.getFullName())
-                        .aclName(user.getAcl() != null ? user.getAcl().getName() : null)
-                        .policyNumber(user.getPolicyNumber())
-                        .build()))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(ErrorResponseDto.builder()
-                                .message("Пользователь с id " + userId + " не найден")
-                                .build()));
+    public ResponseEntity<UserInfoDto> getUserById(
+            @PathVariable Long userId
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.getUserById(userId));
     }
 
-    /**
-     * Получить всех врачей
-     */
-    @GetMapping("/doctors")
-    public ResponseEntity<List<DoctorShortDto>> getAllDoctors() {
-        List<User> doctors = userRepository.findAllDoctors();
-        List<DoctorShortDto> doctorDtos = doctors.stream()
-                .map(userMapper::toDoctorShort)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(doctorDtos);
-    }
-
-    /**
-     * Получить всех пациентов
-     */
-    @GetMapping("/patients")
-    public ResponseEntity<List<PatientListDto.PatientDto>> getAllPatients() {
-        List<User> patients = userRepository.findAllPatients();
-        List<PatientListDto.PatientDto> patientDtos = patients.stream()
-                .map(userMapper::toPatientDto)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(patientDtos);
-    }
-
-    /**
-     * Поиск пользователей по ФИО
-     */
-    @GetMapping("/search")
-    public ResponseEntity<List<UserInfoDto>> searchUsers(@RequestParam String query) {
-        List<User> users = userRepository.findAll().stream()
-                .filter(user -> user.getFullName().toLowerCase().contains(query.toLowerCase()))
-                .collect(Collectors.toList());
-
-        List<UserInfoDto> userDtos = users.stream()
-                .map(user -> UserInfoDto.builder()
-                        .userId(user.getId())
-                        .fio(user.getFullName())
-                        .aclName(user.getAcl() != null ? user.getAcl().getName() : null)
-                        .policyNumber(user.getPolicyNumber())
-                        .build())
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(userDtos);
-    }
-
-    /**
-     * Обновить информацию о пользователе
-     */
+    @PreAuthorize("hasAuthority('admin')")
     @PatchMapping("/{userId}")
-    public ResponseEntity<?> updateUser(@PathVariable Long userId,
-                                        @RequestBody UpdateUserRequestDto request) {
-        Optional<User> userOptional = userRepository.findById(userId);
-
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-
-            if (request.getFio() != null) {
-                user.setFullName(request.getFio());
-            }
-            if (request.getPolicyNumber() != null) {
-                user.setPolicyNumber(request.getPolicyNumber());
-            }
-            if (request.getSpeciality() != null) {
-                user.setSpeciality(request.getSpeciality());
-            }
-
-            User updatedUser = userRepository.save(user);
-
-            return ResponseEntity.ok(UserInfoDto.builder()
-                    .userId(updatedUser.getId())
-                    .fio(updatedUser.getFullName())
-                    .aclName(updatedUser.getAcl() != null ? updatedUser.getAcl().getName() : null)
-                    .policyNumber(updatedUser.getPolicyNumber())
-                    .build());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ErrorResponseDto.builder()
-                            .message("Пользователь с id " + userId + " не найден")
-                            .build());
-        }
+    public ResponseEntity<UpdateUserResponseDto> updateUser(
+            @PathVariable Long userId,
+            @Valid @RequestBody UpdateUserRequestDto request
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.updateUser(userId, request));
     }
 
-    /**
-     * Удалить пользователя
-     */
+    @PreAuthorize("hasAuthority('admin')")
     @DeleteMapping("/{userId}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
-        if (userRepository.existsById(userId)) {
-            userRepository.deleteById(userId);
-            return ResponseEntity.ok(SuccessResponseDto.builder()
-                    .success(true)
-                    .message("Пользователь успешно удален")
-                    .build());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ErrorResponseDto.builder()
-                            .message("Пользователь с id " + userId + " не найден")
-                            .build());
-        }
+    public ResponseEntity<?> deleteUser(
+            @PathVariable Long userId
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.deleteUser(userId));
     }
 
-    /**
-     * Сменить пароль
-     */
-    @PostMapping("/{userId}/change-password")
-    public ResponseEntity<?> changePassword(@PathVariable Long userId,
-                                            @RequestBody ChangePasswordRequestDto request) {
-        Optional<User> userOptional = userRepository.findById(userId);
-
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-
-            // Проверяем старый пароль
-            if (!user.getPassword().equals(request.getOldPassword())) {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .body(ErrorResponseDto.builder()
-                                .message("Неверный текущий пароль")
-                                .build());
-            }
-
-            // Устанавливаем новый пароль
-            user.setPassword(request.getNewPassword());
-            userRepository.save(user);
-
-            return ResponseEntity.ok(SuccessResponseDto.builder()
-                    .success(true)
-                    .message("Пароль успешно изменен")
-                    .build());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(ErrorResponseDto.builder()
-                            .message("Пользователь с id " + userId + " не найден")
-                            .build());
-        }
-    }
 }

@@ -2,13 +2,17 @@ package ru.katacan.registrationoffice.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
 @Table(name = "t_work_slots")
-@Data
+@Setter
+@Getter
 @NoArgsConstructor
 public class WorkSlot {
     @Id

@@ -1,8 +1,12 @@
 package ru.katacan.registrationoffice.mapper;
 
+import org.springframework.data.domain.Page;
 import ru.katacan.registrationoffice.dto.*;
 import ru.katacan.registrationoffice.entity.User;
+
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class UserMapper {
@@ -13,20 +17,30 @@ public class UserMapper {
         return RegistrationResponseDto.builder()
                 .userId(user.getId())
                 .fio(user.getFullName())
-                .aclName(user.getAcl() != null ? user.getAcl().getName() : null)
+                .role(user.getRole() != null ? user.getRole().getName() : null)
                 .message(message)
                 .build();
     }
 
     public LoginResponseDto toLoginResponse(User user, String token) {
         return LoginResponseDto.builder()
-                .token(token)
+                .accessToken(token)
                 .user(UserInfoDto.builder()
                         .userId(user.getId())
                         .fio(user.getFullName())
-                        .aclName(user.getAcl() != null ? user.getAcl().getName() : null)
+                        .role(user.getRole() != null ? user.getRole().getName() : null)
                         .policyNumber(user.getPolicyNumber())
                         .build())
+                .build();
+    }
+
+
+    public UserInfoDto toUserInfo(User user) {
+        return UserInfoDto.builder()
+                .userId(user.getId())
+                .fio(user.getFullName())
+                .role(user.getRole() != null ? user.getRole().getName() : null)
+                .policyNumber(user.getPolicyNumber())
                 .build();
     }
 
@@ -64,6 +78,33 @@ public class UserMapper {
     public AppointmentDetailDto.DoctorInfoDto toDoctorInfo(User doctor) {
         return AppointmentDetailDto.DoctorInfoDto.builder()
                 .fio(doctor.getFullName())
+                .build();
+    }
+
+    public DoctorListDto toDoctorList(List<DoctorShortDto> doctorDtos, org.springframework.data.domain.Page<ru.katacan.registrationoffice.entity.User> doctorPage) {
+        return DoctorListDto.builder()
+                .doctors(doctorDtos)
+                .totalFound(doctorPage.getTotalElements())
+                .totalPages(doctorPage.getTotalPages())
+                .currentPage(doctorPage.getNumber())
+                .build();
+    }
+
+    public UserListDto toUserList(List<UserInfoDto> dtos, Page<User> page) {
+        return UserListDto.builder()
+                .users(dtos)
+                .totalFound(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .currentPage(page.getNumber())
+                .build();
+    }
+
+    public PatientListDto toPatientList(List<PatientListDto.PatientDto> dtos, Page<User> page) {
+        return PatientListDto.builder()
+                .patients(dtos)
+                .totalFound(page.getTotalElements())
+                .totalPages(page.getTotalPages())
+                .currentPage(page.getNumber())
                 .build();
     }
 }
