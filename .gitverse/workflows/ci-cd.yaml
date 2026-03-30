@@ -46,7 +46,7 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/master' && github.event_name == 'push'
 
-    environment: production   # можно создать environment в настройках GitVerse
+    environment: production
 
     steps:
       - name: Checkout code
@@ -59,11 +59,15 @@ jobs:
           DEPLOY_USER: "nabotov"
           DEPLOY_PATH: "/home/nabotov/RegistrationOffice"
         run: |
+          # Устанавливаем необходимые пакеты (rsync + openssh-client)
+          sudo apt-get update -qq
+          sudo apt-get install -y rsync openssh-client
+
           # Настройка SSH
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H $DEPLOY_HOST >> ~/.ssh/known_hosts 2>/dev/null
+          ssh-keyscan -H $DEPLOY_HOST >> ~/.ssh/known_hosts 2>/dev/null || true
 
           # Деплой через rsync
           rsync -avz --delete \
@@ -71,13 +75,14 @@ jobs:
             --exclude '.env' \
             --exclude 'build' \
             --exclude '.gradle' \
+            --exclude '.gitverse' \
             -e "ssh -o StrictHostKeyChecking=no" \
             ./ ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/
 
           # Перезапуск Docker на сервере
           ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} "
             cd ${DEPLOY_PATH} &&
-            if [ ! -f .env ]; then cp .env.example .env; fi &&
+            if [ ! -f .env ]; then cp .env.example .env || true; fi &&
             sudo docker compose down &&
             sudo docker compose up -d --build
           "
