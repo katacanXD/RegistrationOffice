@@ -37,40 +37,8 @@ public class UserServiceImpl implements UserService {
     private final DictRoleRepository dictRoleRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserListDto getAllUsers() {
-        List<User> users = userRepository.findAll();
-
-        List<UserInfoDto> userDtos = users.stream()
-                .map(userMapper::toUserInfo)
-                .collect(Collectors.toList());
-
-        return userMapper.toUserList(userDtos);
-    }
-
-    private DoctorListDto getAllDoctors() {
-        List<User> users = userRepository.findAllDoctors();
-
-        List<DoctorShortDto> doctorDtos = users.stream()
-                .map(userMapper::toDoctorShort)
-                .collect(Collectors.toList());
-
-        return userMapper.toDoctorList(doctorDtos);
-    }
-
-    private PatientListDto getAllPatients() {
-        List<User> users = userRepository.findAllPatients();
-
-        List<PatientListDto.PatientDto> patientDtos = users.stream()
-                .map(userMapper::toPatientDto)
-                .collect(Collectors.toList());
-
-        return userMapper.toPatientList(patientDtos);
-    }
-
     @Override
     public UserListDto searchUsers(String search, Pageable pageable) {
-        // Если поиск пустой, можно передать пустую строку или null,
-        // репозиторий с LIKE %:search% вернет всех пользователей.
         Page<User> userPage = userRepository.searchUsers(search != null ? search : "", pageable);
 
         List<UserInfoDto> userDtos = userPage.getContent().stream()
@@ -93,7 +61,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public DoctorListDto searchDoctors(String search, String specialty, Pageable pageable) {
-        // Добавляем обработку null для параметров, чтобы поиск не сломался
         String searchParam = (search == null) ? "" : search;
         String specialtyParam = (specialty == null) ? "" : specialty;
 
@@ -105,6 +72,7 @@ public class UserServiceImpl implements UserService {
 
         return userMapper.toDoctorList(doctorDtos, doctorPage);
     }
+
     @Override
     public UserInfoDto getUserById(Long userId) {
         User user = userRepository.findById(userId)

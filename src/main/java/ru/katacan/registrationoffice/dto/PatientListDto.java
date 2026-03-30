@@ -20,9 +20,5 @@ public class PatientListDto {
         private Long userId;
         private String fio;
         private String policyNumber;
-        private long totalElements; // Всего записей
-        private int totalPages;    // Всего страниц
-        private int currentPage;
-
     }
 }

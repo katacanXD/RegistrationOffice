@@ -3,9 +3,9 @@ import org.springframework.data.domain.Pageable;
 import ru.katacan.registrationoffice.dto.*;
 
 public interface UserService {
-    DoctorListDto searchDoctors(String search);
-    PatientListDto searchPatients(String search);
-    UserListDto searchUsers(String search);
+    DoctorListDto searchDoctors(String search, String specialty, Pageable pageable);
+    PatientListDto searchPatients(String search, Pageable pageable);
+    UserListDto searchUsers(String search, Pageable pageable);
 
     UserInfoDto getCurrentUser(String login);
     SuccessResponseDto changeOwnPassword(String login, ChangePasswordRequestDto request);
