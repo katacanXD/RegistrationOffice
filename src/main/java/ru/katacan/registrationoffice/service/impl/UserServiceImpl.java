@@ -60,11 +60,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public DoctorListDto searchDoctors(String search, String specialty, Pageable pageable) {
+    public DoctorListDto searchDoctors(String search, Pageable pageable) {
         String searchParam = (search == null) ? "" : search;
-        String specialtyParam = (specialty == null) ? "" : specialty;
 
-        Page<User> doctorPage = userRepository.searchDoctors(searchParam, specialtyParam, pageable);
+        Page<User> doctorPage = userRepository.searchDoctors(searchParam, pageable);
 
         List<DoctorShortDto> doctorDtos = doctorPage.getContent().stream()
                 .map(userMapper::toDoctorShort)

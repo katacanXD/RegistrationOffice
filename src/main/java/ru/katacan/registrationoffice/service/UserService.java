@@ -3,7 +3,7 @@ import org.springframework.data.domain.Pageable;
 import ru.katacan.registrationoffice.dto.*;
 
 public interface UserService {
-    DoctorListDto searchDoctors(String search, String specialty, Pageable pageable);
+    DoctorListDto searchDoctors(String search, Pageable pageable);
     PatientListDto searchPatients(String search, Pageable pageable);
     UserListDto searchUsers(String search, Pageable pageable);
 

@@ -25,14 +25,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByPolicyNumber(String policyNumber);
 
-    // --- МЕТОДЫ ДЛЯ ПАГИНАЦИИ ---
-
-    // Поиск врачей по ФИО и Специальности
+    // Поиск врачей по ФИО и Специальности в одном поле
     @Query("SELECT u FROM User u WHERE u.role.name = 'doctor' " +
-            "AND (:search IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%'))) " +
-            "AND (:specialty IS NULL OR LOWER(u.speciality) LIKE LOWER(CONCAT('%', :specialty, '%')))")
+            "AND (:search IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%')) " +
+            "OR LOWER(u.speciality) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<User> searchDoctors(@Param("search") String search,
-                             @Param("specialty") String specialty,
                              Pageable pageable);
 
     // Поиск пациентов по ФИО или Полису
@@ -45,13 +42,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE " +
             ":search IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%'))")
     Page<User> searchUsers(@Param("search") String search, Pageable pageable);
-
-    // --- СТАРЫЕ МЕТОДЫ (можно оставить, если они нужны в других частях кода) ---
-
-    @Query("SELECT u FROM User u WHERE u.role.name = 'doctor'")
-    Page<User> findAllDoctors(Pageable pageable);
-
-    @Query("SELECT u FROM User u WHERE u.role.name = 'patient'")
-    Page<User> findAllPatients(Pageable pageable);
 }
 

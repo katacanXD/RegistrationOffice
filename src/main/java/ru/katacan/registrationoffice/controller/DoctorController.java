@@ -5,13 +5,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ru.katacan.registrationoffice.dto.DoctorCalendarDto;
 import ru.katacan.registrationoffice.dto.DoctorListDto;
 import ru.katacan.registrationoffice.dto.DoctorScheduleDto;
 import ru.katacan.registrationoffice.dto.DoctorSlotsDto;
-import ru.katacan.registrationoffice.mapper.UserMapper;
-import ru.katacan.registrationoffice.mapper.WorkSlotMapper;
 import ru.katacan.registrationoffice.service.UserService;
 import ru.katacan.registrationoffice.service.WorkSlotService;
 
@@ -25,16 +24,16 @@ public class DoctorController {
     private final UserService userService;
     private final WorkSlotService workSlotService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping()
     public ResponseEntity<DoctorListDto> getDoctors(
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) String specialty,
             Pageable pageable) {
-        // Теперь передаем ВСЕ ТРИ аргумента в сервис
         return ResponseEntity.status(HttpStatus.OK)
-                .body(userService.searchDoctors(search, specialty, pageable));
+                .body(userService.searchDoctors(search, pageable));
     }
 
+    @PreAuthorize("hasAuthority('doctor') and @doctorAccess.isCurrentDoctor(#doctorId, authentication)")
     @GetMapping("/{doctorId}/slots")
     public ResponseEntity<DoctorSlotsDto> getDoctorSlots(
             @PathVariable Long doctorId,
@@ -44,6 +43,7 @@ public class DoctorController {
                 .body(workSlotService.getDoctorSlots(doctorId, date));
     }
 
+    @PreAuthorize("hasAuthority('doctor') and @doctorAccess.isCurrentDoctor(#doctorId, authentication)")
     @GetMapping("/{doctorId}/calendar")
     public ResponseEntity<DoctorCalendarDto> getDoctorCalendar(
             @PathVariable Long doctorId,
@@ -57,6 +57,7 @@ public class DoctorController {
                 .body(workSlotService.getDoctorSlotsBetweenDates(doctorId, startDate, endDate));
     }
 
+    @PreAuthorize("hasAuthority('doctor') and @doctorAccess.isCurrentDoctor(#doctorId, authentication)")
     @GetMapping("/{doctorId}/schedule")
     public ResponseEntity<DoctorScheduleDto> getDoctorSchedule(
             @PathVariable Long doctorId,

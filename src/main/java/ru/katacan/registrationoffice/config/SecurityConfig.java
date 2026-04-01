@@ -94,6 +94,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers("/api/v1/auth/login", "/api/v1/auth/registration", "/api/v1/auth/refresh", "/api/v1/auth/logout").permitAll()
                 .requestMatchers("/api/v1/users/me/**", "/api/v1/auth/me").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/v1/doctors").authenticated()
                 .requestMatchers("/api/v1/patients/me/**").hasAuthority("patient")
                 .requestMatchers("/api/v1/admins/**").hasAuthority("admin")
                 .requestMatchers("/api/v1/users/**").hasAnyAuthority("admin", "registrar")
