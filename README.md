@@ -1,103 +1,50 @@
-# RegistrationOffice
+# RegistrationOffice - Карта документации
 
-Backend API для медицинской регистратуры: пользователи, роли, расписание врачей и записи на прием.
+| Версия | Статус | Дата создания | Дата обновления |
+|--------|---|---|---|
+| v0.1   | Draft | 2026-04-01 | 2026-04-01 |
 
-## Что есть в проекте
+О документе: навигация по документам проекта RegistrationOffice.
 
-- JWT-аутентификация (`access` + `refresh`) и роли: `admin`, `registrar`, `doctor`, `patient`
-- Управление пользователями и профилем (`/api/v1/users`, `/api/v1/auth/me`)
-- Список врачей, календарь и слоты (`/api/v1/doctors/**`)
-- Записи на прием (`/api/v1/appointments/**`)
-- Инициализация тестовых ролей/статусов/пользователей/слотов при первом запуске (`DataInitializer`)
+Для кого: команда backend/frontend, аналитик, тестировщик, заказчик.
 
-## Технологии
+## Контекст проекта
 
-- Java 21
-- Spring Boot 4.0.3
-- Spring Data JPA, Spring Security, Validation
-- PostgreSQL 16
-- JWT (`io.jsonwebtoken:jjwt`)
-- Docker, Docker Compose, Nginx
-- Gradle 9.3.1
+`RegistrationOffice` развивается как fullstack-решение:
+- `backend` (Spring Boot + PostgreSQL + JWT);
+- `frontend` (веб-клиент для пациентов, врачей, регистратора и администратора);
+- инфраструктура деплоя через Docker Compose и Nginx.
 
-## API (базовые префиксы)
+## Структура
 
-- `POST /api/v1/auth/registration`
-- `POST /api/v1/auth/login`
-- `POST /api/v1/auth/refresh`
-- `POST /api/v1/auth/logout`
-- `GET /api/v1/auth/me`
-- `GET /api/v1/users/**`
-- `GET /api/v1/patients/**`
-- `GET /api/v1/doctors/**`
-- `GET/POST/PATCH/DELETE /api/v1/appointments/**`
+- `00-governance` - устав, риски, команда, ретро
+- `01-discovery` - предметная область и персоны
+- `02-requirements` - user stories и story map
+- `03-planning` - реализуемость и план работ
+- `04-architecture` - процессы, контекст, wireframes
+- `05-data-and-integration` - ERD, словарь данных, API-контракты
+- `06-final-specification` - финальная спецификация решения
+- `07-validation-and-delivery` - тестирование, демо, деплой и передача
+- `90-checkpoints` - срезы CP1-CP4
+- `98-source-materials` - исходные материалы
+- `99-standards` - правила оформления документации
 
-Актуальные маппинги: `src/main/java/ru/katacan/registrationoffice/controller`.
+## Текущие источники истины в коде
 
-## Быстрый старт (Docker Compose)
+При обновлении документации ориентируйтесь на:
 
-### 1) Подготовить `.env`
+- API-контроллеры: `src/main/java/ru/katacan/registrationoffice/controller`
+- Security и доступы: `src/main/java/ru/katacan/registrationoffice/config/SecurityConfig.java`
+- Модель данных (JPA сущности): `src/main/java/ru/katacan/registrationoffice/entity`
+- Конфигурация приложения: `src/main/resources/application.properties`
+- Контейнеризация и прокси: `Dockerfile`, `docker-compose.yml`, `deploy/nginx/default.conf`
+- Frontend-контур (если вынесен в отдельный контейнер): `frontend Dockerfile`, compose-конфиг, переменные `VITE_*`
 
-Скопируйте пример:
+## Правило синхронизации
 
-```powershell
-Copy-Item .env.example .env
-```
-
-Минимально заполните:
-
-```dotenv
-DB_NAME=postgres
-DB_USER=postgres
-DB_PASS=admin
-SECURITY_JWT_SECRET=change_me_super_long_random_secret_min_32_chars
-APP_SECURITY_CORS_ALLOWED_ORIGINS=
-APP_SECURITY_CORS_ALLOWED_ORIGIN_PATTERNS=
-```
-
-### 2) Поднять сервисы
-
-```powershell
-docker compose up -d --build
-```
-
-### 3) Проверить, что все запущено
-
-```powershell
-docker compose ps
-docker compose logs --tail 100 backend
-```
-
-После старта API доступно через Nginx на `http://localhost`.
-
-## Локальный запуск без Docker
-
-Нужно вручную поднять PostgreSQL и передать переменные окружения (`DB_NAME`, `DB_USER`, `DB_PASS`, `SECURITY_JWT_SECRET`).
-
-```powershell
-.\gradlew.bat bootRun
-```
-
-## Переменные окружения
-
-Основные переменные описаны в `.env.example`:
-
-- `DB_NAME`, `DB_USER`, `DB_PASS`
-- `SECURITY_JWT_SECRET`
-- `APP_SECURITY_CORS_ALLOWED_ORIGINS`
-- `APP_SECURITY_CORS_ALLOWED_ORIGIN_PATTERNS`
-
-См. также `src/main/resources/application.properties`.
-
-## Документация
-
-- Общие проектные заметки: `HELP.md`
-- Инструкция по деплою в Docker на VM: `DEPLOY_YC_DOCKER.md`
-- Карта папки `docs`: `docs/README.md`
-
-## Структура проекта
-
-- Код backend: `src/main/java/ru/katacan/registrationoffice`
-- Конфиги приложения: `src/main/resources`
-- Docker/Nginx: `Dockerfile`, `docker-compose.yml`, `deploy/nginx/default.conf`
-- Документация: `docs/`
+При изменении API/ролей/модели данных/контейнерного контура обновляются минимум:
+1. `README.md` (корень)
+2. `docs/docs/05-data-and-integration/*`
+3. `docs/docs/06-final-specification/*`
+4. `docs/docs/07-validation-and-delivery/*`
+5. `docs/docs/90-checkpoints/*`
