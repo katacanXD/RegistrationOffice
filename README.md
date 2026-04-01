@@ -1,3 +1,5 @@
+# Ссылка на тестовый сайт: http://registration-office.ru/api/v1
+
 # RegistrationOffice - Карта документации
 
 | Версия | Статус | Дата создания | Дата обновления |
