@@ -1,4 +1,4 @@
-# Ссылка на тестовый сайт: http://registration-office.ru/api/v1
+# Ссылка на тестовый сайт: http://registration-office.ru/api
 
 # RegistrationOffice - Карта документации
 
