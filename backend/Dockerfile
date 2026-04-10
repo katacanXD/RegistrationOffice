@@ -3,12 +3,10 @@
 FROM gradle:9.3.1-jdk21 AS build
 WORKDIR /app
 
-COPY gradlew gradlew
-COPY gradle gradle
 COPY build.gradle settings.gradle ./
 COPY src src
 
-RUN sed -i 's/\r$//' gradlew && chmod +x gradlew && ./gradlew --no-daemon bootJar -x test
+RUN gradle --no-daemon bootJar -x test
 
 FROM eclipse-temurin:21-jre
 WORKDIR /opt/app
