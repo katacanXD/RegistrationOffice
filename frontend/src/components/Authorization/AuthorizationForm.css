@@ -1,0 +1,23 @@
+.authorization-container{
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  margin: 125px auto 0; 
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #ffffff; 
+}
+
+.no-account-link {
+  color: #4C6AFF; 
+  text-decoration: none;
+  font-size: 1rem;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.no-account-link:hover {
+  text-decoration: underline;
+  font-weight: bold;
+}

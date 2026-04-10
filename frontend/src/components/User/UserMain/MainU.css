@@ -1,0 +1,307 @@
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: Arial, sans-serif; 
+}
+
+.main-header {
+  height: 70px;
+  background: #F0F5F9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+}
+
+.header-link {
+  color: #4C6AFF; 
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.header-logo-img {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+}
+
+.brand-name {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.user-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-avatar:hover {
+  transform: scale(1.1);
+}
+
+.user-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.container {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.button-card {
+  display: flex;
+  justify-content: center;
+}
+
+.field-label {
+  display: block;
+  color: #4C6AFF; 
+  margin-bottom: 10px;
+}
+
+.soft-input {
+  width: 100%;
+  height: 45px;
+  border: none;
+  border-radius: 15px;
+  padding: 0 15px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.action-button {
+  border: 1px solid #e0e6ff;
+  color: #ffffff;
+  padding: 10px 40px;
+  border-radius: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  text-decoration: none
+}
+
+.main-footer {
+  height: 100px;
+  background: #F0F5F9;
+}
+
+.user-menu-container {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 60px; 
+  right: 0;
+  width: 280px;
+  background-color: #ffffff;
+  border-radius: 25px; 
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 15px 0;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  gap: 15px;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.dropdown-item:hover {
+  transform: scale(1.05);
+}
+
+.user-name {
+  color: #4C6AFF;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.dropdown-divider {
+  height: 2px;
+  background-color: #4C6AFF; 
+  margin: 5px 20px;
+}
+
+.logout-text {
+  color: #4C6AFF;
+  font-size: 1.1rem;
+}
+
+.small-avatar-circle, .logout-icon-circle {
+  width: 50px;
+  height: 50px;
+  background-color: #F0F2FF;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.exit-arrow {
+  color: #4C6AFF;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Контейнер для всех карточек */
+.appointments-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+  max-width: 600px;
+  margin: 30px auto;
+}
+
+/* Сама карточка */
+.appointment-card {
+  background: white;
+  border-radius: 30px;
+  box-shadow: 0 10px 25px rgba(165, 180, 252, 0.2);
+  border: 1px solid #F0F2FF;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Верхняя часть карточки (видимая всегда) */
+.appointment-main {
+  padding: 25px 35px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.app-spec-title {
+  color: #7C8BFF;
+  font-size: 2rem;
+  margin: 0;
+  font-weight: 500;
+}
+
+.app-info-right {
+  text-align: right;
+  color: #94A3FF;
+}
+
+.app-date-text {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.app-time-text {
+  font-size: 2.2rem;
+  font-weight: bold;
+}
+
+.appointment-details {
+  padding: 0 35px 30px 35px;
+  border-top: 1px solid #F0F2FF;
+  padding-top: 20px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.detail-row {
+  margin-bottom: 15px;
+}
+
+.detail-label {
+  color: #C7D2FE;
+  font-size: 0.8rem;
+  display: block;
+}
+
+.detail-value {
+  color: #7C8BFF;
+  font-size: 1.1rem;
+  margin: 5px 0 0 0;
+}
+
+.detail-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.btn-app-action {
+  flex: 1;
+  padding: 12px;
+  border-radius: 15px;
+  border: 1.5px solid #A5B4FC;
+  background: white;
+  color: #7C8BFF;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-app-action:hover {
+  background: #F5F7FF;
+  transform: translateY(-2px);
+}
+
+.btn-app-action:first-child:hover {
+  border-color: #FF8B8B;
+  color: #FF8B8B;
+}
+
+.app-info-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.arrow-icon {
+  width: 15px;
+  height: 15px;
+  border-right: 3px solid #7C8BFF;
+  border-bottom: 3px solid #7C8BFF;
+  transform: rotate(45deg); /* Повернута вниз */
+  transition: transform 0.3s ease;
+  margin-left: 0px;
+}
+
+.arrow-icon.up {
+  transform: rotate(-135deg); /* Повернута вверх */
+}
+
+.appointment-card {
+  margin-bottom: 15px;
+  background: white;
+  border-radius: 35px;
+  box-shadow: 0 10px 30px rgba(165, 180, 252, 0.15);
+  border: 1px solid #F0F2FF;
+}

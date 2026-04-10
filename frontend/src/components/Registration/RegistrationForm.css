@@ -1,0 +1,88 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #ffffff; 
+  font-family: Arial, sans-serif; 
+}
+
+.screen {
+  background-color: #E4E6FF; 
+  min-height: 100vh;
+  align-items: center;
+  width: 100%;
+  padding: 40px 0;
+}
+
+.registration-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  margin: 125px auto 0; 
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  background-color: #ffffff; 
+}
+
+.Reg {
+  color: #4C6AFF; 
+  margin-bottom: 10px; 
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+input[type='text'], input[type='password'] {
+  display: block;
+  width: 100%;
+  height: 40px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  padding-left: 10px;
+  border: 1px solid #ccc;
+  border-radius: 15px;
+  background-color: #ffffff;
+}
+
+label {
+  color: #4C6AFF; 
+  padding: 5px;
+}
+
+button {
+  display: block;
+  width: 100%;
+  padding: 12px 0px;
+  color: #ffffff;
+  border: none;
+  border-radius: 15px;
+  background-color: #4C6AFF; 
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.back-link {
+  position: absolute; 
+  top: 168px; 
+  left: 350px; 
+  padding: 10px 20px; 
+  color: #ffffff;
+  text-decoration: none;
+  border: none;
+  border-radius: 15px;
+  background-color: #4C6AFF;
+  cursor: pointer; 
+  font-size: 1rem;
+}
+
+button:hover {
+  background-color: #3B5ACF; 
+}
+
+.back-link:hover {
+  background-color: #3B5ACF; 
+}
+
+.error-input {
+  border: 1px solid red !important;
+  background-color: #ffebeb !important;
+}

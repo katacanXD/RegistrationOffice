@@ -1,0 +1,101 @@
+/* Контейнер для страницы поиска */
+.search-container {
+  width: 100%;
+  max-width: 900px; /* Шире, чем на главной */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.top-bar {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 40px;
+}
+
+.back-button {
+  background-color: #4C6AFF; 
+  color: white;
+  padding: 10px 25px;
+  border-radius: 15px;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 80%;
+  max-width: 600px;
+  margin-bottom: 50px;
+}
+
+.search-field {
+  width: 100%;
+  height: 55px;
+  border: 2px solid #A5B4FC;
+  border-radius: 15px;
+  padding: 0 20px 0 50px;
+  font-size: 1rem;
+  color: #A5B4FC;
+  outline: none;
+}
+
+.search-field::placeholder {
+  color: #C7D2FE;
+}
+
+.search-icon {
+  position: absolute;
+  left: 1px;
+  top: 15%;
+  transform: translateX(-100%);
+  font-size: 1.5rem;
+  color: #A5B4FC;
+
+}
+
+.doctors-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  gap: 30px;
+  width: 100%;
+}
+
+.doctor-card-link {
+  text-decoration: none;
+  display: block; 
+  color: inherit;
+}
+
+.doctor-card {
+  background: white;
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(165, 180, 252, 0.2); 
+  border: 1px solid #F0F2FF;
+  transition: transform 0.2s;
+  cursor: pointer;
+}
+
+.doctor-card:hover {
+  transform: translateY(-5px);
+}
+
+.spec-title {
+  color: #7C8BFF;
+  font-size: 1.8rem;
+  margin: 0 0 8px 0;
+  font-weight: 500;
+}
+
+.doc-name {
+  color: #94A3FF;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.back-button:hover {
+  background-color: #3B5ACF; 
+}
