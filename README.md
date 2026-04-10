@@ -1,4 +1,4 @@
-# Ссылка на тестовый сайт: http://registration-office.ru/api
+# Ссылка на тестовый сайт: http://registration-office.ru
 
 # RegistrationOffice - Карта документации
 
@@ -35,12 +35,12 @@
 
 При обновлении документации ориентируйтесь на:
 
-- API-контроллеры: `src/main/java/ru/katacan/registrationoffice/controller`
-- Security и доступы: `src/main/java/ru/katacan/registrationoffice/config/SecurityConfig.java`
-- Модель данных (JPA сущности): `src/main/java/ru/katacan/registrationoffice/entity`
-- Конфигурация приложения: `src/main/resources/application.properties`
-- Контейнеризация и прокси: `Dockerfile`, `docker-compose.yml`, `deploy/nginx/default.conf`
-- Frontend-контур (если вынесен в отдельный контейнер): `frontend Dockerfile`, compose-конфиг, переменные `VITE_*`
+- API-контроллеры: `backend/src/main/java/ru/katacan/registrationoffice/controller`
+- Security и доступы: `backend/src/main/java/ru/katacan/registrationoffice/config/SecurityConfig.java`
+- Модель данных (JPA сущности): `backend/src/main/java/ru/katacan/registrationoffice/entity`
+- Конфигурация приложения: `backend/src/main/resources/application.properties`
+- Контейнеризация и прокси: `backend/Dockerfile`, `frontend/Dockerfile`, `frontend/nginx/default.conf`, `docker-compose.yml`, `deploy/nginx/default.conf`
+- Frontend-контур: отдельный контейнер со статической сборкой Vite и proxy через `/api`
 
 ## Правило синхронизации
 

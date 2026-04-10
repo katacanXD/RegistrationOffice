@@ -1,67 +1,106 @@
-import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { 
-  format, addMonths, subMonths, startOfMonth, endOfMonth, 
-  startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay 
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  format, addMonths, subMonths, startOfMonth, endOfMonth,
+  startOfWeek, endOfWeek, addDays, isSameMonth, isSameDay, isPast, startOfDay
 } from 'date-fns';
 import { ru } from 'date-fns/locale';
+import { useAuth } from '../../../context/AuthContext';
+import { useApp } from '../../../context/AppContext';
 import './CalendarU.css';
 import myLogo from '../Foto/Icon.png';
 import myAvatar from '../Foto/Account.png';
 
 export default function CalendarU() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { selectedDoctor, loading, error, userPolicy, fetchDoctorSlots, fetchDoctorCalendar, fetchUserPolicy, createAppointment } = useApp();
+
   const [isOpen, setIsOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const userName = location.state?.userName || "Гость";
-  const doctorName = location.state?.selectedDoctor || "Врач не выбран";
-  const specialization = location.state?.specialization || "Специалист";
-  const address = location.state?.address || "Адрес не указан";
-  
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedTime, setSelectedTime] = useState(null);
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [slotsLoading, setSlotsLoading] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [policyChecked, setPolicyChecked] = useState(false);
 
-  const timesBeforeLunch = ["9:00", "10:00", "11:00", "12:00"];
-  const timesAfterLunch = ["15:00", "16:00", "17:00", "18:00"];
+  useEffect(() => {
+    const checkPolicy = async () => {
+      if (!userPolicy && !policyChecked) {
+        await fetchUserPolicy();
+        setPolicyChecked(true);
+      }
+    };
+    checkPolicy();
+  }, []);
 
-  const formatName = (name) => {
-    if (!name) return "Гость";
-    const parts = name.trim().split(/\s+/); 
-    if (parts.length === 1) return parts[0]; 
+  useEffect(() => {
+    if (policyChecked) {
+      if (!userPolicy) {
+        alert('Пожалуйста, сначала добавьте полис ОМС');
+        navigate('/MainU');
+        return;
+      }
+      if (!selectedDoctor?.id) {
+        navigate('/SearchU');
+        return;
+      }
+      loadSlots();
+    }
+  }, [selectedDate, selectedDoctor, policyChecked, userPolicy]);
+
+  const loadSlots = async () => {
+    if (!selectedDoctor?.id) return;
+    setSlotsLoading(true);
+    const dateStr = format(selectedDate, 'yyyy-MM-dd');
+    const result = await fetchDoctorSlots(selectedDoctor.id, dateStr);
+    setSlotsLoading(false);
+    if (result.success) {
+      setAvailableSlots(result.slots || []);
+      setSelectedTime(null);
+    }
+  };
+
+  const formatName = (fio) => {
+    if (!fio) return "Гость";
+    const parts = fio.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0];
     const firstName = parts[0];
-    const initials = parts.slice(1).map(part => `${part[0].toUpperCase()}.`).join(' '); 
+    const initials = parts.slice(1).map(part => `${part[0].toUpperCase()}.`).join(' ');
     return `${firstName} ${initials}`;
   };
 
-  const handleConfirm = () => {
-    const newAppointment = {
-      id: Date.now(), 
-      spec: specialization,
-      doctor: doctorName,
-      address: address,
-      date: format(selectedDate, 'd MMMM, ee', { locale: ru }),
-      time: selectedTime
-    };
+  const handleConfirm = async () => {
+    if (!userPolicy) {
+      alert('Пожалуйста, сначала добавьте полис ОМС');
+      navigate('/MainU');
+      return;
+    }
 
-    // 1. Достаем старые записи из памяти
-    const existingAppointments = JSON.parse(localStorage.getItem('my_appointments') || '[]');
-    
-    // 2. Добавляем новую к старым
-    const updatedAppointments = [newAppointment, ...existingAppointments];
-    
-    // 3. Сохраняем обратно в память
-    localStorage.setItem('my_appointments', JSON.stringify(updatedAppointments));
+    if (!selectedTime) {
+      alert('Выберите время');
+      return;
+    }
 
-    // 4. Возвращаемся на главную
-    navigate('/MainU', { state: { userName } });
+    setCreating(true);
+    const slotDatetime = format(selectedDate, 'yyyy-MM-dd') + 'T' + selectedTime;
+    const result = await createAppointment(selectedDoctor.id, slotDatetime);
+    setCreating(false);
+
+    if (result.success) {
+      alert('Запись успешно создана!');
+      setShowModal(false);
+      navigate('/MainU');
+    } else {
+      alert(result.error || 'Ошибка при создании записи');
+    }
   };
 
   const handleTimeClick = (time) => {
-  setSelectedTime(time);
-  setShowModal(true); 
+    setSelectedTime(time);
+    setShowModal(true);
   };
 
   const renderHeader = () => (
@@ -97,11 +136,24 @@ export default function CalendarU() {
       for (let i = 0; i < 7; i++) {
         const formattedDate = format(day, 'd');
         const cloneDay = day;
+        const isPastDay = isPast(startOfDay(day)) && !isSameDay(day, new Date());
+        const isCurrentMonth = isSameMonth(day, monthStart);
+        const isSelected = isSameDay(day, selectedDate);
+
+        let cellClass = 'cell';
+        if (!isCurrentMonth) {
+          cellClass += ' disabled';
+        } else if (isPastDay) {
+          cellClass += ' past-day';
+        } else if (isSelected) {
+          cellClass += ' selected';
+        }
+
         days.push(
           <div
             key={day}
-            className={`cell ${!isSameMonth(day, monthStart) ? 'disabled' : isSameDay(day, selectedDate) ? 'selected' : ''}`}
-            onClick={() => setSelectedDate(cloneDay)}
+            className={cellClass}
+            onClick={() => !isPastDay && isCurrentMonth && setSelectedDate(cloneDay)}
           >
             <span>{formattedDate}</span>
           </div>
@@ -114,46 +166,60 @@ export default function CalendarU() {
     return <div className="calendar-body">{rows}</div>;
   };
 
+  if (!selectedDoctor) {
+    return <div>Загрузка...</div>;
+  }
+
+  const groupedSlots = {};
+  availableSlots.forEach(slot => {
+    const time = slot.time || slot;
+    const timeObj = new Date(`2000-01-01T${time}`);
+    const hour = timeObj.getHours();
+    const period = hour < 12 ? 'before' : 'after';
+    if (!groupedSlots[period]) groupedSlots[period] = [];
+    groupedSlots[period].push(time);
+  });
+
   return (
     <div className="app-wrapper">
       <header className="main-header">
         <div className="header-left">
-          <Link to="/MainU" className="header-link" state={{ userName }}>
+          <Link to="/MainU" className="header-link">
             <img src={myLogo} alt="Logo" className="header-logo-img" />
             <span className="brand-name">REGISTRATION OFFICE</span>
           </Link>
         </div>
 
         <div className="user-menu-container">
-            <div className="user-avatar" onClick={() => setIsOpen(!isOpen)}>
-              <img src={myAvatar} alt="User" className="user-photo" />
-            </div>
-            {isOpen && (
-              <div className="dropdown-menu">
-                <div className="dropdown-item user-info">
-                  <div className="small-avatar-circle">
-                    <img src={myAvatar} alt="User" className="user-photo" />
-                  </div>
-                  <span className="user-name">{formatName(userName)}</span>
-                </div>
-                
-                <div className="dropdown-divider"></div>
-                
-                <Link to="/" className="dropdown-item logout-link">
-                  <div className="logout-icon-circle">
-                    <span className="exit-arrow">→</span> 
-                  </div>
-                  <span className="logout-text">Sign out</span>
-                </Link>
-              </div>
-            )}
+          <div className="user-avatar" onClick={() => setIsOpen(!isOpen)}>
+            <img src={myAvatar} alt="User" className="user-photo" />
           </div>
+          {isOpen && (
+            <div className="dropdown-menu">
+              <div className="dropdown-item user-info">
+                <div className="small-avatar-circle">
+                  <img src={myAvatar} alt="User" className="user-photo" />
+                </div>
+                <span className="user-name">{formatName(user?.fio)}</span>
+              </div>
+
+              <div className="dropdown-divider"></div>
+
+              <Link to="/" className="dropdown-item logout-link">
+                <div className="logout-icon-circle">
+                  <span className="exit-arrow">→</span>
+                </div>
+                <span className="logout-text">Sign out</span>
+              </Link>
+            </div>
+          )}
+        </div>
       </header>
 
       <main className="content calendar-page">
         <div className="calendar-container">
           <div className="top-bar">
-            <Link to="/SearchU" state={{ userName }} className="back-button">Назад</Link>
+            <Link to="/SearchU" className="back-button">Назад</Link>
           </div>
 
           <div className="calendar-layout">
@@ -165,32 +231,47 @@ export default function CalendarU() {
 
             <div className="time-box">
               <div className="time-header">{format(selectedDate, 'd MMMM', { locale: ru })}</div>
-              
-              <div className="time-grid">
-                {timesBeforeLunch.map((t, i) => (
-                  <button 
-                    key={i} 
-                    className={`time-item ${selectedTime === t ? 'active' : ''}`} 
-                    onClick={() => handleTimeClick(t)} 
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
 
-              <div className="divider-label"><span>Перерыв</span></div>
+              {error && <p style={{ color: 'red', fontSize: '12px' }}>{error}</p>}
+              {slotsLoading && <p style={{ color: '#A5B4FC', fontSize: '12px', textAlign: 'center' }}>Загрузка слотов...</p>}
 
-              <div className="time-grid">
-                {timesAfterLunch.map((t, i) => (
-                  <button 
-                    key={i} 
-                    className={`time-item ${selectedTime === t ? 'active' : ''}`} 
-                    onClick={() => handleTimeClick(t)} 
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
+              {groupedSlots.before && groupedSlots.before.length > 0 && (
+                <div className="time-grid">
+                  {groupedSlots.before.map((t, i) => (
+                    <button
+                      key={i}
+                      className={`time-item ${selectedTime === t ? 'active' : ''}`}
+                      onClick={() => handleTimeClick(t)}
+                      disabled={slotsLoading}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {(groupedSlots.before || groupedSlots.after) && (
+                <div className="divider-label"><span>Перерыв</span></div>
+              )}
+
+              {groupedSlots.after && groupedSlots.after.length > 0 && (
+                <div className="time-grid">
+                  {groupedSlots.after.map((t, i) => (
+                    <button
+                      key={i}
+                      className={`time-item ${selectedTime === t ? 'active' : ''}`}
+                      onClick={() => handleTimeClick(t)}
+                      disabled={slotsLoading}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {(!groupedSlots.before && !groupedSlots.after) && !slotsLoading && (
+                <p style={{ color: '#A5B4FC', fontSize: '12px', textAlign: 'center' }}>Нет свободных слотов</p>
+              )}
             </div>
           </div>
 
@@ -198,27 +279,25 @@ export default function CalendarU() {
             <div className="modal-overlay">
               <div className="confirm-modal">
                 <div className="modal-header-row">
-                  <h2 className="modal-title">{specialization}</h2>
+                  <h2 className="modal-title">{selectedDoctor.specialty}</h2>
                   <div className="modal-date-time">
                     <p>{format(selectedDate, 'd MMMM', { locale: ru })}</p>
                     <span className="modal-time-big">{selectedTime}</span>
                   </div>
                 </div>
-                
+
                 <div className="modal-body">
                   <div className="info-block">
                     <span className="info-label">Врач</span>
-                    <p className="info-value">{doctorName}</p>
-                  </div>
-                  <div className="info-block">
-                    <span className="info-label">Адрес</span>
-                    <p className="info-value">{address}</p>
+                    <p className="info-value">{selectedDoctor.name}</p>
                   </div>
                 </div>
 
                 <div className="modal-footer">
-                  <button className="btn-cancel" onClick={() => setShowModal(false)}>Отмена</button>
-                  <button className="btn-confirm" onClick={handleConfirm}>Подтвердить</button>
+                  <button className="btn-cancel" onClick={() => setShowModal(false)} disabled={creating}>Отмена</button>
+                  <button className="btn-confirm" onClick={handleConfirm} disabled={creating || loading}>
+                    {creating ? 'Создание...' : 'Подтвердить'}
+                  </button>
                 </div>
               </div>
             </div>

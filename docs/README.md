@@ -1,6 +1,6 @@
 # Документация RegistrationOffice
 
-Эта папка содержит проектную и эксплуатационную документацию для fullstack-проекта `RegistrationOffice` (backend + будущий frontend).
+Эта папка содержит проектную и эксплуатационную документацию для fullstack-проекта `RegistrationOffice` (backend + frontend).
 
 ## Быстрая навигация
 
@@ -17,11 +17,11 @@
 
 При обновлении документации ориентируйтесь на:
 
-- API-контроллеры: `src/main/java/ru/katacan/registrationoffice/controller`
-- Security и доступы: `src/main/java/ru/katacan/registrationoffice/config/SecurityConfig.java`
-- Модель данных (JPA сущности): `src/main/java/ru/katacan/registrationoffice/entity`
-- Конфигурация приложения: `src/main/resources/application.properties`
-- Контейнеризация и прокси: `Dockerfile`, `docker-compose.yml`, `deploy/nginx/default.conf`
+- API-контроллеры: `backend/src/main/java/ru/katacan/registrationoffice/controller`
+- Security и доступы: `backend/src/main/java/ru/katacan/registrationoffice/config/SecurityConfig.java`
+- Модель данных (JPA сущности): `backend/src/main/java/ru/katacan/registrationoffice/entity`
+- Конфигурация приложения: `backend/src/main/resources/application.properties`
+- Контейнеризация и прокси: `backend/Dockerfile`, `frontend/Dockerfile`, `frontend/nginx/default.conf`, `docker-compose.yml`, `deploy/nginx/default.conf`
 
 ## ERD (Mermaid)
 

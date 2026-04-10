@@ -1,6 +1,6 @@
 # Deploy: VM + Docker Compose (RegistrationOffice)
 
-Инструкция для деплоя backend на Linux VM (включая Yandex Cloud).
+Инструкция для деплоя backend + frontend на Linux VM (включая Yandex Cloud).
 
 ## 1. Подготовить сервер
 
@@ -74,8 +74,13 @@ sudo docker compose ps
 
 ```bash
 sudo docker compose logs --tail 200 backend
+sudo docker compose logs --tail 200 frontend
 sudo docker compose logs --tail 100 nginx
 ```
+
+Сайт должен открываться по адресу:
+
+- `http://<vm_ip_or_domain>/`
 
 API должно открываться по адресу:
 
@@ -102,9 +107,16 @@ sudo docker compose up -d
 sudo docker compose up -d --build backend
 ```
 
+Пересобрать весь стек:
+
+```bash
+sudo docker compose up -d --build backend frontend nginx
+```
+
 ## 7. Что проверить, если не работает
 
 - Порт `80` открыт в security group / firewall
 - Файл `deploy/nginx/default.conf` смонтирован в контейнер `nginx`
+- Файл `frontend/nginx/default.conf` попал в образ фронта и отдаёт SPA fallback
 - `SECURITY_JWT_SECRET` задан и достаточно длинный
 - БД поднята (`regoffice-postgres` в `healthy` статусе)

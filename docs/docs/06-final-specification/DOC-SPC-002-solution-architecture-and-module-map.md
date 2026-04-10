@@ -36,6 +36,6 @@
 
 ## Связь с кодом
 
-- backend: `src/main/java/ru/katacan/registrationoffice`
-- конфиги: `src/main/resources/application.properties`
+- backend: `backend/src/main/java/ru/katacan/registrationoffice`
+- конфиги: `backend/src/main/resources/application.properties`
 - infra: `docker-compose.yml`, `deploy/nginx/default.conf`

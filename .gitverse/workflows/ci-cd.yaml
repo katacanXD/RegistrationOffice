@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-    name: Build (Gradle)
+    name: Build (Backend + Frontend)
     runs-on: ubuntu-latest
     if: github.ref != 'refs/heads/master' || github.event_name == 'push'
 
@@ -28,10 +28,27 @@ jobs:
           java-version: '21'
 
       - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+        working-directory: backend
+        run: sed -i 's/\r$//' gradlew && chmod +x gradlew
 
       - name: Build project (compile + test)
+        working-directory: backend
         run: ./gradlew --no-daemon build --continue
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
 
   deploy:
     name: Deploy to Server
@@ -78,8 +95,11 @@ jobs:
             --exclude '.git' \
             --exclude '.env' \
             --exclude '.env.example' \
-            --exclude 'build' \
-            --exclude '.gradle' \
+            --exclude 'backend/build' \
+            --exclude 'backend/.gradle' \
+            --exclude 'frontend/node_modules' \
+            --exclude 'frontend/dist' \
+            --exclude 'frontend/.vite' \
             --exclude '.gitverse' \
             -e "ssh -o StrictHostKeyChecking=no" \
             ./ ${DEPLOY_USER}@${DEPLOY_HOST}:${DEPLOY_PATH}/

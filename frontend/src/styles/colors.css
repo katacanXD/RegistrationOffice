@@ -1,0 +1,23 @@
+/* Global Color Palette for ОПД System */
+
+:root {
+  /* Primary Colors */
+  --color-primary: #4C6AFF;           /* основной синий */
+  --color-primary-dark: #3B5ACF;      /* темный синий (hover) */
+  --color-primary-light: #94A3FF;     /* светлый синий */
+
+  /* Accent Colors */
+  --color-accent-lighter: #A5B4FC;    /* светлый синий для границ */
+  --color-accent-medium: #7C8BFF;     /* средний синий для заголовков */
+  --color-accent-lightest: #C7D2FE;   /* очень светлый синий для текста */
+
+  /* Background Colors */
+  --color-bg-card: #F0F2FF;           /* фон карточки */
+  --color-bg-disabled: #E0E6FF;       /* фон для отключенных элементов */
+  --color-bg-page: #E4E6FF;           /* фон страницы (регистрация) */
+  --color-bg-header: #F0F5F9;         /* фон хедера */
+  --color-bg-white: #000000;          /* белый фон */
+
+  /* Error Colors */
+  --color-error: #FF8B8B;             /* красный для ошибок и удаления */
+}

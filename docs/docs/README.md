@@ -13,7 +13,8 @@
 `RegistrationOffice` развивается как fullstack-решение:
 - `backend` (Spring Boot + PostgreSQL + JWT);
 - `frontend` (веб-клиент для пациентов, врачей, регистратора и администратора);
-- инфраструктура деплоя через Docker Compose и Nginx.
+- инфраструктура деплоя через Docker Compose и Nginx;
+- отдельные контейнеры для `backend` и `frontend`.
 
 ## Структура
 
@@ -31,9 +32,9 @@
 
 ## Источники истины в коде
 
-- API и безопасность: `src/main/java/ru/katacan/registrationoffice`
-- Конфиги: `src/main/resources/application.properties`
-- Контейнеризация: `Dockerfile`, `docker-compose.yml`, `deploy/nginx/default.conf`
+- API и безопасность: `backend/src/main/java/ru/katacan/registrationoffice`
+- Конфиги: `backend/src/main/resources/application.properties`
+- Контейнеризация: `backend/Dockerfile`, `frontend/Dockerfile`, `frontend/nginx/default.conf`, `docker-compose.yml`, `deploy/nginx/default.conf`
 
 ## Правило синхронизации
 

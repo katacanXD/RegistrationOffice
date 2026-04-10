@@ -42,9 +42,8 @@
 .day-name {
   width: 45px;
   text-align: center;
-  color: #7C8BFF;
   font-weight: bold;
-  background: #94A3FF;
+  background: #4C6AFF;
   margin: 2px;
   border-radius: 5px;
   color: white;
@@ -67,6 +66,17 @@
 
 .cell.selected { background: #94A3FF; color: white; }
 .cell.disabled { color: #E0E6FF; border: none; }
+.cell.past-day {
+  color: #C7D2FE;
+  background: #F0F2FF;
+  border: 1px solid #E0E6FF;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.cell.past-day:hover {
+  background: #F0F2FF;
+  cursor: not-allowed;
+}
 
 .time-box { width: 250px; text-align: center; }
 .time-header { color: #4C6AFF; margin-bottom: 20px; }
