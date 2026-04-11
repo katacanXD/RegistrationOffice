@@ -5,6 +5,7 @@ import { useApp } from '../../../context/AppContext';
 import './SearchU.css';
 import myLogo from '../Foto/Icon.png';
 import myAvatar from '../Foto/Account.png';
+import searchIcon from '../Foto/search.svg';
 
 export default function SearchU() {
   const { user } = useAuth();
@@ -110,7 +111,9 @@ export default function SearchU() {
           </div>
 
           <div className="search-input-wrapper">
-            <div className="search-icon">🔍</div>
+            <div className="search-icon" aria-hidden="true">
+              <img src={searchIcon} alt="" className="search-icon-image" />
+            </div>
             <input
               type="text"
               placeholder="Имя / Специалист"

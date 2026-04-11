@@ -58,9 +58,9 @@ export default function AuthorizationForm () {
     };
 
     return (
-    <div className='screen'>
+    <div className='auth-screen'>
         <div className="authorization-container">
-            <h1 className='Reg'>REGISTRATION OFFICE</h1>
+            <h1 className='auth-title'>REGISTRATION OFFICE</h1>
 
             {generalError && <div style={{ color: 'red', marginBottom: '10px' }}>{generalError}</div>}
             {authError && <div style={{ color: 'red', marginBottom: '10px' }}>{authError}</div>}
@@ -73,7 +73,7 @@ export default function AuthorizationForm () {
                 name="login"
                 value={data.login}
                 onChange={handleChange}
-                className={errors.login ? 'error-input' : ''}
+                className={errors.login ? 'auth-error-input' : ''}
                 disabled={loading}
             />
 
@@ -84,7 +84,7 @@ export default function AuthorizationForm () {
                 name="password"
                 value={data.password}
                 onChange={handleChange}
-                className={errors.password ? 'error-input' : ''}
+                className={errors.password ? 'auth-error-input' : ''}
                 disabled={loading}
             />
 
@@ -99,4 +99,3 @@ export default function AuthorizationForm () {
     </div>
     );
 };
-   

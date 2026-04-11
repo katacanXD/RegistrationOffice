@@ -36,7 +36,7 @@
   height: 55px;
   border: 2px solid #A5B4FC;
   border-radius: 15px;
-  padding: 0 20px 0 50px;
+  padding: 0 20px 0 76px;
   font-size: 1rem;
   color: #A5B4FC;
   outline: none;
@@ -48,12 +48,21 @@
 
 .search-icon {
   position: absolute;
-  left: 1px;
-  top: 15%;
-  transform: translateX(-100%);
-  font-size: 1.5rem;
-  color: #A5B4FC;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
 
+.search-icon-image {
+  width: 24px;
+  height: 24px;
+  display: block;
 }
 
 .doctors-grid {

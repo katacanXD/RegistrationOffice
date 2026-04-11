@@ -74,86 +74,88 @@ export default function RegistrationForm () {
   };
 
   return (
-    <div className='screen'>
-      <Link to="/" className="back-link">Назад</Link>
-      <div className="registration-container">
-        <h1 className='Reg'>REGISTRATION OFFICE</h1>
+    <div className='registration-screen'>
+      <div className="registration-layout">
+        <Link to="/" className="back-link">Назад</Link>
+        <div className="registration-container">
+          <h1 className='registration-title'>REGISTRATION OFFICE</h1>
 
-        {successMessage && <div style={{ color: 'green', marginBottom: '10px' }}>{successMessage}</div>}
-        {authError && <div style={{ color: 'red', marginBottom: '10px' }}>{authError}</div>}
-        {errors.general && <div style={{ color: 'red', marginBottom: '10px' }}>{errors.general}</div>}
+          {successMessage && <div style={{ color: 'green', marginBottom: '10px' }}>{successMessage}</div>}
+          {authError && <div style={{ color: 'red', marginBottom: '10px' }}>{authError}</div>}
+          {errors.general && <div style={{ color: 'red', marginBottom: '10px' }}>{errors.general}</div>}
 
-        <form onSubmit={handleSubmit}>
-        <label htmlFor="login">Логин</label>
-        <input
-          type="text"
-          id="login"
-          name="login"
-          value={data.login}
-          onChange={handleChange}
-          className={errors.login ? 'error-input' : ''}
-          disabled={loading}
-        />
+          <form onSubmit={handleSubmit}>
+          <label htmlFor="login">Логин</label>
+          <input
+            type="text"
+            id="login"
+            name="login"
+            value={data.login}
+            onChange={handleChange}
+            className={errors.login ? 'registration-error-input' : ''}
+            disabled={loading}
+          />
 
-        <label htmlFor="lastName">Фамилия</label>
-        <input
-          type="text"
-          id="lastName"
-          name="lastName"
-          value={data.lastName}
-          onChange={handleChange}
-          className={errors.lastName ? 'error-input' : ''}
-          disabled={loading}
-        />
+          <label htmlFor="lastName">Фамилия</label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            value={data.lastName}
+            onChange={handleChange}
+            className={errors.lastName ? 'registration-error-input' : ''}
+            disabled={loading}
+          />
 
-        <label htmlFor="firstName">Имя</label>
-        <input
-          type="text"
-          id="firstName"
-          name="firstName"
-          value={data.firstName}
-          onChange={handleChange}
-          className={errors.firstName ? 'error-input' : ''}
-          disabled={loading}
-        />
+          <label htmlFor="firstName">Имя</label>
+          <input
+            type="text"
+            id="firstName"
+            name="firstName"
+            value={data.firstName}
+            onChange={handleChange}
+            className={errors.firstName ? 'registration-error-input' : ''}
+            disabled={loading}
+          />
 
-        <label htmlFor="middleName">Отчество</label>
-        <input
-          type="text"
-          id="middleName"
-          name="middleName"
-          value={data.middleName}
-          onChange={handleChange}
-          className={errors.middleName ? 'error-input' : ''}
-          disabled={loading}
-        />
+          <label htmlFor="middleName">Отчество</label>
+          <input
+            type="text"
+            id="middleName"
+            name="middleName"
+            value={data.middleName}
+            onChange={handleChange}
+            className={errors.middleName ? 'registration-error-input' : ''}
+            disabled={loading}
+          />
 
-        <label htmlFor="password">Пароль</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          value={data.password}
-          onChange={handleChange}
-          className={errors.password ? 'error-input' : ''}
-          disabled={loading}
-        />
+          <label htmlFor="password">Пароль</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={data.password}
+            onChange={handleChange}
+            className={errors.password ? 'registration-error-input' : ''}
+            disabled={loading}
+          />
 
-        <label htmlFor="confirmPassword">Повтор пароля</label>
-        <input
-          type="password"
-          id="confirmPassword"
-          name="confirmPassword"
-          value={data.confirmPassword}
-          onChange={handleChange}
-          className={errors.confirmPassword ? 'error-input' : ''}
-          disabled={loading}
-        />
+          <label htmlFor="confirmPassword">Повтор пароля</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            name="confirmPassword"
+            value={data.confirmPassword}
+            onChange={handleChange}
+            className={errors.confirmPassword ? 'registration-error-input' : ''}
+            disabled={loading}
+          />
 
-        <button type="submit" disabled={loading}>
-          {loading ? 'Загрузка...' : 'Зарегистрироваться'}
-        </button>
-        </form>
+          <button type="submit" disabled={loading}>
+            {loading ? 'Загрузка...' : 'Зарегистрироваться'}
+          </button>
+          </form>
+        </div>
       </div>
     </div>
   );

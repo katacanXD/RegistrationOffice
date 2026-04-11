@@ -125,39 +125,48 @@ export default function MainU () {
         <div className="container">
 
           <div className="policy-section">
-            <label className="field-label">Номер полиса ОМС</label>
             {!policyLoaded ? (
               <p style={{ color: '#A5B4FC', textAlign: 'center' }}>Загрузка полиса...</p>
             ) : userPolicy ? (
-              <div className="policy-display">
-                <div className="policy-value">{userPolicy}</div>
+              <>
+                <div className="policy-panel">
+                  <label className="field-label">Номер полиса ОМС</label>
+                  <div className="policy-display">
+                    <div className="policy-value">{userPolicy}</div>
+                  </div>
+                </div>
                 <button
-                  className="btn-action-primary"
+                  className="btn-action-primary btn-book-cta"
                   onClick={handleGoToSearch}
                   disabled={loading}
                 >
                   Записаться
                 </button>
-              </div>
+              </>
             ) : (
-              <div className="policy-input-group">
-                <input
-                  type="text"
-                  id="oms"
-                  className="soft-input"
-                  value={policyInput}
-                  onChange={(e) => setPolicyInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && policyInput.trim() && handleSavePolicy()}
-                  disabled={policyLoading}
-                />
+              <>
+                <div className="policy-panel">
+                  <label className="field-label">Номер полиса ОМС</label>
+                  <div className="policy-input-group">
+                    <input
+                      type="text"
+                      id="oms"
+                      className="soft-input"
+                      value={policyInput}
+                      onChange={(e) => setPolicyInput(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && policyInput.trim() && handleSavePolicy()}
+                      disabled={policyLoading}
+                    />
+                  </div>
+                </div>
                 <button
-                  className="btn-action-primary"
+                  className="btn-action-primary btn-book-cta"
                   onClick={handleSavePolicy}
                   disabled={policyLoading || !policyInput.trim()}
                 >
                   {policyLoading ? '...' : 'Сохранить'}
                 </button>
-              </div>
+              </>
             )}
           </div>
 

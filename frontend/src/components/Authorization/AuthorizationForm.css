@@ -1,23 +1,97 @@
-.authorization-container{
+.auth-screen {
+  background-color: #e4e6ff;
+  min-height: 100vh;
+  width: 100%;
+  padding: 40px 0;
+}
+
+.authorization-container {
   display: flex;
   flex-direction: column;
-  max-width: 500px;
-  margin: 125px auto 0; 
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background-color: #ffffff; 
+  max-width: 591px;
+  margin: 125px auto 0;
+  padding: 28px 38px 34px;
+  border: none;
+  border-radius: 20px;
+  background-color: #fbfcff;
+}
+
+.auth-title {
+  color: #8993ff;
+  margin-bottom: 24px;
+  text-align: center;
+  font-size: 40px;
+  font-weight: 400;
+  line-height: 1.2;
+  -webkit-text-stroke: 1px #8993ff;
+}
+
+.authorization-container input[type='text'],
+.authorization-container input[type='password'] {
+  display: block;
+  width: 100%;
+  height: 50px;
+  margin-top: 7px;
+  margin-bottom: 18px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 15px;
+  background-color: #edeeff;
+  font-size: 16px;
+}
+
+.authorization-container label {
+  color: #8993ff;
+  padding-left: 7px;
+  font-size: 18px;
+}
+
+.authorization-container button {
+  display: block;
+  width: 100%;
+  height: 50px;
+  color: #ffffff;
+  border: none;
+  border-radius: 15px;
+  background-color: #8993ff;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.authorization-container button:hover {
+  background-color: #7580ef;
+}
+
+.auth-error-input {
+  border: 1px solid red !important;
+  background-color: #ffebeb !important;
 }
 
 .no-account-link {
-  color: #4C6AFF; 
+  color: #8993ff;
   text-decoration: none;
-  font-size: 1rem;
-  margin-top: 10px;
+  font-size: 14px;
+  margin-top: 12px;
   text-align: center;
 }
 
 .no-account-link:hover {
   text-decoration: underline;
   font-weight: bold;
+}
+
+@media (max-width: 700px) {
+  .auth-screen {
+    padding: 20px 16px;
+  }
+
+  .authorization-container {
+    margin-top: 40px;
+    padding: 20px;
+  }
+
+  .auth-title {
+    font-size: 24px;
+    -webkit-text-stroke: 0;
+  }
 }
