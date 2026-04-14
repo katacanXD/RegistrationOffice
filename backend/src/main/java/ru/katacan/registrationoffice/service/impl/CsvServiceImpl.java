@@ -536,11 +536,11 @@ public class CsvServiceImpl implements CsvService {
 
                         try {
                             minutes = Integer.parseInt(slotMinutes.trim());
-                            if (minutes <= 0) {
-                                throw new NumberFormatException("Значение должно быть больше 0");
+                            if (minutes != 60) {
+                                throw new NumberFormatException("Значение должно быть равно 60");
                             }
                         } catch (NumberFormatException e) {
-                            throw new CsvValidationException("Неверное значение для слотов (в минутах): " + slotMinutes,
+                            throw new CsvValidationException("Неверное значение для слотов (в минутах): " + slotMinutes + ". Допустимо только 60",
                                     processedCount, record.toString());
                         }
 
@@ -632,8 +632,8 @@ public class CsvServiceImpl implements CsvService {
 
     private String generateTempPassword(String login) {
         return login.substring(0, Math.min(1, login.length())).toUpperCase() +
-               login.substring(0, Math.min(2, login.length())) +
-               "123";
+                login.substring(0, Math.min(2, login.length())) +
+                "123";
     }
 }
 
