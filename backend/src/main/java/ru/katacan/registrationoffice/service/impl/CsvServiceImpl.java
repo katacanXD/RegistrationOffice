@@ -368,6 +368,8 @@ public class CsvServiceImpl implements CsvService {
 
                 for (var record : parser) {
                     processedCount++;
+                    final int rowNumber = processedCount;
+                    final String rowData = record.toString();
                     try {
                         String patientLogin = record.get("patientLogin");
                         String doctorLogin = record.get("doctorLogin");
@@ -392,11 +394,11 @@ public class CsvServiceImpl implements CsvService {
 
                         User patient = userRepository.findByLoginIgnoreCase(normalizedPatientLogin)
                                 .orElseThrow(() -> new CsvValidationException("Пациент с логином '" + patientLogin + "' не найден",
-                                        processedCount, record.toString()));
+                                        rowNumber, rowData));
 
                         User doctor = userRepository.findByLoginIgnoreCase(normalizedDoctorLogin)
                                 .orElseThrow(() -> new CsvValidationException("Врач с логином '" + doctorLogin + "' не найден",
-                                        processedCount, record.toString()));
+                                        rowNumber, rowData));
 
                         LocalDateTime appointmentTime;
                         try {
@@ -408,7 +410,7 @@ public class CsvServiceImpl implements CsvService {
 
                         DictStatus status = statusRepository.findByName(statusName.trim())
                                 .orElseThrow(() -> new CsvValidationException("Статус '" + statusName + "' не найден",
-                                        processedCount, record.toString()));
+                                        rowNumber, rowData));
 
                         if (appointmentRepository.existsByDoctorAndSlotDateTimeAndNotCanceled(doctor, appointmentTime)) {
                             throw new CsvValidationException("На этот слот уже есть активная запись",
@@ -472,6 +474,8 @@ public class CsvServiceImpl implements CsvService {
 
                 for (var record : parser) {
                     processedCount++;
+                    final int rowNumber = processedCount;
+                    final String rowData = record.toString();
                     try {
                         String doctorLogin = record.get("doctorLogin");
                         String date = record.get("date");
@@ -501,7 +505,7 @@ public class CsvServiceImpl implements CsvService {
 
                         User doctor = userRepository.findByLoginIgnoreCase(normalizedDoctorLogin)
                                 .orElseThrow(() -> new CsvValidationException("Врач с логином '" + doctorLogin + "' не найден",
-                                        processedCount, record.toString()));
+                                        rowNumber, rowData));
 
                         LocalDate slotDate;
                         LocalTime slotStartTime;
