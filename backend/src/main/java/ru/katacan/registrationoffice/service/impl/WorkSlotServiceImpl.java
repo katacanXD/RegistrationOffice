@@ -42,7 +42,7 @@ public class WorkSlotServiceImpl implements WorkSlotService {
         User doctor = userRepository.findById(doctorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Врач не найден"));
 
-        List<WorkSlot> workSlots = workSlotRepository.findByDoctorAndDate(doctor, date);
+        List<WorkSlot> workSlots = ensureWorkSlotsForDate(doctor, date);
         DoctorSlotsDto.BreakDto breakDto = getBreakForDoctor(workSlots);
 
         // Получаем все записи на этот день, которые не отменены
@@ -58,6 +58,7 @@ public class WorkSlotServiceImpl implements WorkSlotService {
     @Override
     public DoctorCalendarDto getDoctorSlotsBetweenDates(Long doctorId, LocalDate startDate, LocalDate endDate) {
         User doctor = userRepository.getReferenceById(doctorId);
+        ensureWorkSlotsForRange(doctor, startDate, endDate);
         List<WorkSlot> workSlots = workSlotRepository.findByDoctorAndDateBetween(doctor, startDate, endDate);
 
         // Получаем все записи за период
@@ -93,7 +94,7 @@ public class WorkSlotServiceImpl implements WorkSlotService {
         User doctor = userRepository.findById(doctorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Врач не найден"));
 
-        List<WorkSlot> workSlots = workSlotRepository.findByDoctorAndDate(doctor, date);
+        List<WorkSlot> workSlots = ensureWorkSlotsForDate(doctor, date);
         DoctorSlotsDto.BreakDto breakDto = getBreakForDoctor(workSlots);
 
         // Получаем все записи на этот день для детального расписания
@@ -102,7 +103,8 @@ public class WorkSlotServiceImpl implements WorkSlotService {
                 .filter(a -> !"canceled".equalsIgnoreCase(a.getStatus().getName()))
                 .collect(Collectors.toMap(
                         a -> a.getSlotDateTime().toLocalTime(),
-                        a -> a
+                        a -> a,
+                        (existing, duplicate) -> existing
                 ));
 
         DoctorScheduleDto.BreakDto scheduleBreak = breakDto != null ?
@@ -110,7 +112,47 @@ public class WorkSlotServiceImpl implements WorkSlotService {
                         .start(breakDto.getStart())
                         .end(breakDto.getEnd())
                         .build() : null;
-        
+
         return workSlotMapper.toDoctorScheduleWithBookings(date.toString(), workSlots, scheduleBreak, appointmentsByTime);
+    }
+
+    private List<WorkSlot> ensureWorkSlotsForDate(User doctor, LocalDate date) {
+        List<WorkSlot> existing = workSlotRepository.findByDoctorAndDate(doctor, date);
+        if (!existing.isEmpty()) {
+            return existing;
+        }
+
+        List<WorkSlot> generated = createDefaultDaySlots(doctor, date);
+        return workSlotRepository.saveAll(generated);
+    }
+
+    private void ensureWorkSlotsForRange(User doctor, LocalDate startDate, LocalDate endDate) {
+        LocalDate date = startDate;
+        while (!date.isAfter(endDate)) {
+            ensureWorkSlotsForDate(doctor, date);
+            date = date.plusDays(1);
+        }
+    }
+
+    private List<WorkSlot> createDefaultDaySlots(User doctor, LocalDate date) {
+        WorkSlot morningSlot = new WorkSlot();
+        morningSlot.setDoctor(doctor);
+        morningSlot.setDate(date);
+        morningSlot.setStartTime(LocalTime.of(9, 0));
+        morningSlot.setEndTime(LocalTime.of(13, 0));
+        morningSlot.setSlotMinutes(60);
+        morningSlot.setBreakStart(LocalTime.of(11, 0));
+        morningSlot.setBreakEnd(LocalTime.of(11, 15));
+
+        WorkSlot eveningSlot = new WorkSlot();
+        eveningSlot.setDoctor(doctor);
+        eveningSlot.setDate(date);
+        eveningSlot.setStartTime(LocalTime.of(14, 0));
+        eveningSlot.setEndTime(LocalTime.of(18, 0));
+        eveningSlot.setSlotMinutes(60);
+        eveningSlot.setBreakStart(LocalTime.of(16, 0));
+        eveningSlot.setBreakEnd(LocalTime.of(16, 15));
+
+        return List.of(morningSlot, eveningSlot);
     }
 }

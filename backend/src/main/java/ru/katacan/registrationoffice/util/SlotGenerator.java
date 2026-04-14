@@ -13,6 +13,9 @@ public class SlotGenerator {
     /**
      * Генерирует список доступных временных слотов для врача на день.
      *
+     * По бизнес-правилу слот для записи всегда равен 60 минутам.
+     * Если в данных сохранено другое значение, оно приводится к 60.
+     *
      * @param startTime     время начала работы (например, 09:00)
      * @param endTime       время окончания работы (например, 17:00)
      * @param slotMinutes   длительность одного слота в минутах (например, 30)
@@ -29,14 +32,16 @@ public class SlotGenerator {
 
         List<LocalTime> slots = new ArrayList<>();
 
-        if (startTime == null || endTime == null || slotMinutes <= 0) {
+        int effectiveSlotMinutes = normalizeSlotMinutes(slotMinutes);
+
+        if (startTime == null || endTime == null || effectiveSlotMinutes <= 0) {
             return slots;
         }
 
         LocalTime current = startTime;
 
         while (true) {
-            LocalTime slotEnd = current.plusMinutes(slotMinutes);
+            LocalTime slotEnd = current.plusMinutes(effectiveSlotMinutes);
 
             // Проверяем, выходит ли слот за рамки рабочего времени
             if (slotEnd.isAfter(endTime)) {
@@ -97,7 +102,9 @@ public class SlotGenerator {
             LocalTime breakStart,
             LocalTime breakEnd) {
 
-        if (startTime == null || endTime == null || slotMinutes <= 0) {
+        int effectiveSlotMinutes = normalizeSlotMinutes(slotMinutes);
+
+        if (startTime == null || endTime == null || effectiveSlotMinutes <= 0) {
             return 0;
         }
 
@@ -109,7 +116,15 @@ public class SlotGenerator {
             totalMinutes -= breakMinutes;
         }
 
-        return (int) (totalMinutes / slotMinutes);
+        return (int) (totalMinutes / effectiveSlotMinutes);
+    }
+
+    private static int normalizeSlotMinutes(int slotMinutes) {
+        if (slotMinutes <= 0) {
+            return 0;
+        }
+
+        return 60;
     }
 }
 
