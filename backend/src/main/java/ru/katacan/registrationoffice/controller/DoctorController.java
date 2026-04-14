@@ -33,7 +33,7 @@ public class DoctorController {
                 .body(userService.searchDoctors(search, pageable));
     }
 
-    @PreAuthorize("hasAuthority('doctor') and @doctorAccess.isCurrentDoctor(#doctorId, authentication)")
+    @PreAuthorize("hasAnyAuthority('admin', 'registrar', 'patient') or (hasAuthority('doctor') and @doctorAccess.isCurrentDoctor(#doctorId, authentication))")
     @GetMapping("/{doctorId}/slots")
     public ResponseEntity<DoctorSlotsDto> getDoctorSlots(
             @PathVariable Long doctorId,
@@ -43,7 +43,7 @@ public class DoctorController {
                 .body(workSlotService.getDoctorSlots(doctorId, date));
     }
 
-    @PreAuthorize("hasAuthority('doctor') and @doctorAccess.isCurrentDoctor(#doctorId, authentication)")
+    @PreAuthorize("hasAnyAuthority('admin', 'registrar', 'patient') or (hasAuthority('doctor') and @doctorAccess.isCurrentDoctor(#doctorId, authentication))")
     @GetMapping("/{doctorId}/calendar")
     public ResponseEntity<DoctorCalendarDto> getDoctorCalendar(
             @PathVariable Long doctorId,
@@ -57,7 +57,7 @@ public class DoctorController {
                 .body(workSlotService.getDoctorSlotsBetweenDates(doctorId, startDate, endDate));
     }
 
-    @PreAuthorize("hasAuthority('doctor') and @doctorAccess.isCurrentDoctor(#doctorId, authentication)")
+    @PreAuthorize("hasAuthority('admin') or (hasAuthority('doctor') and @doctorAccess.isCurrentDoctor(#doctorId, authentication))")
     @GetMapping("/{doctorId}/schedule")
     public ResponseEntity<DoctorScheduleDto> getDoctorSchedule(
             @PathVariable Long doctorId,
