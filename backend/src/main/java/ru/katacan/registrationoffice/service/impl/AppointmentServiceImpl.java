@@ -10,13 +10,17 @@ import ru.katacan.registrationoffice.mapper.AppointmentMapper;
 import ru.katacan.registrationoffice.repository.AppointmentRepository;
 import ru.katacan.registrationoffice.repository.DictStatusRepository;
 import ru.katacan.registrationoffice.repository.UserRepository;
+import ru.katacan.registrationoffice.repository.WorkSlotRepository;
 import ru.katacan.registrationoffice.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.katacan.registrationoffice.util.LoginNormalizer;
+import ru.katacan.registrationoffice.util.SlotGenerator;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +33,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final UserRepository userRepository;
     private final DictStatusRepository statusRepository;
+    private final WorkSlotRepository workSlotRepository;
 
     private final AppointmentMapper appointmentMapper;
 
@@ -83,6 +88,8 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new BadRequestException("Нельзя записаться на прошедшее время");
         }
 
+        validateDoctorHasBookableSlot(doctor.getId(), slotTime);
+
         if (appointmentRepository.existsByDoctorAndSlotDateTimeAndNotCanceled(doctor, slotTime)) {
             throw new SlotNotAvailableException("Этот слот уже занят");
         }
@@ -120,6 +127,8 @@ public class AppointmentServiceImpl implements AppointmentService {
             if (newSlotTime.isBefore(LocalDateTime.now())) {
                 throw new BadRequestException("Нельзя перенести запись на прошедшее время");
             }
+
+            validateDoctorHasBookableSlot(appointment.getDoctor().getId(), newSlotTime);
 
             // Проверяем доступность слота, исключая текущую запись из проверки
             if (appointmentRepository.existsActiveAppointment(
@@ -193,6 +202,30 @@ public class AppointmentServiceImpl implements AppointmentService {
             throw new BadRequestException("Неверный формат даты и времени");
         }
 
+        if (!isBookableWorkSlot(doctorId, slotTime)) {
+            return false;
+        }
+
         return !appointmentRepository.existsByDoctorAndSlotDateTimeAndNotCanceled(doctor, slotTime);
+    }
+
+    private void validateDoctorHasBookableSlot(Long doctorId, LocalDateTime slotTime) {
+        if (!isBookableWorkSlot(doctorId, slotTime)) {
+            throw new BadRequestException("Выбранное время не входит в рабочие слоты врача");
+        }
+    }
+
+    private boolean isBookableWorkSlot(Long doctorId, LocalDateTime slotTime) {
+        LocalDate date = slotTime.toLocalDate();
+        LocalTime time = slotTime.toLocalTime();
+
+        return workSlotRepository.findContainingTime(doctorId, date, time).stream()
+                .anyMatch(slot -> SlotGenerator.generateSlots(
+                                slot.getStartTime(),
+                                slot.getEndTime(),
+                                slot.getSlotMinutes(),
+                                slot.getBreakStart(),
+                                slot.getBreakEnd())
+                        .contains(time));
     }
 }

@@ -31,7 +31,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     @Transactional
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         // Инициализация словарей, если их нет
         initDicts();
 
@@ -135,7 +135,7 @@ public class DataInitializer implements CommandLineRunner {
                     morningSlot.setDate(date);
                     morningSlot.setStartTime(LocalTime.of(9, 0));
                     morningSlot.setEndTime(LocalTime.of(13, 0));
-                    morningSlot.setSlotMinutes(15);
+                    morningSlot.setSlotMinutes(60);
                     morningSlot.setBreakStart(LocalTime.of(11, 0));
                     morningSlot.setBreakEnd(LocalTime.of(11, 15));
                     workSlotRepository.save(morningSlot);
@@ -145,7 +145,7 @@ public class DataInitializer implements CommandLineRunner {
                     eveningSlot.setDate(date);
                     eveningSlot.setStartTime(LocalTime.of(14, 0));
                     eveningSlot.setEndTime(LocalTime.of(18, 0));
-                    eveningSlot.setSlotMinutes(15);
+                    eveningSlot.setSlotMinutes(60);
                     eveningSlot.setBreakStart(LocalTime.of(16, 0));
                     eveningSlot.setBreakEnd(LocalTime.of(16, 15));
                     workSlotRepository.save(eveningSlot);
@@ -174,12 +174,20 @@ public class DataInitializer implements CommandLineRunner {
             LocalDate tomorrow = LocalDate.now().plusDays(1);
 
             if (!doctors.isEmpty() && !patients.isEmpty()) {
+                LocalTime[] demoTimes = {
+                        LocalTime.of(9, 0),
+                        LocalTime.of(10, 0),
+                        LocalTime.of(12, 0),
+                        LocalTime.of(14, 0),
+                        LocalTime.of(15, 0)
+                };
+
                 // Создаем несколько тестовых записей
                 for (int i = 0; i < 5; i++) {
                     User doctor = doctors.get(i % doctors.size());
                     User patient = patients.get(i % patients.size());
 
-                    LocalDateTime slotTime = LocalDateTime.of(tomorrow, LocalTime.of(9, 15).plusMinutes(i * 15));
+                    LocalDateTime slotTime = LocalDateTime.of(tomorrow, demoTimes[i]);
 
                     Appointment appointment = new Appointment();
                     appointment.setDoctor(doctor);

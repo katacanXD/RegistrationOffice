@@ -66,4 +66,26 @@ public class DoctorController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(workSlotService.getDoctorSchedule(doctorId, date));
     }
+
+    @GetMapping("/{doctorId}/public/calendar")
+    public ResponseEntity<DoctorCalendarDto> getDoctorCalendarPublic(
+            @PathVariable Long doctorId,
+            @RequestParam Integer month,
+            @RequestParam Integer year
+    ) {
+        LocalDate startDate = LocalDate.of(year, month, 1);
+        LocalDate endDate = startDate.plusMonths(1).minusDays(1);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(workSlotService.getDoctorSlotsBetweenDates(doctorId, startDate, endDate));
+    }
+
+    @GetMapping("/{doctorId}/public/slots")
+    public ResponseEntity<DoctorSlotsDto> getDoctorSlotsPublic(
+            @PathVariable Long doctorId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(workSlotService.getDoctorSlots(doctorId, date));
+    }
 }
