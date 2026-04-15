@@ -1,51 +1,119 @@
-# DOC-OPS-003 План деплоя и runbook
+# DOC-OPS-003 — План развёртывания и runbook
 
-| Версия | Статус | Дата обновления |
-|---|---|---|
-| v1.0 | Draft | 2026-04-01 |
+| Версия | Статус | Дата создания | Дата обновления |
+|--------|--------|---------------|-----------------|
+| v0.1   | Draft  | 2026-04-10    | 2026-04-10      |
 
-## Целевая среда
+О документе: инструкция по развёртыванию и запуску системы RegistrationOffice.
 
-- Linux VM
-- Docker + Docker Compose
-- Nginx + backend + postgres (+ frontend container, если используется отдельный сервис)
+Для кого: backend-разработчик, DevOps, команда проекта.
 
-## Состав сервисов
+Основано на: репозиторий проекта, `Dockerfile`, `docker-compose.yml`, `deploy/nginx/default.conf`.
 
-- Обязательные: `postgres`, `backend`, `nginx`
-- Опционально: `frontend` (если фронт запускается отдельным контейнером, а не как статика в `nginx`)
-- По текущему `docker-compose.yml` в репозитории описаны `postgres`, `backend`, `nginx`; frontend-контур документируется как целевой fullstack-вариант.
+---
 
-## Шаги
+## Авторы документа
 
-1. Скопировать проект на VM.
-2. Создать `.env` из `.env.example`.
-3. Запустить `docker compose up -d --build`.
-4. Проверить логи backend/nginx.
+- Сысоев Георгий — backend developer — деплой
+- Чернышов Ярослав — backend developer — Docker-конфигурация
 
-## Проверка после деплоя
+## История изменений
 
-- доступен `POST /api/v1/auth/login`;
-- backend контейнер в `healthy/running`;
-- postgres принимает подключения.
+- [v0.1] [2026-04-10] (Сысоев, Чернышов): первичный runbook.
 
-## Проверки frontend
+---
 
-- главная страница UI отдается по `/`;
-- SPA-маршруты не дают `404` при прямом открытии URL;
-- запросы frontend к `/api/v1/**` проходят через `nginx`;
-- login из UI получает токен и открывает роль-специфичный экран.
+## Архитектура деплоя
 
-## Типовые сбои frontend-контура
+```
+Internet → Nginx (reverse proxy, :80) → Spring Boot API (:8080) → PostgreSQL (:5432)
+                                    ↘ Static files (frontend)
+```
 
-- `404` на SPA-роутах: проверить fallback на `index.html` в `nginx`.
-- `CORS` ошибки в браузере: проверить `APP_SECURITY_CORS_ALLOWED_ORIGINS` и origin frontend.
-- UI работает, API нет: проверить проксирование `/api` в `deploy/nginx/default.conf`.
-- После деплоя старая версия UI: проверить пересборку frontend-образа и кэш браузера/CDN.
+Все компоненты запускаются через Docker Compose на одной виртуальной машине в Yandex Cloud.
 
-## Операционные команды
+## Предусловия
 
-- `docker compose ps`
-- `docker compose logs --tail 200 backend`
-- `docker compose up -d --build backend`
-- `docker compose down`
+- Виртуальная машина с Ubuntu 22.04+.
+- Установлены Docker и Docker Compose.
+- Домен registration-office.ru направлен на IP машины.
+
+## Шаги развёртывания
+
+### 1. Клонировать репозиторий
+
+```bash
+git clone https://gitverse.ru/KatacanXD/RegistrationOffice.git
+cd RegistrationOffice
+```
+
+### 2. Настроить переменные окружения
+
+```bash
+cp .env.example .env
+# Отредактировать .env:
+# - POSTGRES_PASSWORD
+# - JWT_SECRET
+# - SPRING_DATASOURCE_URL
+```
+
+### 3. Собрать и запустить
+
+```bash
+docker-compose up -d --build
+```
+
+### 4. Проверить работоспособность
+
+```bash
+# Проверить статус контейнеров
+docker-compose ps
+
+# Проверить API
+curl http://localhost:8080/api/doctors
+
+# Проверить через домен
+curl http://registration-office.ru/api/doctors
+```
+
+### 5. Загрузить начальные данные (при необходимости)
+
+```bash
+# Импорт врачей, пациентов, слотов через CSV или SQL-скрипты
+# (описано в документации к API: POST /api/work-slots/import-csv)
+```
+
+## Обновление
+
+```bash
+cd RegistrationOffice
+git pull
+docker-compose up -d --build
+```
+
+## Откат
+
+```bash
+docker-compose down
+git checkout <предыдущий-коммит>
+docker-compose up -d --build
+```
+
+## Мониторинг
+
+```bash
+# Логи приложения
+docker-compose logs -f app
+
+# Логи Nginx
+docker-compose logs -f nginx
+
+# Логи PostgreSQL
+docker-compose logs -f db
+```
+
+## Известные ограничения
+
+- HTTPS не настроен (учебный проект).
+- Backup БД не автоматизирован.
+- Масштабирование на несколько инстансов не предусмотрено.

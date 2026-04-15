@@ -1,88 +1,95 @@
-# DOC-DAT-001 Логическая модель данных и ERD
+# DOC-DAT-001 — ER-диаграмма (логическая модель данных)
 
-| Версия | Статус | Дата обновления |
-|---|---|---|
-| v1.0 | Draft | 2026-04-01 |
+| Версия | Статус | Дата создания | Дата обновления |
+|--------|--------|---------------|-----------------|
+| v0.2   | Draft  | 2026-04-08    | 2026-04-10      |
 
-## Сущности
+О документе: логическая модель данных системы RegistrationOffice — сущности, атрибуты, связи.
 
-- `t_users`
-- `t_dict_role`
-- `t_dict_status`
-- `t_work_slots`
-- `t_appointments`
-- `t_refresh_tokens`
+Для кого: backend-разработчики, аналитик, тестировщик.
 
-## Ключевые связи
+Основано на: [кейсе проекта](../98-source-materials/Кейс_Здравоохранение_График_приёмов_врача.md), [user stories](../02-requirements/DOC-REQ-001-user-stories.md).
 
-- `t_users.f_role_id -> t_dict_role.f_role_id`
-- `t_work_slots.f_doctor_id -> t_users.f_users_id`
-- `t_appointments.f_doctor_id -> t_users.f_users_id`
-- `t_appointments.f_patient_id -> t_users.f_users_id`
-- `t_appointments.f_status_id -> t_dict_status.f_status_id`
-- `t_refresh_tokens.f_user_id -> t_users.f_users_id`
+---
 
-## ERD (Mermaid)
+## Авторы документа
 
-```mermaid
-erDiagram
-    t_users {
-        BIGINT f_users_id PK
-        VARCHAR f_login "NOT NULL, UNIQUE"
-        VARCHAR f_fio "NOT NULL"
-        VARCHAR f_password "NOT NULL"
-        VARCHAR f_policy_number "NULL, len=30"
-        BIGINT f_role_id FK "NOT NULL"
-        VARCHAR f_speciality_name "NULL"
-    }
+- Чернышов Ярослав — backend developer — проектирование модели
+- Наботов Карим — project lead — валидация
 
-    t_dict_role {
-        BIGINT f_role_id PK
-        VARCHAR f_role_name "NOT NULL, UNIQUE, len=50"
-    }
+## История изменений
 
-    t_dict_status {
-        BIGINT f_status_id PK
-        VARCHAR f_status_name "NOT NULL, UNIQUE, len=50"
-    }
+- [v0.1] [2026-04-08] (Чернышов): первичная ER-диаграмма.
+- [v0.2] [2026-04-10] (Чернышов, Наботов): добавлены таблицы users и roles для JWT.
 
-    t_appointments {
-        BIGINT f_appoint_id PK
-        BIGINT f_doctor_id FK "NOT NULL"
-        DATETIME f_slot_datetime "NOT NULL"
-        BIGINT f_status_id FK "NOT NULL"
-        BIGINT f_patient_id FK "NOT NULL"
-    }
+---
 
-    t_work_slots {
-        BIGINT f_work_slots_id PK
-        BIGINT f_doctor_id FK "NOT NULL"
-        DATE f_date "NOT NULL"
-        TIME f_start_time "NOT NULL"
-        TIME f_end_time "NOT NULL"
-        INT f_slot_minutes "NOT NULL"
-        TIME f_break_start "NULL"
-        TIME f_break_end "NULL"
-    }
+## ER-диаграмма (текстовое представление)
 
-    t_refresh_tokens {
-        BIGINT f_token_id PK
-        VARCHAR f_token_hash "NOT NULL, UNIQUE, len=512"
-        BIGINT f_user_id FK "NOT NULL"
-        TIMESTAMP f_expiry_date "NOT NULL"
-        TIMESTAMP f_created_at "NOT NULL"
-        TIMESTAMP f_revoked_at "NULL"
-        VARCHAR f_replaced_by_token_hash "NULL, len=512"
-    }
+```
+┌──────────────┐       ┌──────────────────┐       ┌──────────────┐
+│   doctors    │       │   work_slots     │       │   patients   │
+├──────────────┤       ├──────────────────┤       ├──────────────┤
+│ doctor_id PK │──┐    │ slot_id PK       │       │ patient_code │
+│ fio          │  │    │ doctor_id FK ────┼───────│   PK         │
+│ specialty    │  │    │ date             │       │ fio          │
+│ user_id FK   │  │    │ start_time       │       │ birth_year   │
+└──────────────┘  │    │ end_time         │       │ user_id FK   │
+                  │    │ slot_minutes     │       └──────┬───────┘
+                  │    │ break_start      │              │
+                  │    │ break_end        │              │
+                  │    └────────┬─────────┘              │
+                  │             │                        │
+                  │    ┌────────▼─────────┐              │
+                  │    │  appointments    │              │
+                  │    ├──────────────────┤              │
+                  └───▶│ appt_id PK       │              │
+                       │ doctor_id FK     │              │
+                       │ slot_datetime    │◀─────────────┘
+                       │ status           │   patient_code FK
+                       │ patient_code FK  │
+                       │ created_at       │
+                       │ updated_at       │
+                       │ cancel_reason    │
+                       │ created_by       │
+                       └──────────────────┘
 
-    t_dict_role ||--o{ t_users : "f_role_id"
-    t_users ||--o{ t_refresh_tokens : "f_user_id"
-    t_users ||--o{ t_work_slots : "doctor (f_doctor_id)"
-    t_dict_status ||--o{ t_appointments : "f_status_id"
-    t_users ||--o{ t_appointments : "doctor (f_doctor_id)"
-    t_users ||--o{ t_appointments : "patient (f_patient_id)"
+┌──────────────┐       ┌──────────────────┐
+│    users     │       │     roles        │
+├──────────────┤       ├──────────────────┤
+│ user_id PK   │       │ role_id PK       │
+│ username     │       │ name             │
+│ password_hash│       │ (PATIENT, DOCTOR,│
+│ role_id FK   │       │  REGISTRAR,      │
+│ enabled      │       │  ADMIN)          │
+└──────────────┘       └──────────────────┘
 ```
 
-## Примечание для frontend
+## Сущности и связи
 
-Frontend должен считать `role` и `status` словарными сущностями, а не хардкодить значения в UI.
+| Связь                        | Тип   | Описание                                               |
+|------------------------------|-------|---------------------------------------------------------|
+| doctors → work_slots         | 1 : N | У врача может быть много рабочих слотов                 |
+| doctors → appointments       | 1 : N | У врача может быть много записей на приём                |
+| patients → appointments      | 1 : N | У пациента может быть много записей                      |
+| users → doctors              | 1 : 1 | Врач привязан к учётной записи                           |
+| users → patients             | 1 : 1 | Пациент привязан к учётной записи                        |
+| roles → users                | 1 : N | У роли может быть много пользователей                    |
+
+## Нормализация
+
+Модель приведена к 3НФ:
+
+- **1НФ**: все атрибуты атомарны, нет повторяющихся групп.
+- **2НФ**: все неключевые атрибуты зависят от полного первичного ключа (ключи — одноатрибутные).
+- **3НФ**: нет транзитивных зависимостей (specialty зависит только от doctor_id, а не через промежуточный атрибут).
+
+## Ограничения целостности
+
+| Ограничение                              | Реализация                                |
+|------------------------------------------|-------------------------------------------|
+| Уникальность doctor_id + slot_datetime   | UNIQUE constraint на appointments          |
+| status ∈ {booked, canceled, completed}   | CHECK constraint                           |
+| doctor_id → doctors.doctor_id            | FOREIGN KEY                                |
+| patient_code → patients.patient_code     | FOREIGN KEY                                |
+| slot_datetime внутри рабочего интервала  | Проверка на уровне бизнес-логики (backend) |
