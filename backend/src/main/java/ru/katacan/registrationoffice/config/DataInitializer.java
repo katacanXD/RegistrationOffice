@@ -226,11 +226,11 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private List<User> findAllDoctors() {
-        return fetchAllUsersByPage(page -> userRepository.searchDoctors(null, page));
+        return fetchAllUsersByPage(page -> userRepository.searchDoctors("", page));
     }
 
     private List<User> findAllPatients() {
-        return fetchAllUsersByPage(page -> userRepository.searchPatients(null, page));
+        return fetchAllUsersByPage(page -> userRepository.searchPatients("", page));
     }
 
     private List<User> fetchAllUsersByPage(java.util.function.Function<PageRequest, Page<User>> pageFetcher) {
