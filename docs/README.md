@@ -1,94 +1,154 @@
-# Документация RegistrationOffice
+# RegistrationOffice
 
-Эта папка содержит проектную и эксплуатационную документацию для fullstack-проекта `RegistrationOffice` (backend + frontend).
+## Система управления графиком приёмов врача
 
-## Быстрая навигация
+Сервис решает проблему «окон» в расписании врачей, двойного бронирования и отсутствия прозрачной отчётности. Пациенты записываются на приём через веб-интерфейс, регистратура управляет записями всех врачей, администратор видит загрузку и экспортирует отчёты в CSV.
 
-- Основной обзор проекта: `README.md`
-- Технический runbook: `HELP.md`
-- Деплой на VM через Docker Compose: `DEPLOY_YC_DOCKER.md`
+**Демо:** http://registration-office.ru
+**Ссылка на Kaiten:** https://myoprlove.yougile.com/team/efcc60ee0048/EMIAS-2.0?lang=ru
+**Ссылка на Figma:** https://www.figma.com/design/dhSpD9QDRP79l77V0HJsWv/%D0%9E%D0%9F%D0%94?node-id=0-1&p=f&t=QOJygsnFG9sZETfO-0
 
-## Что сейчас есть в `docs/`
 
-- `docs/README.md` — этот файл (карта документации)
-- `docs/docs/` — основной комплект проектной документации (GOV/DIS/REQ/PLN/ARC/DAT/INT/SPC/TST/OPS)
+---
 
-## Текущие источники истины в коде
+## Команда
 
-При обновлении документации ориентируйтесь на:
+| ФИО                  | Группа     | Роль                  | Логин GitVerse  |
+|----------------------|------------|-----------------------|-----------------|
+| Наботов Карим        | ЭФБО-10-25 | Project Lead          | KatacanXD       |
+| Лукьянов Илья        | ЭФБО-10-25 | Frontend developer    |                 |
+| Чернышов Ярослав     | ЭФБО-10-25 | Backend developer     |                 |
+| Сысоев Георгий       | ЭФБО-10-25 | Backend developer     |                 |
+| Романчук Даниил      | ЭФБО-10-25 | Designer / Tester     |                 |
 
-- API-контроллеры: `backend/src/main/java/ru/katacan/registrationoffice/controller`
-- Security и доступы: `backend/src/main/java/ru/katacan/registrationoffice/config/SecurityConfig.java`
-- Модель данных (JPA сущности): `backend/src/main/java/ru/katacan/registrationoffice/entity`
-- Конфигурация приложения: `backend/src/main/resources/application.properties`
-- Контейнеризация и прокси: `backend/Dockerfile`, `frontend/Dockerfile`, `frontend/nginx/default.conf`, `docker-compose.yml`, `deploy/nginx/default.conf`
+> Логины участников заполняются каждым лично. Карим — владелец репозитория.
 
-## ERD (Mermaid)
+**Заказчик:** Сивцев Алексей Олегович.
 
-```mermaid
-erDiagram
-    t_users {
-        BIGINT f_users_id PK
-        VARCHAR f_login "NOT NULL, UNIQUE"
-        VARCHAR f_fio "NOT NULL"
-        VARCHAR f_password "NOT NULL"
-        VARCHAR f_policy_number "NULL"
-        BIGINT f_role_id FK
-        VARCHAR f_speciality_name "NULL"
-    }
+---
 
-    t_dict_role {
-        BIGINT f_role_id PK
-        VARCHAR f_role_name "NOT NULL, UNIQUE"
-    }
+## Что умеет система
 
-    t_dict_status {
-        BIGINT f_status_id PK
-        VARCHAR f_status_name "NOT NULL, UNIQUE"
-    }
+- **Расписание:** администратор задаёт рабочие интервалы врачей (дата, время, длительность слота, перерывы). Слоты генерируются автоматически.
+- **Запись:** пациент или регистратор выбирает врача, дату и свободный слот. Система проверяет 5 валидаций (врач существует, пациент существует, слот в интервале, не перерыв, не занят).
+- **Перенос/отмена:** запись можно перенести на другой свободный слот или отменить с указанием причины.
+- **Отчёт:** утилизация расписания по врачу/дате/специальности. Экспорт CSV.
+- **Роли:** пациент, врач, регистратура, администратор. JWT-аутентификация.
 
-    t_appointments {
-        BIGINT f_appoint_id PK
-        BIGINT f_doctor_id FK
-        DATETIME f_slot_datetime
-        BIGINT f_status_id FK
-        BIGINT f_patient_id FK
-    }
+---
 
-    t_work_slots {
-        BIGINT f_work_slots_id PK
-        BIGINT f_doctor_id FK
-        DATE f_date
-        TIME f_start_time
-        TIME f_end_time
-        INT f_slot_minutes
-        TIME f_break_start
-        TIME f_break_end
-    }
+## Макеты и сценарии
 
-    t_refresh_tokens {
-        BIGINT f_token_id PK
-        VARCHAR f_token_hash "NOT NULL, UNIQUE"
-        BIGINT f_user_id FK
-        TIMESTAMP f_expiry_date
-        TIMESTAMP f_created_at
-        TIMESTAMP f_revoked_at
-        VARCHAR f_replaced_by_token_hash
-    }
+Дизайн-макеты всех экранов, интерактивные прототипы и анимации пользовательских сценариев собраны в Figma:
 
-    t_dict_role ||--o{ t_users : "f_role_id"
-    t_users ||--o{ t_refresh_tokens : "f_user_id"
-    t_users ||--o{ t_work_slots : "doctor"
-    t_dict_status ||--o{ t_appointments : "f_status_id"
-    t_users ||--o{ t_appointments : "doctor"
-    t_users ||--o{ t_appointments : "patient"
+**[Открыть в Figma](https://www.figma.com/design/dhSpD9QDRP79l77V0HJsWv/%D0%9E%D0%9F%D0%94?node-id=0-1&p=f&t=QOJygsnFG9sZETfO-0)**
+
+Внутри — 10 экранов (логин, выбор врача, календарь слотов, подтверждение записи, мои записи, расписание врача, управление записями, настройка расписания, отчёт утилизации, импорт CSV) и 7 кликабельных прототипов по каждому пользовательскому сценарию: запись, отмена, перенос, просмотр расписания врачом, запись через регистратуру, отчёт и импорт CSV.
+
+Описание экранной логики и привязка к API — в [DOC-ARC-003](docs/04-architecture/DOC-ARC-003-low-fi-wireframes.md), описание анимаций и структура Figma-проекта — в [DOC-ARC-004](docs/04-architecture/DOC-ARC-004-figma-wireframes.md).
+
+---
+
+## Макеты и сценарии
+
+Все дизайн-макеты экранов, интерактивные прототипы и анимации пользовательских сценариев — в Figma:
+
+**[Открыть в Figma](https://www.figma.com/design/dhSpD9QDRP79l77V0HJsWv/%D0%9E%D0%9F%D0%94?node-id=0-1&p=f&t=QOJygsnFG9sZETfO-0)**
+
+Внутри: макеты каждого экрана по ролям (пациент, врач, регистратура, администратор), кликабельные прототипы основных сценариев (запись, отмена, перенос, просмотр расписания, отчёт утилизации, импорт CSV) и анимации переходов.
+
+---
+
+## Стек
+
+| Слой           | Технология                   |
+|----------------|------------------------------|
+| Backend        | Spring Boot (Java)           |
+| Frontend       | React (JS), HTML, CSS        |
+| БД             | PostgreSQL                   |
+| Auth           | JWT                          |
+| Инфраструктура | Docker Compose, Nginx        |
+| Деплой         | Yandex Cloud                 |
+
+---
+
+## Как запустить
+
+```bash
+git clone https://gitverse.ru/KatacanXD/RegistrationOffice.git
+cd RegistrationOffice
+cp .env.example .env        # заполнить пароли
+docker-compose up -d --build
+curl http://localhost:8080/api/doctors
 ```
 
-## Правило обновления документации
+---
 
-Любое изменение API, ролей доступа, env-переменных или структуры БД должно сопровождаться обновлением:
+## Документация
 
-1. `README.md`
-2. `HELP.md`
-3. `DEPLOY_YC_DOCKER.md` (если затронут деплой)
-4. `docs/README.md` (если изменена карта документации)
+Вся проектная документация лежит в `docs/`. Навигация — в [docs/README.md](docs/README.md).
+
+### Что внутри
+
+| Документ                          | Где лежит                                         |
+|-----------------------------------|----------------------------------------------------|
+| Карточка проекта                  | [DOC-GOV-001](docs/00-governance/DOC-GOV-001-project-charter.md)       |
+| Матрица рисков                    | [DOC-GOV-002](docs/00-governance/DOC-GOV-002-risk-matrix.md)           |
+| Роли — кто что делает             | [DOC-GOV-003](docs/00-governance/DOC-GOV-003-team-rules.md)            |
+| Календарный план (WBS)            | [DOC-GOV-004](docs/00-governance/DOC-GOV-004-wbs.md)                   |
+| Предметная область                | [DOC-DSC-001](docs/01-discovery/DOC-DSC-001-domain-research.md)        |
+| Персоны пользователей             | [DOC-DSC-002](docs/01-discovery/DOC-DSC-002-personas.md)               |
+| User Stories                      | [DOC-REQ-001](docs/02-requirements/DOC-REQ-001-user-stories.md)        |
+| User Story Map                    | [DOC-REQ-002](docs/02-requirements/DOC-REQ-002-user-story-map.md)      |
+| UX-сценарии всех ролей            | [DOC-REQ-003](docs/02-requirements/DOC-REQ-003-ux-scenarios.md)        |
+| Оценка реализуемости              | [DOC-PLN-001](docs/03-planning/DOC-PLN-001-feasibility.md)             |
+| Фич-лист (по часам и разработчикам)| [DOC-PLN-002](docs/03-planning/DOC-PLN-002-feature-list.md)            |
+| BPMN — бизнес-процессы            | [DOC-ARC-001](docs/04-architecture/DOC-ARC-001-bpmn-processes.md)      |
+| Архитектура + границы MVP          | [DOC-ARC-002](docs/04-architecture/DOC-ARC-002-system-context.md)      |
+| Low-fi wireframes (экранная логика)| [DOC-ARC-003](docs/04-architecture/DOC-ARC-003-low-fi-wireframes.md)   |
+| Figma: макеты и анимации           | [DOC-ARC-004](docs/04-architecture/DOC-ARC-004-figma-wireframes.md)    |
+| ER-диаграмма                      | [DOC-DAT-001](docs/05-data-and-integration/DOC-DAT-001-erd.md)         |
+| Словарь данных                    | [DOC-DAT-002](docs/05-data-and-integration/DOC-DAT-002-data-dictionary.md)|
+| REST API (GET/POST/PUT)           | [DOC-DAT-003](docs/05-data-and-integration/DOC-DAT-003-api-specification.md)|
+| DFD                               | [DOC-DAT-004](docs/05-data-and-integration/DOC-DAT-004-dfd.md)         |
+| Маппинг данных                    | [DOC-DAT-005](docs/05-data-and-integration/DOC-DAT-005-data-mapping.md) |
+| SQL-запросы к БД (6 шт.)          | [DOC-DAT-006](docs/05-data-and-integration/DOC-DAT-006-sql-queries.md)  |
+| Финальная спецификация            | [DOC-SPC-001](docs/06-final-specification/DOC-SPC-001-final-specification.md)|
+| Архитектура решения               | [DOC-SPC-002](docs/06-final-specification/DOC-SPC-002-solution-architecture.md)|
+| Сводка точек интеграции           | [DOC-SPC-003](docs/06-final-specification/DOC-SPC-003-integration-points.md)|
+| Тест-кейсы (14 шт.)              | [DOC-OPS-001](docs/07-validation-and-delivery/DOC-OPS-001-test-scenarios.md)|
+| Демо-сценарий                     | [DOC-OPS-002](docs/07-validation-and-delivery/DOC-OPS-002-demo-scenario.md)|
+| Деплой (runbook)                  | [DOC-OPS-003](docs/07-validation-and-delivery/DOC-OPS-003-deployment-plan.md)|
+
+### Контрольные точки
+
+| CP  | Дата       | Что сделано                                    |
+|-----|------------|------------------------------------------------|
+| [CP1](docs/90-checkpoints/CP1-deliverables.md) | 16.03 | Устав, персоны, user stories, риски, WBS |
+| [CP2](docs/90-checkpoints/CP2-deliverables.md) | 06.04 | BPMN, Event Storming, контекст, wireframes |
+| [CP3](docs/90-checkpoints/CP3-deliverables.md) | 20.04 | ERD, API, DFD, SQL-запросы, маппинг |
+| [CP4](docs/90-checkpoints/CP4-deliverables.md) | 01.05 | Финальное ТЗ, тесты, демо, деплой |
+
+---
+
+## Структура репозитория
+
+```
+RegistrationOffice/
+├── docs/                           # Документация (22 документа)
+│   ├── 00-governance/              # Карточка, риски, роли, WBS
+│   ├── 01-discovery/               # Предметная область, персоны
+│   ├── 02-requirements/            # User stories, UX-сценарии
+│   ├── 03-planning/                # Реализуемость, фич-лист
+│   ├── 04-architecture/            # BPMN, архитектура
+│   ├── 05-data-and-integration/    # ERD, API, DFD, SQL, маппинг
+│   ├── 06-final-specification/     # Финальное ТЗ
+│   ├── 07-validation-and-delivery/ # Тесты, демо, деплой
+│   ├── 90-checkpoints/             # CP1–CP4
+│   └── 98-source-materials/        # Исходный кейс
+├── src/                            # Spring Boot (Java)
+├── deploy/                         # Nginx
+├── Dockerfile
+├── docker-compose.yml
+└── README.md                       # Этот файл
+```
