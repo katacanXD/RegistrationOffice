@@ -6,9 +6,13 @@ import ru.katacan.registrationoffice.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import ru.katacan.registrationoffice.util.LoginNormalizer;
+
+import org.jspecify.annotations.NonNull;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,6 +25,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
+    private static final int TOTAL_TEST_USERS = 100;
+    private static final int TEST_DOCTORS_COUNT = 10;
+    private static final int TEST_REGISTRARS_COUNT = 1;
+    private static final int TEST_ADMINS_COUNT = 1;
+
     private final DictStatusRepository statusRepository;
     private final DictRoleRepository roleRepository;
     private final UserRepository userRepository;
@@ -31,7 +40,7 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     @Transactional
-    public void run(String... args) {
+    public void run(String @NonNull... args) {
         // Инициализация словарей, если их нет
         initDicts();
 
@@ -81,27 +90,54 @@ public class DataInitializer implements CommandLineRunner {
             DictRole registrarRole = roleRepository.findByName("registrar").orElseThrow();
             DictRole adminRole = roleRepository.findByName("admin").orElseThrow();
 
-            // Пациенты
-            createUser("patient_ivanov", "Иванов Иван Иванович", "pass123", null, patientRole);
-            createUser("patient_petrov", "Петров Петр Петрович", "pass123", "1234567890123456", patientRole);
-            createUser("patient_sidorova", "Сидорова Анна Сергеевна", "pass123", null, patientRole);
-            createUser("patient_kozlov", "Козлов Дмитрий Николаевич", "pass123", "9876543210987654", patientRole);
+            String[] specialities = {
+                    "Терапевт",
+                    "Отоларинголог",
+                    "Офтальмолог",
+                    "Кардиолог",
+                    "Невролог"
+            };
 
-            // Врачи
-            createUser("doctor_keminova", "Кеминова Екатерина Юрьевна", "doc123", null, doctorRole)
-                    .setSpeciality("Терапевт");
-            createUser("doctor_ivanov", "Иванов Иван Иванович", "doc123", null, doctorRole)
-                    .setSpeciality("Отоларинголог");
-            createUser("doctor_ahmetov", "Ахметов Демеург Евгеньевич", "doc123", null, doctorRole)
-                    .setSpeciality("Терапевт");
-            createUser("doctor_smirnova", "Смирнова Ольга Викторовна", "doc123", null, doctorRole)
-                    .setSpeciality("Офтальмолог");
+            for (int i = 1; i <= TEST_DOCTORS_COUNT; i++) {
+                createUser(
+                        String.format("doctor_%03d", i),
+                        String.format("Врач Тестовый %03d", i),
+                        "doc123",
+                        null,
+                        doctorRole
+                ).setSpeciality(specialities[(i - 1) % specialities.length]);
+            }
 
-            // Регистратор
-            createUser("registrar_main", "Регистратор Регистратор Регистраторович", "reg123", null, registrarRole);
+            for (int i = 1; i <= TEST_REGISTRARS_COUNT; i++) {
+                createUser(
+                        String.format("registrar_%03d", i),
+                        String.format("Регистратор Тестовый %03d", i),
+                        "reg123",
+                        null,
+                        registrarRole
+                );
+            }
 
-            // Админ
-            createUser("admin_main", "Администратор Админ Админович", "admin123", null, adminRole);
+            for (int i = 1; i <= TEST_ADMINS_COUNT; i++) {
+                createUser(
+                        String.format("admin_%03d", i),
+                        String.format("Администратор Тестовый %03d", i),
+                        "admin123",
+                        null,
+                        adminRole
+                );
+            }
+
+            int patientsCount = TOTAL_TEST_USERS - TEST_DOCTORS_COUNT - TEST_REGISTRARS_COUNT - TEST_ADMINS_COUNT;
+            for (int i = 1; i <= patientsCount; i++) {
+                createUser(
+                        String.format("patient_%03d", i),
+                        String.format("Пациент Тестовый %03d", i),
+                        "pass123",
+                        String.format("%016d", 1_000_000_000_000_000L + i),
+                        patientRole
+                );
+            }
 
             userRepository.flush();
         }
@@ -119,10 +155,7 @@ public class DataInitializer implements CommandLineRunner {
 
     private void initTestWorkSlots() {
         if (workSlotRepository.count() == 0) {
-            // Заменяем вызов на фильтрацию по роли вручную
-            List<User> doctors = userRepository.findAll().stream()
-                    .filter(u -> "doctor".equals(u.getRole().getName()))
-                    .toList();
+            List<User> doctors = findAllDoctors();
             LocalDate today = LocalDate.now();
 
             for (User doctor : doctors) {
@@ -159,18 +192,8 @@ public class DataInitializer implements CommandLineRunner {
         if (appointmentRepository.count() == 0) {
             DictStatus bookedStatus = statusRepository.findByName("booked").orElseThrow();
 
-// 1. Получаем ВООБЩЕ ВСЕХ пользователей из базы одним списком
-            List<User> allUsers = userRepository.findAll();
-
-            // 2. Фильтруем этот список в памяти, чтобы достать врачей
-            List<User> doctors = allUsers.stream()
-                    .filter(u -> u.getRole() != null && "doctor".equals(u.getRole().getName()))
-                    .toList();
-
-            // 3. Фильтруем этот же список, чтобы достать пациентов
-            List<User> patients = allUsers.stream()
-                    .filter(u -> u.getRole() != null && "patient".equals(u.getRole().getName()))
-                    .toList();
+            List<User> doctors = findAllDoctors();
+            List<User> patients = findAllPatients();
             LocalDate tomorrow = LocalDate.now().plusDays(1);
 
             if (!doctors.isEmpty() && !patients.isEmpty()) {
@@ -201,4 +224,32 @@ public class DataInitializer implements CommandLineRunner {
             appointmentRepository.flush();
         }
     }
+
+    private List<User> findAllDoctors() {
+        return fetchAllUsersByPage(page -> userRepository.searchDoctors("", page));
+    }
+
+    private List<User> findAllPatients() {
+        return fetchAllUsersByPage(page -> userRepository.searchPatients("", page));
+    }
+
+    private List<User> fetchAllUsersByPage(java.util.function.Function<PageRequest, Page<User>> pageFetcher) {
+        List<User> result = new java.util.ArrayList<>();
+        int pageNumber = 0;
+        int pageSize = 50;
+
+        while (true) {
+            Page<User> page = pageFetcher.apply(PageRequest.of(pageNumber, pageSize));
+            result.addAll(page.getContent());
+
+            if (!page.hasNext()) {
+                break;
+            }
+
+            pageNumber++;
+        }
+
+        return result;
+    }
 }
+
