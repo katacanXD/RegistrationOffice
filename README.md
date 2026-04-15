@@ -1,4 +1,7 @@
 ### Ссылка на тестовый сайт: http://registration-office.ru
+### Ссылка на Kaiten: https://myoprlove.yougile.com/team/efcc60ee0048/EMIAS-2.0?lang=ru
+### Ссылка на Figma: https://www.figma.com/design/dhSpD9QDRP79l77V0HJsWv/%D0%9E%D0%9F%D0%94?node-id=0-1&p=f&t=QOJygsnFG9sZETfO-0
+
 
 # RegistrationOffice - Карта документации
 
