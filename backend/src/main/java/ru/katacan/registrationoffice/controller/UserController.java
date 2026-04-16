@@ -29,7 +29,7 @@ public class UserController {
     @PostMapping("/me/change-password")
     public ResponseEntity<SuccessResponseDto> changeMyPassword(
             Authentication authentication,
-            @RequestBody ChangePasswordRequestDto request
+            @Valid @RequestBody ChangePasswordRequestDto request
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userService.changeOwnPassword(authentication.getName(), request));
