@@ -20,18 +20,18 @@
 
 | Код          | Документ                           | Статус | Ссылка                                                                            |
 |--------------|------------------------------------|--------|-----------------------------------------------------------------------------------|
-| DOC-SPC-001  | Финальная спецификация решения     | v0.1   | [final-specification](../06-final-specification/DOC-SPC-001-final-specification.md)|
-| DOC-OPS-001  | Сценарии проверки (тест-кейсы)     | v0.1   | [test-scenarios](../07-validation-and-delivery/DOC-OPS-001-test-scenarios.md)      |
-| DOC-OPS-002  | Демо-сценарий                      | v0.1   | [demo-scenario](../07-validation-and-delivery/DOC-OPS-002-demo-scenario.md)        |
-| DOC-OPS-003  | План развёртывания и runbook       | v0.1   | [deployment-plan](../07-validation-and-delivery/DOC-OPS-003-deployment-plan.md)    |
+| DOC-SPC-001  | Финальная спецификация решения     | v1.2   | [final-specification](../06-final-specification/DOC-SPC-001-final-technical-specification.md)|
+| DOC-TST-001  | Приемочные сценарии                | v1.1   | [test-scenarios](../07-validation-and-delivery/DOC-TST-001-acceptance-test-scenarios.md)      |
+| DOC-OPS-001  | Демо-сценарий                      | v1.2   | [demo-scenario](../07-validation-and-delivery/DOC-OPS-001-demo-scenario-and-walkthrough.md)        |
+| DOC-OPS-002  | План пилота и передачи             | v1.2   | [handover-plan](../07-validation-and-delivery/DOC-OPS-002-pilot-rollout-and-handover-plan.md)    |
+| DOC-OPS-003  | План развёртывания и runbook       | v1.2   | [deployment-plan](../07-validation-and-delivery/DOC-OPS-003-deployment-plan-and-runbook.md)    |
 
 ## Ключевые результаты CP4
 
 1. Собрана финальная спецификация, объединяющая все проектные артефакты.
-2. Подготовлено 14 тест-кейсов, покрывающих все 7 валидаций и ключевые сценарии.
-3. Написан демо-сценарий на 15 минут с 7 шагами.
-4. Составлен runbook развёртывания (Docker Compose + Yandex Cloud).
-5. Проект развёрнут и доступен по адресу http://registration-office.ru/api.
+2. Подготовлены приемочные сценарии и демо-скрипт.
+3. Составлен runbook развёртывания (Docker Compose + Yandex Cloud).
+4. Проект развёрнут и доступен по адресу http://registration-office.ru.
 
 ## Практические работы, покрытые CP4
 

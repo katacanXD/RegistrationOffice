@@ -20,18 +20,18 @@
 
 | Код          | Документ                         | Статус | Ссылка                                                                          |
 |--------------|----------------------------------|--------|---------------------------------------------------------------------------------|
-| DOC-DAT-001  | ER-диаграмма                     | v0.2   | [erd](../05-data-and-integration/DOC-DAT-001-erd.md)                             |
-| DOC-DAT-002  | Словарь данных                   | v0.1   | [data-dictionary](../05-data-and-integration/DOC-DAT-002-data-dictionary.md)     |
-| DOC-DAT-003  | REST API спецификация            | v0.2   | [api-specification](../05-data-and-integration/DOC-DAT-003-api-specification.md) |
-| DOC-DAT-004  | DFD                              | v0.1   | [dfd](../05-data-and-integration/DOC-DAT-004-dfd.md)                             |
-| DOC-DAT-005  | Таблица маппинга данных          | v0.1   | [data-mapping](../05-data-and-integration/DOC-DAT-005-data-mapping.md)           |
+| DOC-DAT-001  | ER-диаграмма                     | v1.2   | [erd](../05-data-and-integration/DOC-DAT-001-logical-data-model-and-erd.md)                             |
+| DOC-DAT-002  | Словарь данных                   | v1.2   | [data-dictionary](../05-data-and-integration/DOC-DAT-002-data-dictionary-and-validation-rules.md)     |
+| DOC-DAT-003  | REST API спецификация            | v1.0   | [api-specification](../05-data-and-integration/DOC-DAT-003-api-specification.md) |
+| DOC-DAT-004  | DFD                              | v0.1   | [dfd](../05-data-and-integration/DOC-DAT-004.md)                             |
+| DOC-DAT-005  | Таблица маппинга данных          | v0.2   | [data-mapping](../05-data-and-integration/DAT-005-data-mapping.md)           |
 
 ## Ключевые результаты CP3
 
-1. Спроектирована логическая модель данных (6 таблиц), приведена к 3НФ.
-2. Составлен словарь данных с описанием всех полей, типов и ограничений.
-3. Специфицировано REST API: 15+ эндпоинтов с описанием параметров, тел и кодов ответа.
-4. Построена DFD (уровни 0 и 1) с 7 процессами и 5 хранилищами.
+1. Спроектирована логическая модель данных, приведена к 3НФ.
+2. Составлен словарь данных с описанием полей, типов и ог��аничений.
+3. Специфицировано REST API в актуальном `/api/v1`-контуре.
+4. Построена DFD (уровни 0 и 1).
 5. Составлена таблица маппинга для CSV-импорта/экспорта и API-ответов.
 
 ## Практические работы, покрытые CP3

@@ -61,7 +61,7 @@
 - Ссылка «Зарегистрироваться» → форма регистрации (username, password, роль).
 - При ошибке — inline-сообщение под формой.
 
-**API:** `POST /api/auth/login`, `POST /api/auth/register`
+**API:** `POST /api/v1/auth/login`, `POST /api/v1/auth/registration`
 
 ---
 
@@ -75,7 +75,7 @@
 - При выборе врача → появляется календарь с доступными датами.
 - Даты с доступными слотами подсвечены зелёным.
 
-**API:** `GET /api/doctors`, `GET /api/work-slots?doctorId=...&date=...`
+**API:** `GET /api/v1/doctors`, `GET /api/v1/doctors/{doctorId}/slots?date=...`
 
 ---
 
@@ -90,7 +90,7 @@
 - Перерывы — отмечены штриховкой.
 - При клике на слот → модальное окно подтверждения.
 
-**API:** `GET /api/work-slots?doctorId=...&date=...`, `GET /api/appointments?doctorId=...&date=...`
+**API:** `GET /api/v1/doctors/{doctorId}/slots?date=...`, `GET /api/v1/doctors/{doctorId}/public/calendar?month=...&year=...`
 
 ---
 
@@ -104,7 +104,7 @@
 - При успехе → toast «Запись создана» + редирект на «Мои записи».
 - При ошибке (двойное бронирование) → toast с описанием.
 
-**API:** `POST /api/appointments`
+**API:** `POST /api/v1/appointments` или `POST /api/v1/appointments/me`
 
 ---
 
@@ -119,7 +119,7 @@
 - «Отменить» → модальное окно с полем «Причина».
 - «Перенести» → переход на экран 3 (выбор нового слота).
 
-**API:** `GET /api/appointments?patientCode=...`, `PUT /api/appointments/{id}/cancel`, `PUT /api/appointments/{id}/reschedule`
+**API:** `GET /api/v1/patients/me/dashboard`, `PATCH /api/v1/appointments/{id}`, `DELETE /api/v1/appointments/{id}`
 
 ---
 
@@ -133,7 +133,7 @@
 - Неделя: горизонтальная сетка 7 колонок, слоты как цветные ячейки.
 - Клик на запись → детали (ФИО, статус, кнопка «Завершить приём»).
 
-**API:** `GET /api/appointments?doctorId=...&date=...`
+**API:** `GET /api/v1/doctors/{doctorId}/schedule?date=...`
 
 ---
 
@@ -146,7 +146,7 @@
 - Таблица результатов: дата, время, врач, пациент, статус.
 - Действия: «Отменить», «Перенести» — аналогично экрану 5.
 
-**API:** `GET /api/appointments?doctorId=...&date=...&status=...`
+**API:** `GET /api/v1/users?search=...&page=...&size=...`, `GET /api/v1/appointments/{id}`
 
 ---
 
@@ -161,7 +161,7 @@
 - Кнопка «Импорт CSV» → переход на экран 10.
 - Превью: список сгенерированных слотов перед сохранением.
 
-**API:** `POST /api/work-slots`
+**API:** `POST /api/v1/admins/import/work-slots`
 
 ---
 
@@ -175,7 +175,7 @@
 - Визуализация: bar chart утилизации по дням.
 - Кнопка «Экспорт CSV».
 
-**API:** `GET /api/reports/utilization?from=...&to=...`, `GET /api/reports/utilization/export-csv`
+**API:** `GET /api/v1/admins/export/appointments`, `GET /api/v1/admins/export/work-slots`
 
 ---
 
@@ -190,7 +190,7 @@
 - Результат: «Импортировано: N, пропущено: M».
 - Повторная загрузка того же файла → пропущены дубли (идемпотентность).
 
-**API:** `POST /api/work-slots/import-csv`
+**API:** `POST /api/v1/admins/import/work-slots`
 
 ---
 

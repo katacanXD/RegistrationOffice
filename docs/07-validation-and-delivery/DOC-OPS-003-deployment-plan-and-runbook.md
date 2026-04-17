@@ -56,8 +56,9 @@ cd RegistrationOffice
 ```
 
 ### 2. Настроить переменные окружения
-- доступен `POST /api/v1/auth/login`;
-- backend контейнер в `running`;
+
+- используйте `.env.example` как базу;
+- backend контейнер должен подниматься без ошибок;
 - postgres принимает подключения;
 - frontend доступен по `/` и открывает SPA без 404 на маршрутах.
 
@@ -111,17 +112,17 @@ docker-compose up -d --build
 docker-compose ps
 
 # Проверить API
-curl http://localhost:8080/api/doctors
+curl http://localhost:8080/api/v1/doctors
 
 # Проверить через домен
-curl http://registration-office.ru/api/doctors
+curl http://registration-office.ru/api/v1/doctors
 ```
 
 ### 5. Загрузить начальные данные (при необходимости)
 
 ```bash
 # Импорт врачей, пациентов, слотов через CSV или SQL-скрипты
-# (описано в документации к API: POST /api/work-slots/import-csv)
+# (описано в документации к API: POST /api/v1/admins/import/work-slots)
 ```
 
 ## Обновление

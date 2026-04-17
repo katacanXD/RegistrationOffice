@@ -201,13 +201,13 @@ RegistrationOffice (Figma)
 
 | Экран                   | UX-сценарий (DOC-REQ-003) | User Story    | API-эндпоинт                |
 |-------------------------|---------------------------|---------------|------------------------------|
-| Логин                   | —                         | —             | POST /api/auth/login         |
-| Выбор врача             | Сценарий 1, шаг 1-2      | US-P1         | GET /api/doctors             |
-| Календарь слотов        | Сценарий 1, шаг 3-4      | US-P1         | GET /api/work-slots          |
-| Подтверждение записи    | Сценарий 1, шаг 5-6      | US-P2         | POST /api/appointments       |
-| Мои записи              | Сценарий 2, 3             | US-P3, US-P4  | GET /api/appointments        |
-| Расписание врача        | Сценарий 4                | US-D1, US-D2  | GET /api/appointments        |
-| Управление записями     | Сценарий 5, 6             | US-R1–R4      | GET/PUT /api/appointments    |
-| Настройка расписания    | Сценарий 7                | US-A1         | POST /api/work-slots         |
-| Отчёт утилизации        | Сценарий 8                | US-A2, US-A3  | GET /api/reports/utilization |
-| Импорт CSV              | Сценарий 7, шаг 4         | US-A5         | POST /api/work-slots/import-csv |
+| Логин                   | —                         | —             | POST /api/v1/auth/login |
+| Выбор врача             | Сценарий 1, шаг 1-2      | US-P1         | GET /api/v1/doctors |
+| Календарь слотов        | Сценарий 1, шаг 3-4      | US-P1         | GET /api/v1/doctors/{doctorId}/slots |
+| Подтверждение записи    | Сценарий 1, шаг 5-6      | US-P2         | POST /api/v1/appointments/me |
+| ��ои записи              | Сценарий 2, 3             | US-P3, US-P4  | GET /api/v1/patients/me/dashboard |
+| Расписание врача        | Сценарий 4                | US-D1, US-D2  | GET /api/v1/doctors/{doctorId}/schedule |
+| Управление записями     | Сценарий 5, 6             | US-R1–R4      | GET/PATCH/DELETE /api/v1/appointments/* |
+| Настройка расписания    | Сценарий 7                | US-A1         | POST /api/v1/admins/import/work-slots |
+| Отчёт утилизации        | Сценарий 8                | US-A2, US-A3  | GET /api/v1/admins/export/* |
+| Импорт CSV              | Сценарий 7, шаг 4         | US-A5         | POST /api/v1/admins/import/* |
