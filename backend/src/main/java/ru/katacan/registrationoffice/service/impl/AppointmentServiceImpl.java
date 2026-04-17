@@ -13,6 +13,7 @@ import ru.katacan.registrationoffice.repository.UserRepository;
 import ru.katacan.registrationoffice.repository.WorkSlotRepository;
 import ru.katacan.registrationoffice.service.AppointmentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.katacan.registrationoffice.util.LoginNormalizer;
@@ -103,7 +104,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         appointment.setSlotDateTime(slotTime);
         appointment.setStatus(status);
 
-        appointmentRepository.save(appointment);
+        persistAppointmentOrThrowSlotConflict(appointment, "Этот слот уже занят");
 
         return appointmentMapper.toCreateResponse(appointment, doctor);
     }
@@ -138,7 +139,7 @@ public class AppointmentServiceImpl implements AppointmentService {
             appointment.setSlotDateTime(newSlotTime);
         }
 
-        appointmentRepository.save(appointment);
+        persistAppointmentOrThrowSlotConflict(appointment, "Этот слот уже занят другим пациентом");
 
         return appointmentMapper.toUpdateResponse(appointment);
     }
@@ -227,5 +228,17 @@ public class AppointmentServiceImpl implements AppointmentService {
                                 slot.getBreakStart(),
                                 slot.getBreakEnd())
                         .contains(time));
+    }
+
+    private void persistAppointmentOrThrowSlotConflict(Appointment appointment, String conflictMessage) {
+        try {
+            appointmentRepository.saveAndFlush(appointment);
+        } catch (DataIntegrityViolationException e) {
+            String rootMessage = e.getMostSpecificCause().getMessage();
+            if (rootMessage != null && rootMessage.contains("active appointment for this doctor slot")) {
+                throw new SlotNotAvailableException(conflictMessage);
+            }
+            throw e;
+        }
     }
 }

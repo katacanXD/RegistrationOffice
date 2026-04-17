@@ -12,7 +12,6 @@ public class OpenApiConfig {
     @Bean
     public ModelResolver modelResolver() {
         ObjectMapper mapper = new ObjectMapper();
-        // Устанавливаем стратегию snake_case
         mapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
         return new ModelResolver(mapper);
     }

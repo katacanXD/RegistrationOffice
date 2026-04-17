@@ -30,6 +30,7 @@ public class UserMapper {
                         .fio(user.getFullName())
                         .role(user.getRole() != null ? user.getRole().getName() : null)
                         .policyNumber(user.getPolicyNumber())
+                        .specialty(user.getSpeciality())
                         .build())
                 .build();
     }
@@ -41,6 +42,7 @@ public class UserMapper {
                 .fio(user.getFullName())
                 .role(user.getRole() != null ? user.getRole().getName() : null)
                 .policyNumber(user.getPolicyNumber())
+                .specialty(user.getSpeciality())
                 .build();
     }
 

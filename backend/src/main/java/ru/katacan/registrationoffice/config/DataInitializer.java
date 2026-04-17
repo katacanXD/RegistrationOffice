@@ -160,7 +160,7 @@ public class DataInitializer implements CommandLineRunner {
 
             for (User doctor : doctors) {
                 // Создаем слоты на сегодня и ближайшие дни
-                for (int i = 0; i < 7; i++) {
+                for (int i = 0; i < 30; i++) {
                     LocalDate date = today.plusDays(i);
 
                     WorkSlot morningSlot = new WorkSlot();

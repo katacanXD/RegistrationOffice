@@ -35,7 +35,7 @@ public class UserController {
                 .body(userService.changeOwnPassword(authentication.getName(), request));
     }
 
-    @PreAuthorize("hasAnyAuthority('admin', 'registrar')")
+    @PreAuthorize("hasAnyAuthority('admin')")
     @GetMapping
     public ResponseEntity<UserListDto> getAllUsers(
             @RequestParam(required = false) String search,

@@ -2,7 +2,6 @@ package ru.katacan.registrationoffice.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,7 +11,7 @@ import ru.katacan.registrationoffice.dto.CsvExportResultDto;
 import ru.katacan.registrationoffice.dto.CsvImportResultDto;
 import ru.katacan.registrationoffice.service.CsvService;
 
-import java.time.LocalDate;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/api/v1/admins")
@@ -71,7 +70,7 @@ public class AdminController {
     public ResponseEntity<CsvImportResultDto> importDoctors(@RequestParam("file") MultipartFile file) {
         log.info("Received request to import doctors from file: {}", file.getOriginalFilename());
         try {
-            String csvContent = new String(file.getBytes(), "UTF-8");
+            String csvContent = new String(file.getBytes(), StandardCharsets.UTF_8);
             CsvImportResultDto result = csvService.importDoctors(csvContent);
             
             HttpStatus status = "SUCCESS".equals(result.getStatus()) ? HttpStatus.OK : 
@@ -84,7 +83,7 @@ public class AdminController {
                     .rowsSuccessful(0)
                     .rowsFailed(0)
                     .status("FAILED")
-                    .message("Ошибка при обработке файла: " + e.getMessage())
+                    .message(resolveErrorMessage(e))
                     .build();
             return ResponseEntity.badRequest().body(errorResult);
         }
@@ -98,7 +97,7 @@ public class AdminController {
     public ResponseEntity<CsvImportResultDto> importPatients(@RequestParam("file") MultipartFile file) {
         log.info("Received request to import patients from file: {}", file.getOriginalFilename());
         try {
-            String csvContent = new String(file.getBytes(), "UTF-8");
+            String csvContent = new String(file.getBytes(), StandardCharsets.UTF_8);
             CsvImportResultDto result = csvService.importPatients(csvContent);
             
             HttpStatus status = "SUCCESS".equals(result.getStatus()) ? HttpStatus.OK : 
@@ -111,7 +110,7 @@ public class AdminController {
                     .rowsSuccessful(0)
                     .rowsFailed(0)
                     .status("FAILED")
-                    .message("Ошибка при обработке файла: " + e.getMessage())
+                    .message(resolveErrorMessage(e))
                     .build();
             return ResponseEntity.badRequest().body(errorResult);
         }
@@ -125,7 +124,7 @@ public class AdminController {
     public ResponseEntity<CsvImportResultDto> importAppointments(@RequestParam("file") MultipartFile file) {
         log.info("Received request to import appointments from file: {}", file.getOriginalFilename());
         try {
-            String csvContent = new String(file.getBytes(), "UTF-8");
+            String csvContent = new String(file.getBytes(), StandardCharsets.UTF_8);
             CsvImportResultDto result = csvService.importAppointments(csvContent);
             
             HttpStatus status = "SUCCESS".equals(result.getStatus()) ? HttpStatus.OK : 
@@ -138,7 +137,7 @@ public class AdminController {
                     .rowsSuccessful(0)
                     .rowsFailed(0)
                     .status("FAILED")
-                    .message("Ошибка при обработке файла: " + e.getMessage())
+                    .message(resolveErrorMessage(e))
                     .build();
             return ResponseEntity.badRequest().body(errorResult);
         }
@@ -152,7 +151,7 @@ public class AdminController {
     public ResponseEntity<CsvImportResultDto> importWorkSlots(@RequestParam("file") MultipartFile file) {
         log.info("Received request to import work slots from file: {}", file.getOriginalFilename());
         try {
-            String csvContent = new String(file.getBytes(), "UTF-8");
+            String csvContent = new String(file.getBytes(), StandardCharsets.UTF_8);
             CsvImportResultDto result = csvService.importWorkSlots(csvContent);
             
             HttpStatus status = "SUCCESS".equals(result.getStatus()) ? HttpStatus.OK : 
@@ -165,9 +164,15 @@ public class AdminController {
                     .rowsSuccessful(0)
                     .rowsFailed(0)
                     .status("FAILED")
-                    .message("Ошибка при обработке файла: " + e.getMessage())
+                    .message(resolveErrorMessage(e))
                     .build();
             return ResponseEntity.badRequest().body(errorResult);
         }
+    }
+
+    private String resolveErrorMessage(Exception e) {
+        return e.getMessage() != null && !e.getMessage().isBlank()
+                ? e.getMessage()
+                : "Ошибка при обработке файла";
     }
 }
