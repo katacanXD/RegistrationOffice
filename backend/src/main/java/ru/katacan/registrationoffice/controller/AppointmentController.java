@@ -30,7 +30,7 @@ public class AppointmentController {
                 .body(appointmentService.createAppointment(appointmentRequestDto));
     }
 
-    @PreAuthorize("hasAuthority('patient')")
+    @PreAuthorize("hasAnyAuthority('admin', 'patient')")
     @PostMapping("/me")
     public ResponseEntity<?> createOwnAppointment(
             Authentication authentication,

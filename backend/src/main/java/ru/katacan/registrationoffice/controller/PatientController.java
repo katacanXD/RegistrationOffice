@@ -20,7 +20,7 @@ public class PatientController {
 
     private final UserService userService;
 
-    @PreAuthorize("hasAuthority('patient')")
+    @PreAuthorize("hasAnyAuthority('admin', 'patient')")
     @GetMapping("/me/dashboard")
     public ResponseEntity<PatientDashboardDto> getDashboard(
             Authentication authentication
@@ -29,7 +29,7 @@ public class PatientController {
                 userService.getDashboardByLogin(authentication.getName()));
     }
 
-    @PreAuthorize("hasAuthority('patient')")
+    @PreAuthorize("hasAnyAuthority('admin', 'patient')")
     @PatchMapping("/me/policy")
     public ResponseEntity<?> updatePolicy(
             Authentication authentication,

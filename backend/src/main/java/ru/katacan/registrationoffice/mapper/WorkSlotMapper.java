@@ -1,7 +1,9 @@
 package ru.katacan.registrationoffice.mapper;
 
 import ru.katacan.registrationoffice.dto.*;
+import ru.katacan.registrationoffice.entity.Appointment;
 import ru.katacan.registrationoffice.entity.WorkSlot;
+import ru.katacan.registrationoffice.util.SlotGenerator;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
@@ -33,16 +35,29 @@ public class WorkSlotMapper {
     }
 
     private List<DoctorSlotsDto.SlotDto> generateTimeSlots(WorkSlot slot) {
-        // Логика генерации слотов по slotMinutes
-        // TODO: реализовать генерацию временных слотов
-        return List.of();
+        List<LocalTime> slots = SlotGenerator.generateSlots(
+                slot.getStartTime(),
+                slot.getEndTime(),
+                slot.getSlotMinutes(),
+                slot.getBreakStart(),
+                slot.getBreakEnd()
+        );
+
+        return slots.stream()
+                .map(time -> DoctorSlotsDto.SlotDto.builder()
+                        .time(time.format(timeFormatter))
+                        .isAvailable(true)
+                        .build())
+                .collect(Collectors.toList());
     }
 
-    /*
-    public DoctorSlotsDto toDoctorSlots(Long doctorId, String date, List<WorkSlot> slots,
-                                        DoctorSlotsDto.BreakDto breakDto, Set<LocalTime> bookedTimes) {
+    /**
+     * Генерирует DTO с учетом забронированных слотов
+     */
+    public DoctorSlotsDto toDoctorSlotsWithAvailability(Long doctorId, String date, List<WorkSlot> slots,
+                                                        DoctorSlotsDto.BreakDto breakDto, Set<LocalTime> bookedTimes) {
         List<DoctorSlotsDto.SlotDto> slotDtos = slots.stream()
-                .flatMap(slot -> generateTimeSlots(slot, bookedTimes).stream())
+                .flatMap(slot -> generateTimeSlotsWithAvailability(slot, bookedTimes).stream())
                 .collect(Collectors.toList());
 
         return DoctorSlotsDto.builder()
@@ -53,30 +68,22 @@ public class WorkSlotMapper {
                 .build();
     }
 
-    private List<DoctorSlotsDto.SlotDto> generateTimeSlots(WorkSlot slot, Set<LocalTime> bookedTimes) {
-        List<DoctorSlotsDto.SlotDto> result = new java.util.ArrayList<>();
-        LocalTime current = slot.getStartTime();
-        LocalTime end = slot.getEndTime();
-        int minutes = slot.getSlotMinutes();
+    private List<DoctorSlotsDto.SlotDto> generateTimeSlotsWithAvailability(WorkSlot slot, Set<LocalTime> bookedTimes) {
+        List<LocalTime> slots = SlotGenerator.generateSlots(
+                slot.getStartTime(),
+                slot.getEndTime(),
+                slot.getSlotMinutes(),
+                slot.getBreakStart(),
+                slot.getBreakEnd()
+        );
 
-        while (!current.plusMinutes(minutes).isAfter(end)) {
-            LocalTime slotEnd = current.plusMinutes(minutes);
-
-            boolean isDuringBreak = slot.getBreakStart() != null && slot.getBreakEnd() != null
-                    && current.isBefore(slot.getBreakEnd())
-                    && slotEnd.isAfter(slot.getBreakStart());
-
-            if (!isDuringBreak) {
-                result.add(DoctorSlotsDto.SlotDto.builder()
-                        .time(current.format(timeFormatter))
-                        .isAvailable(!bookedTimes.contains(current))
-                        .build());
-            }
-            current = current.plusMinutes(minutes);
-        }
-        return result;
+        return slots.stream()
+                .map(time -> DoctorSlotsDto.SlotDto.builder()
+                        .time(time.format(timeFormatter))
+                        .isAvailable(!bookedTimes.contains(time))
+                        .build())
+                .collect(Collectors.toList());
     }
-    */
 
     public DoctorScheduleDto toDoctorSchedule(String date, List<WorkSlot> slots,
                                               DoctorScheduleDto.BreakDto breakDto) {
@@ -92,9 +99,59 @@ public class WorkSlotMapper {
     }
 
     private List<DoctorScheduleDto.ScheduleSlotDto> generateScheduleSlots(WorkSlot slot) {
-        // Логика генерации слотов для расписания
-        // TODO: реализовать
-        return List.of();
+        List<LocalTime> slots = SlotGenerator.generateSlots(
+                slot.getStartTime(),
+                slot.getEndTime(),
+                slot.getSlotMinutes(),
+                slot.getBreakStart(),
+                slot.getBreakEnd()
+        );
+
+        return slots.stream()
+                .map(time -> DoctorScheduleDto.ScheduleSlotDto.builder()
+                        .time(time.format(timeFormatter))
+                        .build())
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Генерирует расписание с информацией о забронированных слотах
+     */
+    public DoctorScheduleDto toDoctorScheduleWithBookings(String date, List<WorkSlot> slots,
+                                                         DoctorScheduleDto.BreakDto breakDto,
+                                                         Map<LocalTime, Appointment> appointmentsByTime) {
+        List<DoctorScheduleDto.ScheduleSlotDto> slotDtos = slots.stream()
+                .flatMap(slot -> generateScheduleSlotsWithBookings(slot, appointmentsByTime).stream())
+                .collect(Collectors.toList());
+
+        return DoctorScheduleDto.builder()
+                .date(date)
+                .slots(slotDtos)
+                .break_(breakDto)
+                .build();
+    }
+
+    private List<DoctorScheduleDto.ScheduleSlotDto> generateScheduleSlotsWithBookings(
+            WorkSlot slot,
+            Map<LocalTime, Appointment> appointmentsByTime) {
+        List<LocalTime> slots = SlotGenerator.generateSlots(
+                slot.getStartTime(),
+                slot.getEndTime(),
+                slot.getSlotMinutes(),
+                slot.getBreakStart(),
+                slot.getBreakEnd()
+        );
+
+        return slots.stream()
+                .map(time -> {
+                    Appointment appointment = appointmentsByTime.get(time);
+                    return DoctorScheduleDto.ScheduleSlotDto.builder()
+                            .time(time.format(timeFormatter))
+                            .type(appointment != null ? "closed" : "open")
+                            .appointmentId(appointment != null ? appointment.getId() : null)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
     public DoctorCalendarDto toDoctorCalendar(List<WorkSlot> slots) {
@@ -102,12 +159,15 @@ public class WorkSlotMapper {
                 .collect(Collectors.groupingBy(WorkSlot::getDate))
                 .entrySet().stream()
                 .map(entry -> {
-                    // TODO: рассчитать статистику по дню
+                    int totalSlots = entry.getValue().stream()
+                            .mapToInt(this::calculateSlotsCount)
+                            .sum();
+
                     return DoctorCalendarDto.WorkDayDto.builder()
                             .date(entry.getKey().format(dateFormatter))
-                            .hasAppointments(false)
-                            .totalSlots(0)
-                            .closedSlots(0)
+                            .hasAppointments(false) // будет переопределено в сервисе
+                            .totalSlots(totalSlots)
+                            .closedSlots(0) // будет переопределено в сервисе
                             .build();
                 })
                 .collect(Collectors.toList());
@@ -117,8 +177,10 @@ public class WorkSlotMapper {
                 .build();
     }
 
-    /*
-    public DoctorCalendarDto toDoctorCalendar(List<WorkSlot> slots, Map<LocalDate, Integer> bookedCountByDate) {
+    /**
+     * Генерирует календарь с информацией о забронированных слотах
+     */
+    public DoctorCalendarDto toDoctorCalendarWithBookings(List<WorkSlot> slots, Map<LocalDate, Integer> bookedCountByDate) {
         List<DoctorCalendarDto.WorkDayDto> workDays = slots.stream()
                 .collect(Collectors.groupingBy(WorkSlot::getDate))
                 .entrySet().stream()
@@ -143,12 +205,16 @@ public class WorkSlotMapper {
                 .build();
     }
 
+    /**
+     * Рассчитывает количество слотов в рабочий день
+     */
     private int calculateSlotsCount(WorkSlot slot) {
-        long workMinutes = java.time.Duration.between(slot.getStartTime(), slot.getEndTime()).toMinutes();
-        if (slot.getBreakStart() != null && slot.getBreakEnd() != null) {
-            workMinutes -= java.time.Duration.between(slot.getBreakStart(), slot.getBreakEnd()).toMinutes();
-        }
-        return slot.getSlotMinutes() > 0 ? (int) (workMinutes / slot.getSlotMinutes()) : 0;
+        return SlotGenerator.calculateTotalSlots(
+                slot.getStartTime(),
+                slot.getEndTime(),
+                slot.getSlotMinutes(),
+                slot.getBreakStart(),
+                slot.getBreakEnd()
+        );
     }
-    */
 }
