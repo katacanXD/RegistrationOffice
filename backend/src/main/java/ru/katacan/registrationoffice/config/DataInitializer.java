@@ -102,7 +102,7 @@ public class DataInitializer implements CommandLineRunner {
                 createUser(
                         String.format("doctor_%03d", i),
                         String.format("Врач Тестовый %03d", i),
-                        "doc123",
+                        "doc12345",
                         null,
                         doctorRole
                 ).setSpeciality(specialities[(i - 1) % specialities.length]);
@@ -112,7 +112,7 @@ public class DataInitializer implements CommandLineRunner {
                 createUser(
                         String.format("registrar_%03d", i),
                         String.format("Регистратор Тестовый %03d", i),
-                        "reg123",
+                        "reg12345",
                         null,
                         registrarRole
                 );
@@ -122,7 +122,7 @@ public class DataInitializer implements CommandLineRunner {
                 createUser(
                         String.format("admin_%03d", i),
                         String.format("Администратор Тестовый %03d", i),
-                        "admin123",
+                        "admin12345",
                         null,
                         adminRole
                 );
@@ -131,9 +131,9 @@ public class DataInitializer implements CommandLineRunner {
             int patientsCount = TOTAL_TEST_USERS - TEST_DOCTORS_COUNT - TEST_REGISTRARS_COUNT - TEST_ADMINS_COUNT;
             for (int i = 1; i <= patientsCount; i++) {
                 createUser(
-                        String.format("patient_%03d", i),
+                            String.format("patient_%03d", i),
                         String.format("Пациент Тестовый %03d", i),
-                        "pass123",
+                        "pass12345",
                         String.format("%016d", 1_000_000_000_000_000L + i),
                         patientRole
                 );

@@ -2,7 +2,7 @@
 
 | Версия | Статус | Дата обновления |
 |---|---|---|
-| v1.0 | Draft | 2026-04-01 |
+| v1.1 | Draft | 2026-04-17 |
 
 ## Сущности
 
@@ -86,3 +86,10 @@ erDiagram
 ## Примечание для frontend
 
 Frontend должен считать `role` и `status` словарными сущностями, а не хардкодить значения в UI.
+
+## Примечания по backend-реализации
+
+- `refresh_token` хранится в отдельной таблице и передается через `HttpOnly` cookie, не через JSON;
+- при логине/refresh backend создает новый access token и обновляет refresh token;
+- `speciality` хранится в `t_users.f_speciality_name` и используется только для роли `doctor`.
+
