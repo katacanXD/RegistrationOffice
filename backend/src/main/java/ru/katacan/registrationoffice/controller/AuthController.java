@@ -1,5 +1,6 @@
 package ru.katacan.registrationoffice.controller;
 
+import jakarta.validation.Valid;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -49,7 +50,7 @@ public class AuthController {
 
     @PostMapping("/registration")
     public ResponseEntity<RegistrationResponseDto> register(
-            @RequestBody RegistrationRequestDto request
+            @Valid @RequestBody RegistrationRequestDto request
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(authService.register(request));
@@ -57,7 +58,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDto> login(
-            @RequestBody LoginRequestDto request
+            @Valid @RequestBody LoginRequestDto request
     ) {
         LoginResponseDto response = authService.login(request);
         String refreshToken = response.getRefreshToken();

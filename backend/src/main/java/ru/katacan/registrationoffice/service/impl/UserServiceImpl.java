@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import ru.katacan.registrationoffice.util.LoginNormalizer;
 
+import java.util.Locale;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -87,19 +88,50 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UpdateUserResponseDto updateUser(Long userId, UpdateUserRequestDto request) {
+        if (request == null) {
+            throw new BadRequestException("Тело запроса не должно быть пустым");
+        }
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Пользователь с id " + userId + " не найден"));
 
-        if (request.getPolicyNumber() != null) {
-            user.setPolicyNumber(request.getPolicyNumber());
+        String normalizedRole = normalizeOptionalField(request.getRole(), "role");
+        String normalizedPolicy = normalizeOptionalField(request.getPolicyNumber(), "policyNumber");
+        String normalizedSpeciality = normalizeOptionalField(request.getSpeciality(), "speciality");
+
+        if (normalizedRole == null && normalizedPolicy == null && normalizedSpeciality == null) {
+            throw new BadRequestException("Не указаны поля для обновления");
         }
-        if (request.getSpeciality() != null) {
-            user.setSpeciality(request.getSpeciality());
+
+        DictRole targetRole = user.getRole();
+        if (normalizedRole != null) {
+            String roleName = normalizedRole.toLowerCase(Locale.ROOT);
+            targetRole = dictRoleRepository.findByName(roleName)
+                    .orElseThrow(() -> new BadRequestException("Роль '" + roleName + "' не найдена"));
+            user.setRole(targetRole);
         }
-        if (request.getRole() != null) {
-            DictRole role = dictRoleRepository.findByName(request.getRole())
-                    .orElseThrow(() -> new BadRequestException("Роль '" + request.getRole() + "' не найдена"));
-            user.setRole(role);
+
+        String targetRoleName = targetRole != null ? targetRole.getName() : null;
+        if (normalizedPolicy != null && !"patient".equals(targetRoleName)) {
+            throw new BadRequestException("Полис можно указывать только для роли patient");
+        }
+        if (normalizedSpeciality != null && !"doctor".equals(targetRoleName)) {
+            throw new BadRequestException("Специальность можно указывать только для роли doctor");
+        }
+
+        if (normalizedPolicy != null) {
+            user.setPolicyNumber(normalizedPolicy);
+        }
+        if (normalizedSpeciality != null) {
+            user.setSpeciality(normalizedSpeciality);
+        }
+
+        // Поддерживаем консистентность профиля при смене роли.
+        if (normalizedRole != null && !"patient".equals(targetRoleName)) {
+            user.setPolicyNumber(null);
+        }
+        if (normalizedRole != null && !"doctor".equals(targetRoleName)) {
+            user.setSpeciality(null);
         }
 
         User updatedUser = userRepository.save(user);
@@ -109,6 +141,19 @@ public class UserServiceImpl implements UserService {
                 .speciality(updatedUser.getSpeciality())
                 .role(updatedUser.getRole() != null ? updatedUser.getRole().getName() : null)
                 .build();
+    }
+
+    private String normalizeOptionalField(String value, String fieldName) {
+        if (value == null) {
+            return null;
+        }
+
+        String trimmed = value.trim();
+        if (trimmed.isEmpty()) {
+            throw new BadRequestException("Поле '" + fieldName + "' не должно быть пустым");
+        }
+
+        return trimmed;
     }
 
     @Override

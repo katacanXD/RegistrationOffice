@@ -1,5 +1,6 @@
 package ru.katacan.registrationoffice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,7 @@ public class PatientController {
     @PatchMapping("/me/policy")
     public ResponseEntity<?> updatePolicy(
             Authentication authentication,
-            @RequestBody PolicyRequestDto request
+            @Valid @RequestBody PolicyRequestDto request
     ) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userService.updatePolicyByLogin(authentication.getName(), request));

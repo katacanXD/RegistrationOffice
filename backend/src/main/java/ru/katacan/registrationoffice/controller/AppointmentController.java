@@ -1,5 +1,6 @@
 package ru.katacan.registrationoffice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class AppointmentController {
     @PreAuthorize("hasAnyAuthority('admin', 'registrar')")
     @PostMapping
     public ResponseEntity<?> createAppointment(
-            @RequestBody CreateAppointmentRequestDto appointmentRequestDto
+            @Valid @RequestBody CreateAppointmentRequestDto appointmentRequestDto
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(appointmentService.createAppointment(appointmentRequestDto));
@@ -33,7 +34,7 @@ public class AppointmentController {
     @PostMapping("/me")
     public ResponseEntity<?> createOwnAppointment(
             Authentication authentication,
-            @RequestBody CreateOwnAppointmentRequestDto appointmentRequestDto
+            @Valid @RequestBody CreateOwnAppointmentRequestDto appointmentRequestDto
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(appointmentService.createOwnAppointment(authentication.getName(), appointmentRequestDto));
@@ -51,7 +52,7 @@ public class AppointmentController {
     @PreAuthorize("hasAnyAuthority('admin', 'registrar') or (hasAuthority('patient') and @appointmentAccess.isPatientOwnerOfAppointment(#appointmentId, authentication))")
     @PatchMapping("/{appointmentId}")
     public ResponseEntity<UpdateAppointmentRequestDto> updateAppointment(
-            @RequestBody UpdateAppointmentRequestDto request,
+            @Valid @RequestBody UpdateAppointmentRequestDto request,
             @PathVariable Long appointmentId) {
 
         return ResponseEntity.status(HttpStatus.OK)
