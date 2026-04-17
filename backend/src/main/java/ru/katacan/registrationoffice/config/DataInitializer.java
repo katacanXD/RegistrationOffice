@@ -169,8 +169,8 @@ public class DataInitializer implements CommandLineRunner {
                     morningSlot.setStartTime(LocalTime.of(9, 0));
                     morningSlot.setEndTime(LocalTime.of(13, 0));
                     morningSlot.setSlotMinutes(60);
-                    morningSlot.setBreakStart(LocalTime.of(11, 0));
-                    morningSlot.setBreakEnd(LocalTime.of(11, 15));
+                    morningSlot.setBreakStart(LocalTime.of(13, 0));
+                    morningSlot.setBreakEnd(LocalTime.of(14, 0));
                     workSlotRepository.save(morningSlot);
 
                     WorkSlot eveningSlot = new WorkSlot();
@@ -179,8 +179,8 @@ public class DataInitializer implements CommandLineRunner {
                     eveningSlot.setStartTime(LocalTime.of(14, 0));
                     eveningSlot.setEndTime(LocalTime.of(18, 0));
                     eveningSlot.setSlotMinutes(60);
-                    eveningSlot.setBreakStart(LocalTime.of(16, 0));
-                    eveningSlot.setBreakEnd(LocalTime.of(16, 15));
+                    eveningSlot.setBreakStart(LocalTime.of(13, 0));
+                    eveningSlot.setBreakEnd(LocalTime.of(14, 0));
                     workSlotRepository.save(eveningSlot);
                 }
             }

@@ -101,22 +101,8 @@ public class SlotGenerator {
             int slotMinutes,
             LocalTime breakStart,
             LocalTime breakEnd) {
-
-        int effectiveSlotMinutes = normalizeSlotMinutes(slotMinutes);
-
-        if (startTime == null || endTime == null || effectiveSlotMinutes <= 0) {
-            return 0;
-        }
-
-        long totalMinutes = java.time.Duration.between(startTime, endTime).toMinutes();
-
-        // Вычитаем время перерыва
-        if (breakStart != null && breakEnd != null) {
-            long breakMinutes = java.time.Duration.between(breakStart, breakEnd).toMinutes();
-            totalMinutes -= breakMinutes;
-        }
-
-        return (int) (totalMinutes / effectiveSlotMinutes);
+        // Подсчет через реальную генерацию исключает расхождения между календарем и списком слотов.
+        return generateSlots(startTime, endTime, slotMinutes, breakStart, breakEnd).size();
     }
 
     private static int normalizeSlotMinutes(int slotMinutes) {
