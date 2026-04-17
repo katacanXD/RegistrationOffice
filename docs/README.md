@@ -40,6 +40,9 @@
 ## Макеты и сценарии
 
 Дизайн-макеты всех экранов, интерактивные прототипы и анимации пользовательских сценариев собраны в Figma:
+- Основной обзор проекта: `README.md`
+- Технический runbook и карта API: `DEPLOY_YC_DOCKER.md`
+- Фактический деплой на VM через Docker Compose: `DEPLOY_YC_DOCKER.md`
 
 **[Открыть в Figma](https://www.figma.com/design/dhSpD9QDRP79l77V0HJsWv/%D0%9E%D0%9F%D0%94?node-id=0-1&p=f&t=QOJygsnFG9sZETfO-0)**
 
@@ -50,8 +53,21 @@
 ---
 
 ## Макеты и сценарии
+- API-контроллеры: `backend/src/main/java/ru/katacan/registrationoffice/controller`
+- Security и доступы: `backend/src/main/java/ru/katacan/registrationoffice/config/SecurityConfig.java`
+- Модель данных (JPA сущности): `backend/src/main/java/ru/katacan/registrationoffice/entity`
+- DTO и мапперы: `backend/src/main/java/ru/katacan/registrationoffice/dto`, `backend/src/main/java/ru/katacan/registrationoffice/mapper`
+- Конфигурация приложения: `backend/src/main/resources/application.properties`
+- Контейнеризация и прокси: `backend/Dockerfile`, `frontend/Dockerfile`, `frontend/nginx/default.conf`, `docker-compose.yml`, `deploy/nginx/default.conf`
 
 Все дизайн-макеты экранов, интерактивные прототипы и анимации пользовательских сценариев — в Figma:
+## Что важно помнить про backend
+
+- все публичные JSON-поля идут в `snake_case`;
+- refresh token передается и обновляется через `HttpOnly` cookie `refresh_token`, а не в теле ответа;
+- frontend и backend разворачиваются отдельными контейнерами, а `nginx` проксирует `/api/v1/**` и отдает SPA.
+
+## ERD (Mermaid)
 
 **[Открыть в Figma](https://www.figma.com/design/dhSpD9QDRP79l77V0HJsWv/%D0%9E%D0%9F%D0%94?node-id=0-1&p=f&t=QOJygsnFG9sZETfO-0)**
 

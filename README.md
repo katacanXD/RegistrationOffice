@@ -7,7 +7,7 @@
 
 | Версия | Статус | Дата создания | Дата обновления |
 |--------|---|---|---|
-| v0.1   | Draft | 2026-04-01 | 2026-04-01 |
+| v0.2   | Draft | 2026-04-01 | 2026-04-17 |
 
 О документе: навигация по документам проекта RegistrationOffice.
 
@@ -16,7 +16,7 @@
 ## Контекст проекта
 
 `RegistrationOffice` развивается как fullstack-решение:
-- `backend` (Spring Boot + PostgreSQL + JWT);
+- `backend` (Spring Boot + PostgreSQL + JWT + CSV import/export);
 - `frontend` (веб-клиент для пациентов, врачей, регистратора и администратора);
 - инфраструктура деплоя через Docker Compose и Nginx.
 
@@ -41,6 +41,7 @@
 - API-контроллеры: `backend/src/main/java/ru/katacan/registrationoffice/controller`
 - Security и доступы: `backend/src/main/java/ru/katacan/registrationoffice/config/SecurityConfig.java`
 - Модель данных (JPA сущности): `backend/src/main/java/ru/katacan/registrationoffice/entity`
+- DTO и мапперы: `backend/src/main/java/ru/katacan/registrationoffice/dto`, `backend/src/main/java/ru/katacan/registrationoffice/mapper`
 - Конфигурация приложения: `backend/src/main/resources/application.properties`
 - Контейнеризация и прокси: `backend/Dockerfile`, `frontend/Dockerfile`, `frontend/nginx/default.conf`, `docker-compose.yml`, `deploy/nginx/default.conf`
 - Frontend-контур: отдельный контейнер со статической сборкой Vite и proxy через `/api`
@@ -49,7 +50,7 @@
 
 При изменении API/ролей/модели данных/контейнерного контура обновляются минимум:
 1. `README.md` (корень)
-2. `docs/docs/05-data-and-integration/*`
-3. `docs/docs/06-final-specification/*`
-4. `docs/docs/07-validation-and-delivery/*`
-5. `docs/docs/90-checkpoints/*`
+2. `docs/05-data-and-integration/*`
+3. `docs/06-final-specification/*`
+4. `docs/07-validation-and-delivery/*`
+5. `docs/90-checkpoints/*`

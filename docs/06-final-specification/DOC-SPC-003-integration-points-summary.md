@@ -2,7 +2,7 @@
 
 | Версия | Статус | Дата обновления |
 |---|---|---|
-| v1.0 | Draft | 2026-04-01 |
+| v1.1 | Draft | 2026-04-17 |
 
 ## Точки интеграции
 
@@ -10,6 +10,14 @@
 2. Backend <-> PostgreSQL
 3. Nginx <-> Backend
 4. Nginx <-> Frontend
+
+## Ключевые API-контуры
+
+- Auth: access token в JSON, refresh token в HttpOnly cookie;
+- Users/Patients: профиль, пароль, полис, админский CRUD;
+- Doctors: поиск, public/private slots, calendar, schedule;
+- Appointments: create/update/cancel/detail;
+- Admins: CSV import/export.
 
 ## Матрица интеграционных точек
 
@@ -23,10 +31,11 @@
 
 ## Критичные интеграционные сценарии
 
-- login + refresh;
-- получение профиля;
-- получение врачей и слотов;
-- создание/отмена/обновление записи.
+- login + refresh + logout;
+- получение профиля и смена пароля;
+- получение врачей и слотов, включая public endpoints;
+- создание/отмена/обновление записи;
+- CSV export/import для админа.
 
 ## Контроль консистентности
 
