@@ -10,4 +10,5 @@ public class UserInfoDto {
     private String fio;
     private String role;
     private String policyNumber;
+    private String specialty;
 }

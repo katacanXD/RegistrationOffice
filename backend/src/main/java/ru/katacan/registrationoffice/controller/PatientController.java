@@ -43,7 +43,7 @@ public class PatientController {
     @GetMapping
     public ResponseEntity<PatientListDto> getAllPatients(
             @RequestParam(required = false) String search,
-            Pageable pageable) { //TODO добавить плагинацию
+            Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userService.searchPatients(search, pageable));
     }
