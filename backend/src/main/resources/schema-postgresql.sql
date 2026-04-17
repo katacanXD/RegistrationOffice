@@ -1,5 +1,5 @@
 CREATE INDEX IF NOT EXISTS idx_t_appointments_doctor_slot
-    ON t_appointments (f_doctor_id, f_slot_datetime);
+    ON t_appointments (f_doctor_id, f_slot_datetime)//
 
 CREATE OR REPLACE FUNCTION enforce_active_appointment_uniqueness()
 RETURNS TRIGGER
@@ -47,12 +47,13 @@ BEGIN
     RETURN NEW;
 END;
 $$;
+//
 
-DROP TRIGGER IF EXISTS trg_enforce_active_appointment_uniqueness ON t_appointments;
+DROP TRIGGER IF EXISTS trg_enforce_active_appointment_uniqueness ON t_appointments//
 
 CREATE TRIGGER trg_enforce_active_appointment_uniqueness
 BEFORE INSERT OR UPDATE OF f_doctor_id, f_slot_datetime, f_status_id
 ON t_appointments
 FOR EACH ROW
-EXECUTE FUNCTION enforce_active_appointment_uniqueness();
+EXECUTE FUNCTION enforce_active_appointment_uniqueness()//
 
