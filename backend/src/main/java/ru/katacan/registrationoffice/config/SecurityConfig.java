@@ -48,7 +48,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) {
         return configuration.getAuthenticationManager();
     }
 
@@ -83,7 +83,7 @@ public class SecurityConfig {
                                                    AuthenticationProvider authenticationProvider,
                                                    JwtAuthenticationFilter jwtAuthenticationFilter,
                                                    JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
-                                                   CorsConfigurationSource corsConfigurationSource) throws Exception {
+                                                   CorsConfigurationSource corsConfigurationSource) {
         http.csrf(AbstractHttpConfigurer::disable);
         http.cors(cors -> cors.configurationSource(corsConfigurationSource));
         http.authenticationProvider(authenticationProvider);
@@ -92,10 +92,11 @@ public class SecurityConfig {
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         http.authorizeHttpRequests(auth -> auth
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/v3/api-docs.yaml").permitAll()
                 .requestMatchers("/api/v1/auth/login", "/api/v1/auth/registration", "/api/v1/auth/refresh", "/api/v1/auth/logout").permitAll()
                 .requestMatchers("/api/v1/users/me/**", "/api/v1/auth/me").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/v1/doctors").authenticated()
-                .requestMatchers("/api/v1/patients/me/**").hasAuthority("patient")
+                .requestMatchers("/api/v1/patients/me/**").hasAnyAuthority("admin", "patient")
                 .requestMatchers("/api/v1/admins/**").hasAuthority("admin")
                 .requestMatchers("/api/v1/users/**").hasAnyAuthority("admin", "registrar")
                 .requestMatchers("/api/v1/patients").hasAnyAuthority("admin", "registrar")
