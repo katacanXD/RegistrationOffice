@@ -1,5 +1,6 @@
 HELP.md
 frontend/node_modules/
+etc/letsencrypt/
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
