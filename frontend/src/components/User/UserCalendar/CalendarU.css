@@ -21,7 +21,7 @@
 }
 
 .current-month-label {
-  background: #94A3FF;
+  background: #4C6AFF;
   color: white;
   padding: 5px 40px;
   border-radius: 10px;
@@ -29,7 +29,7 @@
 }
 
 .nav-btn {
-  background: #94A3FF;
+  background: #4C6AFF;
   color: white;
   border: none;
   border-radius: 8px;
@@ -92,7 +92,7 @@
   border: none;
   padding: 12px;
   border-radius: 10px;
-  color: #94A3FF;
+  color: #4C6AFF;
   cursor: pointer;
 }
 
@@ -154,7 +154,7 @@
 
 .modal-date-time { text-align: right; color: #94A3FF; }
 
-.modal-time-big { font-size: 2.5rem; font-weight: bold; display: block; }
+.modal-time-big { font-size: 2.5rem; font-weight: bold; display: block; color: #4C6AFF; }
 
 .info-label { color: #C7D2FE; font-size: 0.8rem; }
 

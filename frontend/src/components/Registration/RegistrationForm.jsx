@@ -53,6 +53,7 @@ export default function RegistrationForm () {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setErrors({});
 
     const validationResult = validateForm();
 
@@ -80,9 +81,8 @@ export default function RegistrationForm () {
         <div className="registration-container">
           <h1 className='registration-title'>REGISTRATION OFFICE</h1>
 
-          {successMessage && <div style={{ color: 'green', marginBottom: '10px' }}>{successMessage}</div>}
-          {authError && <div style={{ color: 'red', marginBottom: '10px' }}>{authError}</div>}
-          {errors.general && <div style={{ color: 'red', marginBottom: '10px' }}>{errors.general}</div>}
+          {successMessage && <div className="success-message">{successMessage}</div>}
+          {errors.general && <div className="general-error">{errors.general}</div>}
 
           <form onSubmit={handleSubmit}>
           <label htmlFor="login">Логин</label>
@@ -95,6 +95,7 @@ export default function RegistrationForm () {
             className={errors.login ? 'registration-error-input' : ''}
             disabled={loading}
           />
+          {errors.login && <p className="field-error">{errors.login}</p>}
 
           <label htmlFor="lastName">Фамилия</label>
           <input
@@ -106,6 +107,7 @@ export default function RegistrationForm () {
             className={errors.lastName ? 'registration-error-input' : ''}
             disabled={loading}
           />
+          {errors.lastName && <p className="field-error">{errors.lastName}</p>}
 
           <label htmlFor="firstName">Имя</label>
           <input
@@ -117,6 +119,7 @@ export default function RegistrationForm () {
             className={errors.firstName ? 'registration-error-input' : ''}
             disabled={loading}
           />
+          {errors.firstName && <p className="field-error">{errors.firstName}</p>}
 
           <label htmlFor="middleName">Отчество</label>
           <input
@@ -128,6 +131,7 @@ export default function RegistrationForm () {
             className={errors.middleName ? 'registration-error-input' : ''}
             disabled={loading}
           />
+          {errors.middleName && <p className="field-error">{errors.middleName}</p>}
 
           <label htmlFor="password">Пароль</label>
           <input
@@ -139,6 +143,7 @@ export default function RegistrationForm () {
             className={errors.password ? 'registration-error-input' : ''}
             disabled={loading}
           />
+          {errors.password && <p className="field-error">{errors.password}</p>}
 
           <label htmlFor="confirmPassword">Повтор пароля</label>
           <input
@@ -150,6 +155,7 @@ export default function RegistrationForm () {
             className={errors.confirmPassword ? 'registration-error-input' : ''}
             disabled={loading}
           />
+          {errors.confirmPassword && <p className="field-error">{errors.confirmPassword}</p>}
 
           <button type="submit" disabled={loading}>
             {loading ? 'Загрузка...' : 'Зарегистрироваться'}

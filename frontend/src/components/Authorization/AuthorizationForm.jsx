@@ -42,6 +42,7 @@ export default function AuthorizationForm () {
     const handleSubmit = async (event) => {
         event.preventDefault();
         setGeneralError('');
+        setErrors({});
 
         const validationResult = validateForm();
 
@@ -62,8 +63,7 @@ export default function AuthorizationForm () {
         <div className="authorization-container">
             <h1 className='auth-title'>REGISTRATION OFFICE</h1>
 
-            {generalError && <div style={{ color: 'red', marginBottom: '10px' }}>{generalError}</div>}
-            {authError && <div style={{ color: 'red', marginBottom: '10px' }}>{authError}</div>}
+            {generalError && <div className="general-error">{generalError}</div>}
 
             <form onSubmit={handleSubmit}>
             <label htmlFor="login">Логин</label>
@@ -76,6 +76,7 @@ export default function AuthorizationForm () {
                 className={errors.login ? 'auth-error-input' : ''}
                 disabled={loading}
             />
+            {errors.login && <p className="field-error">{errors.login}</p>}
 
             <label htmlFor="password">Пароль</label>
             <input
@@ -87,6 +88,7 @@ export default function AuthorizationForm () {
                 className={errors.password ? 'auth-error-input' : ''}
                 disabled={loading}
             />
+            {errors.password && <p className="field-error">{errors.password}</p>}
 
             <button type="submit" disabled={loading}>
                 {loading ? 'Загрузка...' : 'Войти'}

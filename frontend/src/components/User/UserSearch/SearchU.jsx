@@ -30,7 +30,6 @@ export default function SearchU() {
   useEffect(() => {
     if (policyChecked) {
       if (!userPolicy) {
-        alert('Пожалуйста, сначала добавьте полис ОМС');
         navigate('/MainU');
       } else {
         // Загружаем список всех врачей
@@ -62,7 +61,8 @@ export default function SearchU() {
     setSelectedDoctor({
       id: doctor.doctor_id,
       name: doctor.fio,
-      specialty: doctor.speciality
+      specialty: doctor.speciality,
+      address: doctor.address
     });
   };
 

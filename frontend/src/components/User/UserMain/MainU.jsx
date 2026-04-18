@@ -42,25 +42,18 @@ export default function MainU () {
   const handleDeleteAppointment = async (appointmentId) => {
     if (window.confirm('Вы уверены, что хотите отменить запись?')) {
       const result = await deleteAppointment(appointmentId);
-      if (!result.success) {
-        alert(result.error || 'Ошибка при удалении записи');
-      }
     }
   };
 
   const handleUpdatePolicy = async (policyValue = policyInput) => {
     if (!policyValue.trim()) {
-      alert('Введите номер полиса');
       return;
     }
     setPolicyLoading(true);
     const result = await updatePolicy(policyValue);
     setPolicyLoading(false);
     if (result.success) {
-      alert('Полис успешно добавлен');
       setPolicyInput('');
-    } else {
-      alert(result.error || 'Ошибка при обновлении полиса');
     }
   };
 
@@ -72,7 +65,6 @@ export default function MainU () {
 
   const handleGoToSearch = () => {
     if (!userPolicy) {
-      alert('Пожалуйста, сначала добавьте полис ОМС');
       return;
     }
     navigate('/SearchU');

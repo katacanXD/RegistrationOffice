@@ -96,7 +96,6 @@ export default function CalendarU() {
   useEffect(() => {
     if (policyChecked) {
       if (!userPolicy) {
-        alert('Пожалуйста, сначала добавьте полис ОМС');
         navigate('/MainU');
         return;
       }
@@ -124,13 +123,11 @@ export default function CalendarU() {
 
   const handleConfirm = async () => {
     if (!userPolicy) {
-      alert('Пожалуйста, сначала добавьте полис ОМС');
       navigate('/MainU');
       return;
     }
 
     if (!selectedTime) {
-      alert('Выберите время');
       return;
     }
 
@@ -140,11 +137,8 @@ export default function CalendarU() {
     setCreating(false);
 
     if (result.success) {
-      alert('Запись успешно создана!');
       setShowModal(false);
       navigate('/MainU');
-    } else {
-      alert(result.error || 'Ошибка при создании записи');
     }
   };
 
@@ -221,11 +215,23 @@ export default function CalendarU() {
   }
 
   const groupedSlots = {};
+  const now = new Date();
+
   availableSlots.forEach(slot => {
     const time = slot.time || slot;
     const timeObj = new Date(`2000-01-01T${time}`);
     const hour = timeObj.getHours();
-    const period = hour < 12 ? 'before' : 'after';
+
+    // Проверяем, не прошло ли это время
+    const slotDateTime = new Date(selectedDate);
+    slotDateTime.setHours(timeObj.getHours(), timeObj.getMinutes(), 0, 0);
+
+    // Не добавляем, если время прошло
+    if (slotDateTime <= now) {
+      return;
+    }
+
+    const period = hour <= 12 ? 'before' : 'after';
     if (!groupedSlots[period]) groupedSlots[period] = [];
     groupedSlots[period].push(time);
   });
@@ -341,6 +347,12 @@ export default function CalendarU() {
                         <span className="info-label">Врач</span>
                         <p className="info-value">{selectedDoctor.name}</p>
                       </div>
+                      {selectedDoctor.address && (
+                        <div className="info-block">
+                          <span className="info-label">Адрес</span>
+                          <p className="info-value">{selectedDoctor.address}</p>
+                        </div>
+                      )}
                     </div>
 
                     <div className="modal-footer">
