@@ -4,9 +4,16 @@ import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import './AuthorizationForm.css'
 
+const roleEntryPath = {
+    patient: '/patient/main',
+    doctor: '/doctor/calendar',
+    registrar: '/registrar/patients',
+    admin: '/admin',
+};
+
 export default function AuthorizationForm () {
     const navigate = useNavigate();
-    const { login, loading, error: authError } = useAuth();
+    const { login, loading } = useAuth();
 
     const [data, setData] = useState({
         login: '',
@@ -51,7 +58,8 @@ export default function AuthorizationForm () {
         } else {
             const result = await login(data.login, data.password);
             if (result.success) {
-                navigate('/MainU');
+                const role = (result.user?.role || '').toLowerCase();
+                navigate(roleEntryPath[role] || '/patient/main');
             } else {
                 setGeneralError(result.error || 'Ошибка входа');
             }

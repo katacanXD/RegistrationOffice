@@ -1,0 +1,38 @@
+@import '../../User/UserMain/MainU.css';
+@import '../../User/UserCalendar/CalendarU.css';
+
+.registrar-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.selected-patient-tag {
+  color: #7883e6;
+  font-weight: 600;
+}
+
+.back-button {
+  border: none;
+  cursor: pointer;
+}
+
+.logout-link {
+  border: none;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+
+.small-error {
+  color: #d25454;
+  font-size: 12px;
+}
+
+.small-hint {
+  color: #8d99d8;
+  font-size: 12px;
+}
+

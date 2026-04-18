@@ -5,7 +5,7 @@ import './RegistrationForm.css';
 
 export default function RegistrationForm () {
   const navigate = useNavigate();
-  const { register, loading, error: authError } = useAuth();
+    const { register, loading } = useAuth();
 
   const [data, setData] = useState({
     login: '',

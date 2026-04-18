@@ -13,7 +13,6 @@ export default function SearchU() {
   const { doctors, loading, error, userPolicy, fetchDoctors, fetchUserPolicy, setSelectedDoctor } = useApp();
   const [isOpen, setIsOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [selectedSpecialty, setSelectedSpecialty] = useState('');
   const [policyChecked, setPolicyChecked] = useState(false);
 
   useEffect(() => {
@@ -25,18 +24,18 @@ export default function SearchU() {
       }
     };
     loadInitialData();
-  }, []);
+  }, [fetchUserPolicy, policyChecked]);
 
   useEffect(() => {
     if (policyChecked) {
       if (!userPolicy) {
-        navigate('/MainU');
+        navigate('/patient/main');
       } else {
         // Загружаем список всех врачей
         fetchDoctors();
       }
     }
-  }, [policyChecked]);
+  }, [fetchDoctors, navigate, policyChecked, userPolicy]);
 
   const formatName = (fio) => {
     if (!fio) return "Гость";
@@ -49,20 +48,18 @@ export default function SearchU() {
 
   const handleSearch = async (text) => {
     setSearchText(text);
-    await fetchDoctors(text, selectedSpecialty);
+    await fetchDoctors(text);
   };
 
-  const handleSpecialtyFilter = async (specialty) => {
-    setSelectedSpecialty(specialty);
-    await fetchDoctors(searchText, specialty);
-  };
 
   const handleSelectDoctor = (doctor) => {
+    const clinicAddress = doctor.address || doctor.clinic_address || doctor.clinicAddress || 'г. Москва, ул. Менделеева, д. 15с2';
+
     setSelectedDoctor({
       id: doctor.doctor_id,
       name: doctor.fio,
       specialty: doctor.speciality,
-      address: doctor.address
+      address: clinicAddress
     });
   };
 
@@ -70,7 +67,7 @@ export default function SearchU() {
     <div className="app-wrapper">
       <header className="main-header">
         <div className="header-left">
-          <Link to="/MainU" className="header-link">
+          <Link to="/patient/main" className="header-link">
             <img src={myLogo} alt="Logo" className="header-logo-img" />
             <span className="brand-name">REGISTRATION OFFICE</span>
           </Link>
@@ -107,7 +104,7 @@ export default function SearchU() {
         <div className="search-container">
 
           <div className="top-bar">
-            <Link to="/MainU" className="back-button">Назад</Link>
+            <Link to="/patient/main" className="back-button">Назад</Link>
           </div>
 
           <div className="search-input-wrapper">
@@ -134,7 +131,7 @@ export default function SearchU() {
               doctors.map(doc => (
                 <Link
                   key={doc.doctor_id}
-                  to="/CalendarU"
+                  to="/patient/calendar"
                   onClick={() => handleSelectDoctor(doc)}
                   className="doctor-card-link"
                 >

@@ -384,14 +384,23 @@
   transition: all 0.2s;
 }
 
+.btn-app-delete {
+  background: #BCC0E2;
+  border-color: #BCC0E2;
+  color: #7582EA;
+  border: none;
+}
+
 .btn-app-action:hover {
   background: #F5F7FF;
   transform: translateY(-2px);
 }
 
-.btn-app-action:first-child:hover {
-  border-color: #FF8B8B;
-  color: #FF8B8B;
+.btn-app-delete:hover:not(:disabled) {
+  background: #BCC0E2;
+  border-color: #BCC0E2;
+  color: #7582EA;
+  filter: brightness(0.97);
 }
 
 .app-info-left {
@@ -438,7 +447,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.05rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #6B7DD6;
   text-align: center;

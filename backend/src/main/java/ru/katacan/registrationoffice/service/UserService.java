@@ -15,6 +15,7 @@ public interface UserService {
     SuccessResponseDto deleteUser(Long userId);
 
     PatientDashboardDto getDashboardByLogin(String login);
+    PatientDashboardDto getDashboardById(Long patientId);
 
     PolicyResponseDto updatePolicyByLogin(String login, PolicyRequestDto request);
 }

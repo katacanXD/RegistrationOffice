@@ -3,6 +3,18 @@ import apiClient from '../services/apiClient';
 
 const AuthContext = createContext();
 
+function normalizeUser(rawUser) {
+  if (!rawUser) return null;
+
+  return {
+    ...rawUser,
+    userId: rawUser.userId ?? rawUser.user_id,
+    policyNumber: rawUser.policyNumber ?? rawUser.policy_number,
+    specialty: rawUser.specialty ?? rawUser.speciality,
+    role: (rawUser.role || '').toLowerCase(),
+  };
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,7 +27,7 @@ export function AuthProvider({ children }) {
 
     if (token && savedUser) {
       try {
-        setUser(JSON.parse(savedUser));
+        setUser(normalizeUser(JSON.parse(savedUser)));
       } catch {
         localStorage.removeItem('access_token');
         localStorage.removeItem('user');
@@ -33,8 +45,10 @@ export function AuthProvider({ children }) {
         password,
       });
 
-      const { access_token, user: userData } = response.data;
-      localStorage.setItem('access_token', access_token);
+      const accessToken = response.data.access_token ?? response.data.accessToken;
+      const userData = normalizeUser(response.data.user);
+
+      localStorage.setItem('access_token', accessToken);
       localStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);
       return { success: true, user: userData };

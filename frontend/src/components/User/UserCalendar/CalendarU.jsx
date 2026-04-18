@@ -14,7 +14,7 @@ import myAvatar from '../Foto/Account.png';
 export default function CalendarU() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { selectedDoctor, loading, error, userPolicy, fetchDoctorSlots, fetchUserPolicy, createAppointment } = useApp();
+  const { selectedDoctor, loading, error, userPolicy, fetchDoctorSlots, fetchUserPolicy, createAppointment, rescheduleAppointmentId, setRescheduleAppointmentId, updateRegistrarAppointment } = useApp();
 
   const [isOpen, setIsOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -93,24 +93,24 @@ export default function CalendarU() {
     checkPolicy();
   }, [fetchUserPolicy, policyChecked, userPolicy]);
 
-  useEffect(() => {
-    if (policyChecked) {
-      if (!userPolicy) {
-        navigate('/MainU');
-        return;
-      }
-      if (!selectedDoctor?.id) {
-        navigate('/SearchU');
-        return;
-      }
-      const timerId = setTimeout(() => {
-        loadSlots();
-      }, 0);
+   useEffect(() => {
+     if (policyChecked) {
+       if (!userPolicy) {
+         navigate('/patient/main');
+         return;
+       }
+       if (!selectedDoctor?.id) {
+         navigate('/patient/main');
+         return;
+       }
+       const timerId = setTimeout(() => {
+         loadSlots();
+       }, 0);
 
-      return () => clearTimeout(timerId);
-    }
-    return undefined;
-  }, [loadSlots, navigate, policyChecked, selectedDoctor, selectedDate, userPolicy]);
+       return () => clearTimeout(timerId);
+     }
+     return undefined;
+   }, [loadSlots, navigate, policyChecked, selectedDoctor?.id, selectedDate, userPolicy]);
 
   const formatName = (fio) => {
     if (!fio) return "Гость";
@@ -121,26 +121,35 @@ export default function CalendarU() {
     return `${firstName} ${initials}`;
   };
 
-  const handleConfirm = async () => {
-    if (!userPolicy) {
-      navigate('/MainU');
-      return;
-    }
+   const handleConfirm = async () => {
+     if (!userPolicy) {
+       navigate('/patient/main');
+       return;
+     }
 
-    if (!selectedTime) {
-      return;
-    }
+     if (!selectedTime) {
+       return;
+     }
 
-    setCreating(true);
-    const slotDatetime = format(selectedDate, 'yyyy-MM-dd') + 'T' + selectedTime;
-    const result = await createAppointment(selectedDoctor.id, slotDatetime);
-    setCreating(false);
+     setCreating(true);
+     const slotDatetime = format(selectedDate, 'yyyy-MM-dd') + 'T' + selectedTime;
 
-    if (result.success) {
-      setShowModal(false);
-      navigate('/MainU');
-    }
-  };
+     let result;
+     if (rescheduleAppointmentId) {
+       // Режим переноса
+       result = await updateRegistrarAppointment(rescheduleAppointmentId, slotDatetime);
+     } else {
+       // Режим создания
+       result = await createAppointment(selectedDoctor.id, slotDatetime);
+     }
+     setCreating(false);
+
+     if (result.success) {
+       setShowModal(false);
+       setRescheduleAppointmentId(null);
+       navigate('/patient/main');
+     }
+   };
 
   const handleTimeClick = (time) => {
     setSelectedTime(time);
@@ -214,6 +223,11 @@ export default function CalendarU() {
     return <div>Загрузка...</div>;
   }
 
+  const clinicAddress = selectedDoctor.address || 'г. Москва, ул. Менделеева, д. 15с2';
+  const weekdayShort = format(selectedDate, 'EEE', { locale: ru }).replace('.', '');
+  const weekdayCapitalized = weekdayShort.charAt(0).toUpperCase() + weekdayShort.slice(1);
+  const modalDateLabel = `${format(selectedDate, 'd MMMM', { locale: ru })}, ${weekdayCapitalized}`;
+
   const groupedSlots = {};
   const now = new Date();
 
@@ -240,7 +254,7 @@ export default function CalendarU() {
       <div className="app-wrapper">
         <header className="main-header">
           <div className="header-left">
-            <Link to="/MainU" className="header-link">
+            <Link to="/patient/main" className="header-link">
               <img src={myLogo} alt="Logo" className="header-logo-img" />
               <span className="brand-name">REGISTRATION OFFICE</span>
             </Link>
@@ -275,7 +289,7 @@ export default function CalendarU() {
         <main className="content calendar-page">
           <div className="calendar-container">
             <div className="top-bar">
-              <Link to="/SearchU" className="back-button">Назад</Link>
+              <Link to="/patient/search" className="back-button">Назад</Link>
             </div>
 
             <div className="calendar-layout">
@@ -337,7 +351,7 @@ export default function CalendarU() {
                     <div className="modal-header-row">
                       <h2 className="modal-title">{selectedDoctor.specialty}</h2>
                       <div className="modal-date-time">
-                        <p>{format(selectedDate, 'd MMMM', { locale: ru })}</p>
+                        <p className="modal-date-label">{modalDateLabel}</p>
                         <span className="modal-time-big">{selectedTime}</span>
                       </div>
                     </div>
@@ -347,12 +361,10 @@ export default function CalendarU() {
                         <span className="info-label">Врач</span>
                         <p className="info-value">{selectedDoctor.name}</p>
                       </div>
-                      {selectedDoctor.address && (
-                        <div className="info-block">
-                          <span className="info-label">Адрес</span>
-                          <p className="info-value">{selectedDoctor.address}</p>
-                        </div>
-                      )}
+                      <div className="info-block">
+                        <span className="info-label">Адрес клиники</span>
+                        <p className="info-value">{clinicAddress}</p>
+                      </div>
                     </div>
 
                     <div className="modal-footer">

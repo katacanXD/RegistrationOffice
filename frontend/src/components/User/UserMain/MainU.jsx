@@ -9,7 +9,7 @@ import myAvatar from '../Foto/Account.png';
 export default function MainU () {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { appointments, loading, error, userPolicy, fetchAppointments, fetchUserPolicy, deleteAppointment, updatePolicy } = useApp();
+  const { appointments, loading, error, userPolicy, fetchAppointments, fetchUserPolicy, deleteAppointment, updatePolicy, setSelectedDoctor, setRescheduleAppointmentId } = useApp();
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
   const [policyInput, setPolicyInput] = useState('');
@@ -23,7 +23,7 @@ export default function MainU () {
       setPolicyLoaded(true);
     };
     loadData();
-  }, []);
+  }, [fetchAppointments, fetchUserPolicy]);
 
   const formatName = (fio) => {
     if (!fio) return "Гость";
@@ -39,11 +39,22 @@ export default function MainU () {
     navigate('/');
   };
 
-  const handleDeleteAppointment = async (appointmentId) => {
-    if (window.confirm('Вы уверены, что хотите отменить запись?')) {
-      const result = await deleteAppointment(appointmentId);
-    }
-  };
+   const handleDeleteAppointment = async (appointmentId) => {
+     if (window.confirm('Вы уверены, что хотите отменить запись?')) {
+       await deleteAppointment(appointmentId);
+     }
+   };
+
+   const handleRescheduleAppointment = (appointmentId, doctorId, doctorFio, specialty, address) => {
+     setSelectedDoctor({
+       id: doctorId,
+       name: doctorFio,
+       specialty: specialty,
+       address: address || 'г. Москва, ул. Менделеева, д. 15с2',
+     });
+     setRescheduleAppointmentId(appointmentId);
+     navigate('/patient/calendar');
+   };
 
   const handleUpdatePolicy = async (policyValue = policyInput) => {
     if (!policyValue.trim()) {
@@ -67,14 +78,14 @@ export default function MainU () {
     if (!userPolicy) {
       return;
     }
-    navigate('/SearchU');
+    navigate('/patient/search');
   };
 
   return (
     <div className="app-wrapper">
       <header className="main-header">
         <div className="header-left">
-          <Link to="/MainU" className="header-link">
+          <Link to="/patient/main" className="header-link">
             <img src={myLogo} alt="Logo" className="header-logo-img" />
             <span className="brand-name">REGISTRATION OFFICE</span>
           </Link>
@@ -192,16 +203,27 @@ export default function MainU () {
                         <span className="detail-label">Адрес</span>
                         <p className="detail-value">{app.address}</p>
                       </div>
-                      <div className="detail-buttons">
-                        <button
-                          className="btn-app-action"
-                          onClick={() => handleDeleteAppointment(app.appointment_id)}
-                          disabled={loading}
-                        >
-                          Удалить
-                        </button>
-                        <button className="btn-app-action" disabled>Перенести (в разработке)</button>
-                      </div>
+                       <div className="detail-buttons">
+                         <button
+                           className="btn-app-action btn-app-delete"
+                           onClick={() => handleDeleteAppointment(app.appointment_id)}
+                           disabled={loading}
+                         >
+                           Удалить
+                         </button>
+                         <button
+                           className="btn-app-action"
+                           onClick={() => handleRescheduleAppointment(
+                             app.appointment_id,
+                              app.doctorId ?? app.doctor_id,
+                             app.doctor_fio,
+                             app.speciality,
+                             app.address
+                           )}
+                         >
+                           Перенести
+                         </button>
+                       </div>
                     </div>
                   )}
                 </div>
