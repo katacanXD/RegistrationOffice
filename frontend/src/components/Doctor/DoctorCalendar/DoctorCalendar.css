@@ -1,0 +1,66 @@
+@import '../../User/UserMain/MainU.css';
+@import '../../User/UserCalendar/CalendarU.css';
+
+.doctor-page {
+  width: 100%;
+}
+
+.doctor-container {
+  width: 100%;
+  max-width: 1000px;
+  padding: 24px;
+}
+
+.cell.work-day {
+  background: #f3f5ff;
+}
+
+.cell.past-day {
+  background: #f3f5ff;
+  color: #4c6aff;
+  border: 1px solid #f0f2ff;
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.cell.has-bookings {
+  background: #d8effc;
+}
+
+.cell.no-work-day {
+  opacity: 0.5;
+}
+
+.time-item.booked {
+  background: #c4e8f7;
+  color: #4f7f95;
+  cursor: pointer;
+}
+
+.time-item.booked:hover {
+  filter: brightness(0.97);
+}
+
+.time-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.small-error {
+  color: #d25454;
+  font-size: 12px;
+}
+
+.small-hint {
+  color: #8d99d8;
+  font-size: 12px;
+}
+
+.logout-link {
+  border: none;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+

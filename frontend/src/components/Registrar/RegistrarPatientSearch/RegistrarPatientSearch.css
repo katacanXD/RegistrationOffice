@@ -1,0 +1,77 @@
+@import '../../User/UserMain/MainU.css';
+@import '../../User/UserSearch/SearchU.css';
+
+.registrar-page {
+  width: 100%;
+}
+
+.registrar-container {
+  width: 100%;
+  max-width: 900px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.patients-list {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.patient-card {
+  width: 100%;
+  border: 1px solid #eef0ff;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 6px 20px rgba(165, 180, 252, 0.15);
+  text-align: left;
+  padding: 12px 14px;
+  cursor: pointer;
+}
+
+.patient-card:hover {
+  filter: brightness(0.99);
+}
+
+.patient-name {
+  margin: 0;
+  color: #7582ea;
+  font-size: 22px;
+}
+
+.patient-policy {
+  margin: 2px 0 0 0;
+  color: #8a96e8;
+}
+
+.pager-row {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: #7d89e6;
+  width: 100%;
+  max-width: 600px;
+  justify-content: center;
+}
+
+.logout-link {
+  border: none;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+
+.small-error {
+  color: #d25454;
+}
+
+.small-hint {
+  color: #8d99d8;
+}
+

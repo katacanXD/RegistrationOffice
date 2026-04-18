@@ -99,6 +99,36 @@
   background-color: #ffebeb !important;
 }
 
+.field-error {
+  color: red;
+  font-size: 12px;
+  margin-top: -16px;
+  margin-bottom: 12px;
+  padding-left: 7px;
+}
+
+.success-message {
+  background-color: #e0ffe0;
+  border: 1px solid green;
+  color: green;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.general-error {
+  background-color: #ffe0e0;
+  border: 1px solid red;
+  color: red;
+  padding: 12px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: center;
+}
+
 @media (max-width: 900px) {
   .registration-title {
     font-size: 30px;

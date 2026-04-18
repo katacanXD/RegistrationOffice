@@ -29,6 +29,14 @@ public class PatientController {
                 userService.getDashboardByLogin(authentication.getName()));
     }
 
+    @PreAuthorize("hasAnyAuthority('admin', 'registrar')")
+    @GetMapping("/{patientId}/dashboard")
+    public ResponseEntity<PatientDashboardDto> getDashboardById(
+            @PathVariable Long patientId
+    ) {
+        return ResponseEntity.ok(userService.getDashboardById(patientId));
+    }
+
     @PreAuthorize("hasAnyAuthority('admin', 'patient')")
     @PatchMapping("/me/policy")
     public ResponseEntity<?> updatePolicy(
