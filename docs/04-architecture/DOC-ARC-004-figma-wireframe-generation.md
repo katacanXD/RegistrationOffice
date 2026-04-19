@@ -2,13 +2,14 @@
 
 | Версия | Статус | Дата создания | Дата обновления |
 |--------|--------|---------------|-----------------|
-| v0.1   | Draft  | 2026-04-02    | 2026-04-12      |
+| v0.2   | Draft  | 2026-04-02    | 2026-04-18      |
 
-О документе: описание Figma-артефактов проекта — wireframes, прототипы и анимации пользовательских сценариев.
+О документе: описание Figma-артефактов для текущих экранов RegistrationOffice — wireframes, прототипы и переходы.
 
 Для кого: designer, frontend-разработчик, заказчик.
 
-Основано на: [low-fi wireframes](DOC-ARC-003-low-fi-wireframes.md), [UX-сценарии](../02-requirements/DOC-REQ-003-ux-scenarios.md).
+Основано
+на: [low-fi wireframes](DOC-ARC-003-low-fi-wireframes-and-screen-logic.md), [UX-сценарии](../02-requirements/DOC-REQ-003-ux-scenarios.md).
 
 ---
 
@@ -23,12 +24,14 @@
 ## История изменений
 
 - [v0.1] [2026-04-02] (Романчук, Лукьянов): первичный набор wireframes и анимаций.
+- [v0.2] [2026-04-18] (Чернышов): добавлена привязка к API и уточнение данных для макетов.
 
 ---
 
 ## Ссылка на Figma
 
-> Ссылка на проект: *(вставить ссылку на Figma-проект)*
+> Ссылка на проект:
+*[Figma](https://www.figma.com/design/dhSpD9QDRP79l77V0HJsWv/%D0%9E%D0%9F%D0%94?node-id=0-1&p=f&t=QOJygsnFG9sZETfO-0)*
 
 ---
 
@@ -36,33 +39,33 @@
 
 ```
 RegistrationOffice (Figma)
-├── 01-Wireframes/
-│   ├── 01-Login
-│   ├── 02-Doctor-selection
-│   ├── 03-Slot-calendar
-│   ├── 04-Booking-confirmation
-│   ├── 05-My-appointments
-│   ├── 06-Doctor-schedule
-│   ├── 07-Registry-management
-│   ├── 08-Admin-schedule-setup
-│   ├── 09-Utilization-report
-│   └── 10-CSV-import
+├── 01-Screens/
+│   ├── Login
+│   ├── Registration
+│   ├── Patient-main
+│   ├── Patient-search
+│   ├── Patient-calendar
+│   ├── Doctor-calendar
+│   ├── Registrar-patients
+│   ├── Registrar-patient
+│   ├── Registrar-doctors
+│   ├── Registrar-calendar
+│   └── Admin-panel
 ├── 02-Components/
-│   ├── Sidebar
-│   ├── Header
-│   ├── Slot-card
-│   ├── Appointment-row
+│   ├── Header-with-avatar
+│   ├── Back-link
+│   ├── Doctor-card
+│   ├── Patient-card
+│   ├── Slot-button
 │   ├── Modal-confirm
-│   ├── Toast-notification
-│   └── Status-badge
+│   └── User-row
 ├── 03-Prototypes/
-│   ├── Flow-patient-booking
-│   ├── Flow-patient-cancel
-│   ├── Flow-patient-reschedule
-│   ├── Flow-doctor-view
-│   ├── Flow-registry-booking
-│   ├── Flow-admin-report
-│   └── Flow-admin-import
+│   ├── Patient-booking-flow
+│   ├── Patient-reschedule-flow
+│   ├── Patient-cancel-flow
+│   ├── Doctor-view-flow
+│   ├── Registrar-booking-flow
+│   └── Admin-management-flow
 └── 04-Style-guide/
     ├── Colors
     ├── Typography
@@ -74,124 +77,82 @@ RegistrationOffice (Figma)
 
 ## Анимации (прототипы в Figma)
 
-Каждый прототип — интерактивный flow, который можно «прокликать» в Figma Prototype mode.
+Каждый прототип соответствует реальному переходу между экранами.
 
-### Анимация 1: Пациент записывается на приём
+### Анимация 1: Вход и переход по роли
 
-| Шаг | Экран                    | Переход                           | Анимация      |
-|-----|--------------------------|-----------------------------------|---------------|
-| 1   | Логин                    | Ввод логина/пароля → кнопка «Войти» | Dissolve 200ms|
-| 2   | Выбор врача              | Клик на карточку врача            | Smart animate |
-| 3   | Выбор даты               | Клик на дату в календаре          | Smart animate |
-| 4   | Календарь слотов         | Клик на свободный слот            | Move in 150ms |
-| 5   | Модальное подтверждение  | Кнопка «Записаться»              | Dissolve 200ms|
-| 6   | Toast «Запись создана»   | Автоскрытие через 3 сек           | Slide out     |
-| 7   | Мои записи               | Новая запись в списке             | —             |
+| Шаг | Экран             | Действие                     | Анимация       |
+|-----|-------------------|------------------------------|----------------|
+| 1   | Login             | Ввод логина и пароля         | Dissolve 200ms |
+| 2   | Login             | Нажатие «Войти»              | Smart animate  |
+| 3   | Роль пользователя | Переход на стартовый маршрут | Move in 150ms  |
 
-### Анимация 2: Пациент отменяет запись
+### Анимация 2: Пациент привязывает полис и записывается
 
-| Шаг | Экран                    | Переход                           | Анимация      |
-|-----|--------------------------|-----------------------------------|---------------|
-| 1   | Мои записи               | Кнопка «Отменить» на записи      | Move in 150ms |
-| 2   | Модальное окно           | Ввод причины → «Подтвердить»     | Dissolve 200ms|
-| 3   | Toast «Запись отменена»  | Автоскрытие                       | Slide out     |
-| 4   | Мои записи               | Статус записи → `canceled`        | —             |
+| Шаг | Экран            | Действие             | Анимация       |
+|-----|------------------|----------------------|----------------|
+| 1   | Patient-main     | Ввод полиса ОМС      | Smart animate  |
+| 2   | Patient-main     | Нажатие «Сохранить»  | Dissolve 200ms |
+| 3   | Patient-search   | Выбор врача          | Smart animate  |
+| 4   | Patient-calendar | Выбор слота          | Smart animate  |
+| 5   | Modal-confirm    | Подтверждение записи | Dissolve 200ms |
+| 6   | Patient-main     | Возврат в кабинет    | Move in 150ms  |
 
-### Анимация 3: Пациент переносит запись
+### Анимация 3: Пациент переносит или удаляет запись
 
-| Шаг | Экран                    | Переход                           | Анимация      |
-|-----|--------------------------|-----------------------------------|---------------|
-| 1   | Мои записи               | Кнопка «Перенести»               | Smart animate |
-| 2   | Календарь слотов         | Выбор нового слота                | Smart animate |
-| 3   | Модальное подтверждение  | «Перенести»                       | Dissolve 200ms|
-| 4   | Toast «Запись перенесена»| Автоскрытие                       | Slide out     |
+| Шаг | Экран            | Действие                                          | Анимация      |
+|-----|------------------|---------------------------------------------------|---------------|
+| 1   | Patient-main     | Нажатие «Перенести»                               | Smart animate |
+| 2   | Patient-calendar | Выбор нового слота                                | Smart animate |
+| 3   | Patient-main     | Возврат после успеха                              | Move in 150ms |
+| 4   | Patient-main     | Нажатие «Удалить» и подтверждение browser confirm | —             |
 
-### Анимация 4: Врач смотрит расписание
+### Анимация 4: Врач открывает талон записи
 
-| Шаг | Экран                    | Переход                           | Анимация      |
-|-----|--------------------------|-----------------------------------|---------------|
-| 1   | Расписание (день)        | Переключатель «День/Неделя»       | Smart animate |
-| 2   | Расписание (неделя)      | Клик на запись                    | Move in 150ms |
-| 3   | Детали записи            | Кнопка «Завершить приём»          | Dissolve 200ms|
+| Шаг | Экран           | Действие              | Анимация       |
+|-----|-----------------|-----------------------|----------------|
+| 1   | Doctor-calendar | Выбор дня в календаре | Smart animate  |
+| 2   | Doctor-calendar | Клик по занятым слоту | Move in 150ms  |
+| 3   | Modal-detail    | Просмотр талона       | Dissolve 200ms |
 
 ### Анимация 5: Регистратор записывает пациента
 
-| Шаг | Экран                    | Переход                           | Анимация      |
-|-----|--------------------------|-----------------------------------|---------------|
-| 1   | Выбор врача              | Поиск + выбор                     | Smart animate |
-| 2   | Календарь слотов         | Выбор слота                       | Smart animate |
-| 3   | Поиск пациента           | Ввод ФИО → результат              | Dissolve 200ms|
-| 4   | Подтверждение            | «Записать»                        | Dissolve 200ms|
-| 5   | Toast «Запись создана»   | Автоскрытие                       | Slide out     |
+| Шаг | Экран              | Действие                    | Анимация       |
+|-----|--------------------|-----------------------------|----------------|
+| 1   | Registrar-patients | Поиск и выбор пациента      | Smart animate  |
+| 2   | Registrar-patient  | Переход к поиску врача      | Move in 150ms  |
+| 3   | Registrar-doctors  | Поиск врача                 | Smart animate  |
+| 4   | Registrar-calendar | Выбор слота и подтверждение | Dissolve 200ms |
 
-### Анимация 6: Админ смотрит отчёт и экспортирует CSV
+### Анимация 6: Администратор управляет пользователями и импортом
 
-| Шаг | Экран                    | Переход                           | Анимация      |
-|-----|--------------------------|-----------------------------------|---------------|
-| 1   | Отчёт утилизации         | Задать фильтры → «Показать»      | Smart animate |
-| 2   | Таблица + график         | Кнопка «Экспорт CSV»             | —             |
-| 3   | Toast «CSV скачан»       | Автоскрытие                       | Slide out     |
-
-### Анимация 7: Админ импортирует CSV
-
-| Шаг | Экран                    | Переход                           | Анимация      |
-|-----|--------------------------|-----------------------------------|---------------|
-| 1   | Импорт CSV               | Drag-and-drop файл                | Smart animate |
-| 2   | Превью данных            | Кнопка «Загрузить»               | Dissolve 200ms|
-| 3   | Результат                | «Импортировано: N, пропущено: M»  | —             |
+| Шаг | Экран       | Действие                    | Анимация       |
+|-----|-------------|-----------------------------|----------------|
+| 1   | Admin-panel | Поиск пользователя          | Smart animate  |
+| 2   | Admin-panel | Изменение роли / speciality | Dissolve 200ms |
+| 3   | Admin-panel | Загрузка CSV-файла          | Move in 150ms  |
 
 ---
 
-## Дизайн-система (Style guide)
+## Дизайн-система
 
-### Цвета
+### Общие принципы
 
-| Назначение         | Цвет     | HEX       |
-|--------------------|----------|-----------|
-| Primary (accent)   | Синий    | `#2563EB` |
-| Success            | Зелёный  | `#16A34A` |
-| Warning            | Жёлтый   | `#EAB308` |
-| Danger             | Красный  | `#DC2626` |
-| Background         | Белый    | `#FFFFFF` |
-| Surface            | Серый    | `#F8FAFC` |
-| Text primary       | Тёмный   | `#1E293B` |
-| Text secondary     | Серый    | `#64748B` |
-| Border             | Свет.-серый| `#E2E8F0`|
+- Минималистичный светлый интерфейс.
+- Верхний хедер с логотипом и аватаром пользователя.
+- Карточки, модальные окна и кнопки в едином стиле.
+- Для пациента и регистратора важны крупные кнопки «Назад», «Записаться», «Перенести», «Удалить».
 
-### Типографика
-
-| Элемент     | Шрифт      | Размер | Вес |
-|-------------|------------|--------|-----|
-| Заголовок h1| Inter      | 24px   | 600 |
-| Заголовок h2| Inter      | 20px   | 600 |
-| Заголовок h3| Inter      | 16px   | 500 |
-| Body        | Inter      | 14px   | 400 |
-| Caption     | Inter      | 12px   | 400 |
-
-### Отступы
-
-| Элемент           | Значение |
-|-------------------|----------|
-| Padding карточки  | 16px     |
-| Gap между элементами | 12px |
-| Sidebar ширина    | 240px    |
-| Margin от края    | 24px     |
-
----
-
-## Prompt для генерации wireframes
-
-Для быстрой генерации wireframes в Figma AI или аналогичных инструментах можно использовать следующий промпт:
+### Prompt для генерации wireframes
 
 ```
-Создай low-fi wireframe для медицинской системы записи на приём.
+Создай low-fi wireframe для веб-системы записи на приём RegistrationOffice.
 
 Экран: [название экрана]
-Роль: [пациент / врач / регистратор / администратор]
-Действия пользователя: [список действий из UX-сценария]
-Данные на экране: [список полей и элементов]
-Стиль: минималистичный, серо-белый, Inter, отступы 16px, 
-       карточки с border-radius 8px, sidebar слева 240px.
+Роль: [patient / doctor / registrar / admin]
+Действия пользователя: [список действий]
+Данные на экране: [поля, карточки, слоты, модалки]
+Стиль: минималистичный веб-интерфейс, светлый фон, верхний хедер, без sidebar.
 Язык интерфейса: русский.
 ```
 
@@ -199,15 +160,16 @@ RegistrationOffice (Figma)
 
 ## Связь с документацией
 
-| Экран                   | UX-сценарий (DOC-REQ-003) | User Story    | API-эндпоинт                |
-|-------------------------|---------------------------|---------------|------------------------------|
-| Логин                   | —                         | —             | POST /api/v1/auth/login |
-| Выбор врача             | Сценарий 1, шаг 1-2      | US-P1         | GET /api/v1/doctors |
-| Календарь слотов        | Сценарий 1, шаг 3-4      | US-P1         | GET /api/v1/doctors/{doctorId}/slots |
-| Подтверждение записи    | Сценарий 1, шаг 5-6      | US-P2         | POST /api/v1/appointments/me |
-| ��ои записи              | Сценарий 2, 3             | US-P3, US-P4  | GET /api/v1/patients/me/dashboard |
-| Расписание врача        | Сценарий 4                | US-D1, US-D2  | GET /api/v1/doctors/{doctorId}/schedule |
-| Управление записями     | Сценарий 5, 6             | US-R1–R4      | GET/PATCH/DELETE /api/v1/appointments/* |
-| Настройка расписания    | Сценарий 7                | US-A1         | POST /api/v1/admins/import/work-slots |
-| Отчёт утилизации        | Сценарий 8                | US-A2, US-A3  | GET /api/v1/admins/export/* |
-| Импорт CSV              | Сценарий 7, шаг 4         | US-A5         | POST /api/v1/admins/import/* |
+| Экран              | API-эндпоинт                                                                                                                            |
+|--------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| Login              | `POST /api/v1/auth/login`                                                                                                               |
+| Registration       | `POST /api/v1/auth/registration`                                                                                                        |
+| Patient-main       | `GET /api/v1/patients/me/dashboard`, `PATCH /api/v1/patients/me/policy`                                                                 |
+| Patient-search     | `GET /api/v1/doctors`                                                                                                                   |
+| Patient-calendar   | `GET /api/v1/doctors/{doctorId}/slots`, `POST /api/v1/appointments/me`, `PATCH /api/v1/appointments/{id}`                               |
+| Doctor-calendar    | `GET /api/v1/doctors/{doctorId}/calendar`, `GET /api/v1/doctors/{doctorId}/schedule`, `GET /api/v1/appointments/detail/{appointmentId}` |
+| Registrar-patients | `GET /api/v1/patients`                                                                                                                  |
+| Registrar-patient  | `GET /api/v1/patients/{patientId}/dashboard`, `DELETE /api/v1/appointments/{id}`                                                        |
+| Registrar-doctors  | `GET /api/v1/doctors`                                                                                                                   |
+| Registrar-calendar | `GET /api/v1/doctors/{doctorId}/slots`, `POST /api/v1/appointments`, `PATCH /api/v1/appointments/{id}`                                  |
+| Admin-panel        | `GET /api/v1/users`, `PATCH /api/v1/users/{userId}`, `POST /api/v1/admins/import/*`                                                     |

@@ -2,7 +2,7 @@
 
 | Версия | Статус | Дата обновления |
 |---|---|---|
-| v1.1 | Draft | 2026-04-18 |
+| v1.2 | Draft | 2026-04-18 |
 
 ## Точки интеграции
 
@@ -13,9 +13,9 @@
 
 ## Ключевые API-контуры
 
-- Auth: access token в JSON, refresh token в HttpOnly cookie;
-- Users/Patients: профиль, пароль, полис, админский CRUD;
-- Doctors: поиск, public/private slots, calendar, schedule;
+- Auth: login, refresh, logout, me;
+- Users/Patients: профиль, пароль, полис, список пациентов, админский CRUD;
+- Doctors: поиск, slots, calendar, schedule, public views;
 - Appointments: create/update/cancel/detail;
 - Admins: CSV import/export.
 
@@ -23,21 +23,21 @@
 
 | Точка | Протокол | Владелец | Основной риск |
 |---|---|---|---|
-| Browser <-> Nginx | HTTP/HTTPS | DevOps | Ошибка маршрутизации `/api` и SPA routes |
-| Nginx <-> Frontend | HTTP (internal) | Frontend + DevOps | Отдача устаревшей сборки/неверный base path |
-| Nginx <-> Backend | HTTP (internal) | Backend + DevOps | 502/504 при недоступности backend |
-| Frontend <-> Backend API | HTTP/JSON | Frontend + Backend | Несовместимость DTO/ролей/CORS |
-| Backend <-> PostgreSQL | TCP/JDBC | Backend | Ошибки схемы и миграций |
+| Browser <-> Nginx | HTTP/HTTPS | DevOps | SPA routes или `/api` проксирование |
+| Frontend <-> Backend API | HTTP/JSON | Frontend + Backend | DTO, роли, CORS, cookie refresh |
+| Backend <-> PostgreSQL | TCP/JDBC | Backend | схема и миграции |
+| Backend <-> JWT cookie | HTTP cookie | Backend | `refresh_token` path/samesite/secure |
 
 ## Критичные интеграционные сценарии
 
 - login + refresh + logout;
-- получение профиля и смена пароля;
-- получение врачей и слотов, включая public endpoints;
-- создание/отмена/обновление записи;
-- CSV export/import для админа.
+- привязка полиса и загрузка кабинета пациента;
+- поиск врача, слоты, запись, перенос, отмена;
+- просмотр расписания врача и талона;
+- CSV import/export для администратора.
 
 ## Контроль консистентности
 
-- API-контракты и docs обновляются в одном PR;
-- frontend и backend используют единую role-matrix.
+- API-контракты и docs обновляются вместе;
+- frontend и backend используют одну role-matrix;
+- runtime JSON соответствует `snake_case`.
