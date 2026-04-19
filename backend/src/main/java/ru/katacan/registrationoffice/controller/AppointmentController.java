@@ -59,7 +59,7 @@ public class AppointmentController {
                 .body(appointmentService.updateAppointment(appointmentId, request));
     }
 
-    @PreAuthorize("hasAnyAuthority('admin', 'registrar') or (hasAuthority('patient') and @appointmentAccess.isPatientOwnerOfAppointment(#appointmentId, authentication))")
+    @PreAuthorize("hasAnyAuthority('admin', 'registrar', 'doctor') or (hasAuthority('patient') and @appointmentAccess.isPatientOwnerOfAppointment(#appointmentId, authentication))")
     @GetMapping("/detail/{appointmentId}")
     public ResponseEntity<AppointmentDetailDto> getDetailAppointment(
             @PathVariable Long appointmentId
@@ -68,7 +68,7 @@ public class AppointmentController {
                 .body(appointmentService.getDetailAppointmentById(appointmentId));
     }
 
-    @PreAuthorize("hasAnyAuthority('admin', 'registrar') or (hasAuthority('patient') and @appointmentAccess.isPatientOwnerOfAppointment(#appointmentId, authentication))")
+    @PreAuthorize("hasAnyAuthority('admin', 'registrar', 'doctor') or (hasAuthority('patient') and @appointmentAccess.isPatientOwnerOfAppointment(#appointmentId, authentication))")
     @GetMapping("/{appointmentId}")
     public ResponseEntity<AppointmentShortDto> getShortAppointment(
             @PathVariable Long appointmentId

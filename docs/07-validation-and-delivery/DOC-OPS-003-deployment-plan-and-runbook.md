@@ -2,9 +2,9 @@
 
 | Версия | Статус | Дата создания | Дата обновления |
 |--------|--------|---------------|-----------------|
-| v0.1   | Draft  | 2026-04-10    | 2026-04-10      |
+| v0.2   | Draft  | 2026-04-10    | 2026-04-18      |
 
-О документе: инструкция по развёртыванию и запуску системы RegistrationOffice.
+О документе: инструкция по развёртыванию и проверке текущего RegistrationOffice.
 
 Для кого: backend-разработчик, DevOps, команда проекта.
 
@@ -20,51 +20,26 @@
 ## История изменений
 
 - [v0.1] [2026-04-10] (Сысоев, Чернышов): первичный runbook.
+- [v0.2] [2026-04-18] (Чернышов): добавлены проверки и обновление.
 
 ---
 
 ## Архитектура деплоя
-| Версия | Статус | Дата обновления |
-|---|---|---|
-| v1.1 | Draft | 2026-04-17 |
 
 ```
-Internet → Nginx (reverse proxy, :80) → Spring Boot API (:8080) → PostgreSQL (:5432)
-                                    ↘ Static files (frontend)
+Browser → Nginx → Frontend SPA
+                → Spring Boot API → PostgreSQL
 ```
 
-Все компоненты запускаются через Docker Compose на одной виртуальной машине в Yandex Cloud.
-- Linux VM
-- Docker + Docker Compose
-- Nginx + backend + frontend + postgres
+Все компоненты запускаются через Docker Compose на одной VM в Yandex Cloud.
 
 ## Предусловия
 
-- Виртуальная машина с Ubuntu 22.04+.
-- Установлены Docker и Docker Compose.
-- Домен registration-office.ru направлен на IP машины.
-- Обязательные: `postgres`, `backend`, `frontend`, `nginx`
-- По текущему `docker-compose.yml` frontend собирается отдельным контейнером и отдается через `nginx`.
-
-## Шаги развёртывания
-
-### 1. Клонировать репозиторий
-
-```bash
-git clone https://gitverse.ru/KatacanXD/RegistrationOffice.git
-cd RegistrationOffice
-```
-
-### 2. Настроить переменные окружения
-
-- используйте `.env.example` как базу;
-- backend контейнер должен подниматься без ошибок;
-- postgres принимает подключения;
-- frontend доступен по `/` и открывает SPA без 404 на маршрутах.
+- Ubuntu VM с Docker и Docker Compose.
+- Домен/host указывает на VM.
+- Наличие `.env` с параметрами БД и JWT.
 
 ## Переменные окружения
-
-Минимальный набор для `.env`:
 
 ```dotenv
 DB_NAME=postgres
@@ -73,62 +48,28 @@ DB_PASS=<strong_password>
 SECURITY_JWT_SECRET=<jwt_secret_min_32_chars>
 APP_SECURITY_CORS_ALLOWED_ORIGINS=
 APP_SECURITY_CORS_ALLOWED_ORIGIN_PATTERNS=
-VITE_API_BASE_URL=http://<url>/api/v1
+VITE_API_BASE_URL=http://<host>/api/v1
 ```
 
-Примечания:
+## Шаги развёртывания
 
-- `VITE_API_BASE_URL` используется frontend при сборке; если не задан, клиент по умолчанию ходит на `/api/v1`.
-- cookie `refresh_token` работает только при корректном домене/HTTPS и `SameSite`/`Secure` настройках.
+1. Склонировать репозиторий.
+2. Подготовить `.env`.
+3. Выполнить `docker-compose up -d --build`.
+4. Проверить, что SPA доступна по `/` и маршруты не дают `404`.
+5. Проверить `/api/v1/auth/login`, `/api/v1/doctors`, `/api/v1/patients/me/dashboard`.
+6. Убедиться, что `refresh_token` cookie устанавливается и обновляется.
 
-```bash
-cp .env.example .env
-# Отредактировать .env:
-# - POSTGRES_PASSWORD
-# - JWT_SECRET
-# - SPRING_DATASOURCE_URL
-```
+## Проверки после деплоя
 
-### 3. Собрать и запустить
-- главная страница UI отдается по `/`;
-- SPA-маршруты не дают `404` при прямом открытии URL;
-- запросы frontend к `/api/v1/**` проходят через `nginx`;
-- login из UI получает access token, а refresh token сохраняется в cookie;
-- logout очищает `refresh_token` cookie.
-
-```bash
-docker-compose up -d --build
-```
-
-- `404` на SPA-роутах: проверить fallback на `index.html` в `nginx`.
-- `CORS` ошибки в браузере: проверить `APP_SECURITY_CORS_ALLOWED_ORIGINS` и origin frontend.
-- UI работает, API нет: проверить проксирование `/api` в `deploy/nginx/default.conf`.
-- После деплоя старая версия UI: проверить пересборку frontend-образа и кэш браузера/CDN.
-- `refresh` не работает: проверить cookie path `/api/v1/auth`, `Secure`, `SameSite=Lax` и домен.
-### 4. Проверить работоспособность
-
-```bash
-# Проверить статус контейнеров
-docker-compose ps
-
-# Проверить API
-curl http://localhost:8080/api/v1/doctors
-
-# Проверить через домен
-curl http://registration-office.ru/api/v1/doctors
-```
-
-### 5. Загрузить начальные данные (при необходимости)
-
-```bash
-# Импорт врачей, пациентов, слотов через CSV или SQL-скрипты
-# (описано в документации к API: POST /api/v1/admins/import/work-slots)
-```
+- `docker-compose ps`
+- `curl http://localhost:8080/api/v1/doctors`
+- `curl http://<host>/api/v1/doctors`
+- вход через UI с последующим refresh/logout
 
 ## Обновление
 
 ```bash
-cd RegistrationOffice
 git pull
 docker-compose up -d --build
 ```
@@ -144,18 +85,14 @@ docker-compose up -d --build
 ## Мониторинг
 
 ```bash
-# Логи приложения
-docker-compose logs -f app
-
-# Логи Nginx
+docker-compose logs -f backend
+docker-compose logs -f frontend
 docker-compose logs -f nginx
-
-# Логи PostgreSQL
 docker-compose logs -f db
 ```
 
 ## Известные ограничения
 
-- HTTPS не настроен (учебный проект).
+- HTTPS может быть не настроен в учебной среде.
 - Backup БД не автоматизирован.
 - Масштабирование на несколько инстансов не предусмотрено.

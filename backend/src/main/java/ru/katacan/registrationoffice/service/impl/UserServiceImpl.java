@@ -200,6 +200,26 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 
+                    @Override
+                    public PatientDashboardDto getDashboardById(Long patientId) {
+                        User patient = userRepository.findById(patientId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Пациент с id " + patientId + " не найден"));
+
+                        if (patient.getRole() == null || !"patient".equals(patient.getRole().getName())) {
+                            throw new BadRequestException("Пользователь не является пациентом");
+                        }
+
+                        List<Appointment> appointments = appointmentRepository
+                                .findByPatientAndStatus_NameIn(patient, List.of("booked"));
+
+                        return PatientDashboardDto.builder()
+                                .user(userMapper.toPatientUserInfo(patient))
+                                .appointments(appointments.stream()
+                                        .map(appointmentMapper::toAppointmentShort)
+                                        .collect(Collectors.toList()))
+                                .build();
+                    }
+
 
     @Override
     public PolicyResponseDto updatePolicyByLogin(String login, PolicyRequestDto request) {

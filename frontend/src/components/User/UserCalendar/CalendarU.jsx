@@ -14,7 +14,7 @@ import myAvatar from '../Foto/Account.png';
 export default function CalendarU() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { selectedDoctor, loading, error, userPolicy, fetchDoctorSlots, fetchUserPolicy, createAppointment } = useApp();
+  const { selectedDoctor, loading, error, userPolicy, fetchDoctorSlots, fetchUserPolicy, createAppointment, rescheduleAppointmentId, setRescheduleAppointmentId, updateRegistrarAppointment } = useApp();
 
   const [isOpen, setIsOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -93,25 +93,24 @@ export default function CalendarU() {
     checkPolicy();
   }, [fetchUserPolicy, policyChecked, userPolicy]);
 
-  useEffect(() => {
-    if (policyChecked) {
-      if (!userPolicy) {
-        alert('Пожалуйста, сначала добавьте полис ОМС');
-        navigate('/MainU');
-        return;
-      }
-      if (!selectedDoctor?.id) {
-        navigate('/SearchU');
-        return;
-      }
-      const timerId = setTimeout(() => {
-        loadSlots();
-      }, 0);
+   useEffect(() => {
+     if (policyChecked) {
+       if (!userPolicy) {
+         navigate('/patient/main');
+         return;
+       }
+       if (!selectedDoctor?.id) {
+         navigate('/patient/main');
+         return;
+       }
+       const timerId = setTimeout(() => {
+         loadSlots();
+       }, 0);
 
-      return () => clearTimeout(timerId);
-    }
-    return undefined;
-  }, [loadSlots, navigate, policyChecked, selectedDoctor, selectedDate, userPolicy]);
+       return () => clearTimeout(timerId);
+     }
+     return undefined;
+   }, [loadSlots, navigate, policyChecked, selectedDoctor?.id, selectedDate, userPolicy]);
 
   const formatName = (fio) => {
     if (!fio) return "Гость";
@@ -122,31 +121,35 @@ export default function CalendarU() {
     return `${firstName} ${initials}`;
   };
 
-  const handleConfirm = async () => {
-    if (!userPolicy) {
-      alert('Пожалуйста, сначала добавьте полис ОМС');
-      navigate('/MainU');
-      return;
-    }
+   const handleConfirm = async () => {
+     if (!userPolicy) {
+       navigate('/patient/main');
+       return;
+     }
 
-    if (!selectedTime) {
-      alert('Выберите время');
-      return;
-    }
+     if (!selectedTime) {
+       return;
+     }
 
-    setCreating(true);
-    const slotDatetime = format(selectedDate, 'yyyy-MM-dd') + 'T' + selectedTime;
-    const result = await createAppointment(selectedDoctor.id, slotDatetime);
-    setCreating(false);
+     setCreating(true);
+     const slotDatetime = format(selectedDate, 'yyyy-MM-dd') + 'T' + selectedTime;
 
-    if (result.success) {
-      alert('Запись успешно создана!');
-      setShowModal(false);
-      navigate('/MainU');
-    } else {
-      alert(result.error || 'Ошибка при создании записи');
-    }
-  };
+     let result;
+     if (rescheduleAppointmentId) {
+       // Режим переноса
+       result = await updateRegistrarAppointment(rescheduleAppointmentId, slotDatetime);
+     } else {
+       // Режим создания
+       result = await createAppointment(selectedDoctor.id, slotDatetime);
+     }
+     setCreating(false);
+
+     if (result.success) {
+       setShowModal(false);
+       setRescheduleAppointmentId(null);
+       navigate('/patient/main');
+     }
+   };
 
   const handleTimeClick = (time) => {
     setSelectedTime(time);
@@ -220,12 +223,29 @@ export default function CalendarU() {
     return <div>Загрузка...</div>;
   }
 
+  const clinicAddress = selectedDoctor.address || 'г. Москва, ул. Менделеева, д. 15с2';
+  const weekdayShort = format(selectedDate, 'EEE', { locale: ru }).replace('.', '');
+  const weekdayCapitalized = weekdayShort.charAt(0).toUpperCase() + weekdayShort.slice(1);
+  const modalDateLabel = `${format(selectedDate, 'd MMMM', { locale: ru })}, ${weekdayCapitalized}`;
+
   const groupedSlots = {};
+  const now = new Date();
+
   availableSlots.forEach(slot => {
     const time = slot.time || slot;
     const timeObj = new Date(`2000-01-01T${time}`);
     const hour = timeObj.getHours();
-    const period = hour < 12 ? 'before' : 'after';
+
+    // Проверяем, не прошло ли это время
+    const slotDateTime = new Date(selectedDate);
+    slotDateTime.setHours(timeObj.getHours(), timeObj.getMinutes(), 0, 0);
+
+    // Не добавляем, если время прошло
+    if (slotDateTime <= now) {
+      return;
+    }
+
+    const period = hour <= 12 ? 'before' : 'after';
     if (!groupedSlots[period]) groupedSlots[period] = [];
     groupedSlots[period].push(time);
   });
@@ -234,7 +254,7 @@ export default function CalendarU() {
       <div className="app-wrapper">
         <header className="main-header">
           <div className="header-left">
-            <Link to="/MainU" className="header-link">
+            <Link to="/patient/main" className="header-link">
               <img src={myLogo} alt="Logo" className="header-logo-img" />
               <span className="brand-name">REGISTRATION OFFICE</span>
             </Link>
@@ -269,7 +289,7 @@ export default function CalendarU() {
         <main className="content calendar-page">
           <div className="calendar-container">
             <div className="top-bar">
-              <Link to="/SearchU" className="back-button">Назад</Link>
+              <Link to="/patient/search" className="back-button">Назад</Link>
             </div>
 
             <div className="calendar-layout">
@@ -331,7 +351,7 @@ export default function CalendarU() {
                     <div className="modal-header-row">
                       <h2 className="modal-title">{selectedDoctor.specialty}</h2>
                       <div className="modal-date-time">
-                        <p>{format(selectedDate, 'd MMMM', { locale: ru })}</p>
+                        <p className="modal-date-label">{modalDateLabel}</p>
                         <span className="modal-time-big">{selectedTime}</span>
                       </div>
                     </div>
@@ -340,6 +360,10 @@ export default function CalendarU() {
                       <div className="info-block">
                         <span className="info-label">Врач</span>
                         <p className="info-value">{selectedDoctor.name}</p>
+                      </div>
+                      <div className="info-block">
+                        <span className="info-label">Адрес клиники</span>
+                        <p className="info-value">{clinicAddress}</p>
                       </div>
                     </div>
 

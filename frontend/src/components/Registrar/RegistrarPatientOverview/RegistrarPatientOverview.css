@@ -1,0 +1,95 @@
+@import '../../User/UserMain/MainU.css';
+@import '../../User/UserSearch/SearchU.css';
+
+.registrar-overview-page {
+  width: 100%;
+}
+
+.registrar-overview-container {
+  width: 100%;
+  max-width: 900px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: center;
+}
+
+.registrar-overview-back-row {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 8px;
+}
+
+.registrar-overview-back-row.top-bar {
+  margin-bottom: 0;
+}
+
+.registrar-overview-summary {
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 8px;
+}
+
+.registrar-appointments-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #6b7dd6;
+  font-weight: 600;
+}
+
+.small-error {
+  color: #d25454;
+}
+
+.small-hint {
+  color: #8d99d8;
+}
+
+.registrar-overview-summary .policy-panel {
+  width: 100%;
+  max-width: 472px;
+}
+
+.patient-info-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.patient-info-row .field-label {
+  margin-bottom: 6px;
+}
+
+.registrar-overview-book-btn {
+  align-self: center;
+  min-width: 180px;
+  margin-top: 6px;
+}
+
+@media (max-width: 700px) {
+  .registrar-overview-container {
+    padding: 16px;
+  }
+
+  .registrar-overview-book-btn {
+    width: 100%;
+    max-width: 260px;
+  }
+}
+
