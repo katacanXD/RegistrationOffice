@@ -16,6 +16,8 @@ public class AppointmentMapper {
     public AppointmentShortDto toAppointmentShort(Appointment appointment) {
         return AppointmentShortDto.builder()
                 .appointmentId(appointment.getId())
+                .doctorId(appointment.getDoctor() != null ?
+                        appointment.getDoctor().getId() : null)
                 .speciality(appointment.getDoctor() != null ?
                         appointment.getDoctor().getSpeciality() : null)
                 .doctorFio(appointment.getDoctor() != null ?

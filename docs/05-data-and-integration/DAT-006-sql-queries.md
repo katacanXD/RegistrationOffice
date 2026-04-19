@@ -2,9 +2,9 @@
 
 | Версия | Статус | Дата создания | Дата обновления |
 |--------|--------|---------------|-----------------|
-| v0.1   | Draft  | 2026-04-10    | 2026-04-12      |
+| v0.2   | Draft  | 2026-04-10    | 2026-04-18      |
 
-О документе: 6 ключевых SQL-запросов, используемых в системе RegistrationOffice.
+О документе: основные SQL-шаблоны для текущей схемы `t_users`, `t_work_slots`, `t_appointments`.
 
 Для кого: backend-разработчики, тестировщик.
 
@@ -22,119 +22,94 @@
 
 ---
 
-## Запрос 1: Получить свободные слоты врача на дату
-
-Используется при записи на приём — показать пациенту доступные слоты.
-
-```sql
-SELECT generate_series(
-    ws.start_time,
-    ws.end_time - (ws.slot_minutes || ' minutes')::interval,
-    (ws.slot_minutes || ' minutes')::interval
-) AS slot_time
-FROM work_slots ws
-WHERE ws.doctor_id = :doctor_id
-  AND ws.date = :date
-  AND generate_series NOT BETWEEN ws.break_start AND ws.break_end
-EXCEPT
-SELECT a.slot_datetime::time
-FROM appointments a
-WHERE a.doctor_id = :doctor_id
-  AND a.slot_datetime::date = :date
-  AND a.status = 'booked';
+## Запрос 1: Получить список врачей с фильтрацией
+```text
+SELECT u.id AS doctor_id,
+       u.full_name AS fio,
+       u.speciality
+FROM t_users u
+JOIN t_dict_role r ON r.f_role_id = u.f_role_id
+WHERE r.f_role_name = 'doctor'
+  AND (
+      :search IS NULL OR :search = ''
+      OR LOWER(u.full_name) LIKE LOWER(CONCAT('%', :search, '%'))
+      OR LOWER(COALESCE(u.speciality, '')) LIKE LOWER(CONCAT('%', :search, '%'))
+  )
+ORDER BY u.full_name;
 ```
 
----
+## Запрос 2: Получить доступные слоты врача на дату
 
-## Запрос 2: Проверка двойного бронирования
+```text
+SELECT ws.f_date,
+       gs.slot_time
+FROM t_work_slots ws
+CROSS JOIN LATERAL generate_series(
+    ws.f_start_time,
+    ws.f_end_time - (ws.f_slot_minutes || ' minutes')::interval,
+    (ws.f_slot_minutes || ' minutes')::interval
+) AS gs(slot_time)
+WHERE ws.f_doctor_id = :doctor_id
+  AND ws.f_date = :date
+  AND (ws.f_break_start IS NULL OR gs.slot_time < ws.f_break_start OR gs.slot_time >= ws.f_break_end)
+ORDER BY gs.slot_time;
+```
 
-Используется при валидации V5 перед созданием записи.
+## Запрос 3: Проверка двойного бронирования
 
-```sql
+```text
 SELECT COUNT(*) AS cnt
-FROM appointments
-WHERE doctor_id = :doctor_id
-  AND slot_datetime = :slot_datetime
-  AND status = 'booked';
--- Если cnt > 0 → отказ в бронировании
+FROM t_appointments
+WHERE f_doctor_id = :doctor_id
+  AND f_slot_datetime = :slot_datetime
+  AND f_status_id = (SELECT f_status_id FROM t_dict_status WHERE f_status_name = 'booked');
 ```
 
----
+## Запрос 4: Расписание врача на день
 
-## Запрос 3: Расписание врача на день (со списком пациентов)
-
-Используется на экране врача — «Моё расписание».
-
-```sql
-SELECT a.slot_datetime,
-       a.status,
-       p.fio AS patient_name,
-       p.birth_year
-FROM appointments a
-JOIN patients p ON a.patient_code = p.patient_code
-WHERE a.doctor_id = :doctor_id
-  AND a.slot_datetime::date = :date
-ORDER BY a.slot_datetime;
+```text
+SELECT a.f_appoint_id,
+       a.f_slot_datetime,
+       s.f_status_name,
+       p.f_fio AS patient_fio,
+       p.f_policy_number
+FROM t_appointments a
+JOIN t_dict_status s ON s.f_status_id = a.f_status_id
+JOIN t_users p ON p.f_users_id = a.f_patient_id
+WHERE a.f_doctor_id = :doctor_id
+  AND a.f_slot_datetime::date = :date
+ORDER BY a.f_slot_datetime;
 ```
-
----
-
-## Запрос 4: Отчёт утилизации по врачу за период
-
-Основной аналитический запрос — отчёт «Загрузка расписания».
-
-```sql
-SELECT d.doctor_id,
-       d.fio,
-       d.specialty,
-       ws.date,
-       COUNT(DISTINCT slot_time) AS slots_total,
-       COUNT(DISTINCT CASE WHEN a.status = 'booked' THEN a.appt_id END) AS slots_booked,
-       COUNT(DISTINCT CASE WHEN a.status = 'canceled' THEN a.appt_id END) AS slots_canceled,
-       ROUND(
-           COUNT(DISTINCT CASE WHEN a.status = 'booked' THEN a.appt_id END)::numeric
-           / NULLIF(COUNT(DISTINCT slot_time), 0), 2
-       ) AS utilization
-FROM doctors d
-JOIN work_slots ws ON d.doctor_id = ws.doctor_id
-LEFT JOIN appointments a ON a.doctor_id = d.doctor_id
-  AND a.slot_datetime::date = ws.date
-WHERE ws.date BETWEEN :from_date AND :to_date
-GROUP BY d.doctor_id, d.fio, d.specialty, ws.date
-ORDER BY ws.date, d.fio;
-```
-
----
 
 ## Запрос 5: История записей пациента
 
-Используется на экране «Мои записи» пациента.
-
-```sql
-SELECT a.appt_id,
-       a.slot_datetime,
-       a.status,
-       a.cancel_reason,
-       d.fio AS doctor_name,
-       d.specialty
-FROM appointments a
-JOIN doctors d ON a.doctor_id = d.doctor_id
-WHERE a.patient_code = :patient_code
-ORDER BY a.slot_datetime DESC;
+```text
+SELECT a.f_appoint_id,
+       a.f_slot_datetime,
+       s.f_status_name,
+       d.f_fio AS doctor_fio,
+       d.f_speciality_name AS speciality
+FROM t_appointments a
+JOIN t_dict_status s ON s.f_status_id = a.f_status_id
+JOIN t_users d ON d.f_users_id = a.f_doctor_id
+WHERE a.f_patient_id = :patient_id
+ORDER BY a.f_slot_datetime DESC;
 ```
 
----
+## Запрос 6: Выборка пользователей для админ-панели
 
-## Запрос 6: Отмена записи с логированием
-
-Используется при отмене — обновление статуса и фиксация причины.
-
-```sql
-UPDATE appointments
-SET status = 'canceled',
-    cancel_reason = :reason,
-    updated_at = NOW()
-WHERE appt_id = :appt_id
-  AND status = 'booked'
-RETURNING appt_id, doctor_id, slot_datetime, patient_code;
+```text
+SELECT u.f_users_id,
+       u.f_fio,
+       r.f_role_name,
+       u.f_speciality_name,
+       u.f_policy_number
+FROM t_users u
+JOIN t_dict_role r ON r.f_role_id = u.f_role_id
+WHERE (
+    :search IS NULL OR :search = ''
+    OR LOWER(u.f_fio) LIKE LOWER(CONCAT('%', :search, '%'))
+    OR LOWER(COALESCE(u.f_speciality_name, '')) LIKE LOWER(CONCAT('%', :search, '%'))
+)
+ORDER BY u.f_fio;
 ```

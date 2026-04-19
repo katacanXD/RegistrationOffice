@@ -4,9 +4,16 @@ import { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import './AuthorizationForm.css'
 
+const roleEntryPath = {
+    patient: '/patient/main',
+    doctor: '/doctor/calendar',
+    registrar: '/registrar/patients',
+    admin: '/admin',
+};
+
 export default function AuthorizationForm () {
     const navigate = useNavigate();
-    const { login, loading, error: authError } = useAuth();
+    const { login, loading } = useAuth();
 
     const [data, setData] = useState({
         login: '',
@@ -42,6 +49,7 @@ export default function AuthorizationForm () {
     const handleSubmit = async (event) => {
         event.preventDefault();
         setGeneralError('');
+        setErrors({});
 
         const validationResult = validateForm();
 
@@ -50,7 +58,8 @@ export default function AuthorizationForm () {
         } else {
             const result = await login(data.login, data.password);
             if (result.success) {
-                navigate('/MainU');
+                const role = (result.user?.role || '').toLowerCase();
+                navigate(roleEntryPath[role] || '/patient/main');
             } else {
                 setGeneralError(result.error || 'Ошибка входа');
             }
@@ -62,8 +71,7 @@ export default function AuthorizationForm () {
         <div className="authorization-container">
             <h1 className='auth-title'>REGISTRATION OFFICE</h1>
 
-            {generalError && <div style={{ color: 'red', marginBottom: '10px' }}>{generalError}</div>}
-            {authError && <div style={{ color: 'red', marginBottom: '10px' }}>{authError}</div>}
+            {generalError && <div className="general-error">{generalError}</div>}
 
             <form onSubmit={handleSubmit}>
             <label htmlFor="login">Логин</label>
@@ -76,6 +84,7 @@ export default function AuthorizationForm () {
                 className={errors.login ? 'auth-error-input' : ''}
                 disabled={loading}
             />
+            {errors.login && <p className="field-error">{errors.login}</p>}
 
             <label htmlFor="password">Пароль</label>
             <input
@@ -87,6 +96,7 @@ export default function AuthorizationForm () {
                 className={errors.password ? 'auth-error-input' : ''}
                 disabled={loading}
             />
+            {errors.password && <p className="field-error">{errors.password}</p>}
 
             <button type="submit" disabled={loading}>
                 {loading ? 'Загрузка...' : 'Войти'}

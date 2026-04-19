@@ -36,10 +36,12 @@
   height: 55px;
   border: 2px solid #A5B4FC;
   border-radius: 15px;
-  padding: 0 20px 0 76px;
+  padding: 0 16px 0 54px;
   font-size: 1rem;
   color: #A5B4FC;
   outline: none;
+  line-height: 55px;
+  box-sizing: border-box;
 }
 
 .search-field::placeholder {
@@ -48,7 +50,7 @@
 
 .search-icon {
   position: absolute;
-  left: 24px;
+  left: 16px;
   top: 50%;
   transform: translateY(-50%);
   width: 24px;
@@ -60,8 +62,8 @@
 }
 
 .search-icon-image {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   display: block;
 }
 

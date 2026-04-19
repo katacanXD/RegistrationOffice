@@ -7,6 +7,7 @@ import lombok.Data;
 @Builder
 public class AppointmentShortDto {
     private Long appointmentId;
+    private Long doctorId;
     private String speciality;
     private String doctorFio;
     private String datetime; // "2026-11-02T18:30"

@@ -1,0 +1,104 @@
+@import '../../User/UserMain/MainU.css';
+@import '../../User/UserSearch/SearchU.css';
+
+.registrar-doctor-search-page {
+  width: 100%;
+}
+
+.registrar-doctor-search-container {
+  width: 100%;
+  max-width: 900px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.registrar-search-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.registrar-search-top.top-bar {
+  margin-bottom: 0;
+}
+
+.selected-patient-card {
+  width: 100%;
+  max-width: 600px;
+  color: #8a96e8;
+  background: #ffffff;
+  border: 1px solid #eef0ff;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(165, 180, 252, 0.12);
+  padding: 12px 14px;
+}
+
+.registrar-doctor-search-container .search-input-wrapper {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 0;
+}
+
+.registrar-doctor-search-container .search-field {
+  padding: 0 16px 0 54px;
+}
+
+.registrar-doctor-search-container .search-icon {
+  left: 16px;
+}
+
+.registrar-doctor-search-container .search-field {
+  width: 100%;
+}
+
+.registrar-doctor-search-container .doctors-grid {
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  max-width: 700px;
+}
+
+.registrar-doctor-search-container .doctor-card {
+  width: 100%;
+}
+
+.doctor-card-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  text-align: left;
+}
+
+.logout-link {
+  border: none;
+  background: transparent;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+}
+
+.small-error {
+  color: #d25454;
+}
+
+.small-hint {
+  color: #8d99d8;
+  text-align: center;
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 700px) {
+  .registrar-search-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .registrar-doctor-search-container .doctors-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
