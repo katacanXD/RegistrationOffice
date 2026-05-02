@@ -101,9 +101,8 @@ class AppointmentServiceImplTest {
         appointment.setDoctor(doctor);
         appointment.setStatus(status("booked"));
 
-        UpdateAppointmentRequestDto request = UpdateAppointmentRequestDto.builder()
-                .slotDatetime(newSlotTime.toString())
-                .build();
+        UpdateAppointmentRequestDto request = new UpdateAppointmentRequestDto();
+        request.setSlotDatetime(newSlotTime.toString());
 
         when(appointmentRepository.findById(appointment.getId())).thenReturn(Optional.of(appointment));
         when(workSlotRepository.findContainingTime(eq(doctor.getId()), eq(newSlotTime.toLocalDate()), eq(newSlotTime.toLocalTime())))

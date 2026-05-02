@@ -12,6 +12,7 @@ import ru.katacan.registrationoffice.dto.AppointmentShortDto;
 import ru.katacan.registrationoffice.dto.CreateAppointmentRequestDto;
 import ru.katacan.registrationoffice.dto.CreateOwnAppointmentRequestDto;
 import ru.katacan.registrationoffice.dto.UpdateAppointmentRequestDto;
+import ru.katacan.registrationoffice.dto.UpdateAppointmentResponseDto;
 import ru.katacan.registrationoffice.service.AppointmentService;
 
 @RestController
@@ -51,7 +52,7 @@ public class AppointmentController {
 
     @PreAuthorize("hasAnyAuthority('admin', 'registrar') or (hasAuthority('patient') and @appointmentAccess.isPatientOwnerOfAppointment(#appointmentId, authentication))")
     @PatchMapping("/{appointmentId}")
-    public ResponseEntity<UpdateAppointmentRequestDto> updateAppointment(
+    public ResponseEntity<UpdateAppointmentResponseDto> updateAppointment(
             @Valid @RequestBody UpdateAppointmentRequestDto request,
             @PathVariable Long appointmentId) {
 
