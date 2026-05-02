@@ -71,12 +71,12 @@ public class AppointmentMapper {
                 .build();
     }
 
-    public UpdateAppointmentRequestDto toUpdateResponse(Appointment appointment) {
-        return UpdateAppointmentRequestDto.builder()
+    public UpdateAppointmentResponseDto toUpdateResponse(Appointment appointment) {
+        return UpdateAppointmentResponseDto.builder()
                 .doctorId(appointment.getDoctor().getId())
                 .slotDatetime(appointment.getSlotDateTime().format(DateTimeFormatter.ofPattern("d MMMM, HH:mm")))
                 .status(appointment.getStatus() != null ? appointment.getStatus().getName() : null)
-                .message(String.format("Запись к врачу (%s) отменена",
+                .message(String.format("Запись к врачу перенесена на %s",
                         appointment.getSlotDateTime().format(DateTimeFormatter.ofPattern("d MMMM, HH:mm"))))
                 .build();
     }

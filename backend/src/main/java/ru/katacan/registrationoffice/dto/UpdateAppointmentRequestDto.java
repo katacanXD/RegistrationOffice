@@ -2,11 +2,9 @@ package ru.katacan.registrationoffice.dto;
 
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
-import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 public class UpdateAppointmentRequestDto {
     @Positive(message = "doctorId должен быть положительным")
     private Long doctorId;        // если null, не меняем врача
@@ -16,5 +14,4 @@ public class UpdateAppointmentRequestDto {
 
     @Pattern(regexp = "^(booked|canceled|completed)$", message = "Статус должен быть одним из: booked, canceled, completed")
     private String status;        // можно добавить смену статуса
-    private String message;
 }

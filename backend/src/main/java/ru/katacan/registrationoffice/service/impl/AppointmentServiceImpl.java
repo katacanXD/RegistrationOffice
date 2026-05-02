@@ -111,7 +111,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     @Override
     @Transactional
-    public UpdateAppointmentRequestDto updateAppointment(Long appointmentId, UpdateAppointmentRequestDto request) {
+    public UpdateAppointmentResponseDto updateAppointment(Long appointmentId, UpdateAppointmentRequestDto request) {
         // 1. Находим существующую запись
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Запись с id " + appointmentId + " не найдена"));
