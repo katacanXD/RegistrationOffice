@@ -1,5 +1,45 @@
 package ru.katacan.registrationoffice.jwt;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.time.Instant;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class JwtTokenProviderTest {
+
+    private JwtTokenProvider provider;
+
+    @BeforeEach
+    void setUp() {
+        provider = new JwtTokenProvider();
+        ReflectionTestUtils.setField(provider, "jwtSecret", "change-me-super-secret-key-32-bytes-min");
+        ReflectionTestUtils.setField(provider, "accessTtlSeconds", 3600L);
+        ReflectionTestUtils.setField(provider, "refreshTtlSeconds", 7200L);
+        provider.init();
+    }
+
+    @Test
+    void tokens_generation_and_validation() {
+        String access = provider.generateAccessToken(1L, "user1", "patient");
+        assertThat(provider.isTokenValid(access)).isTrue();
+        assertThat(provider.isAccessToken(access)).isTrue();
+        assertThat(provider.isRefreshToken(access)).isFalse();
+        JwtUserPrincipal p = provider.extractPrincipal(access);
+        assertThat(p.userId()).isEqualTo(1L);
+        assertThat(p.login()).isEqualTo("user1");
+
+        String refresh = provider.generateRefreshToken(1L, "user1");
+        assertThat(provider.isTokenValid(refresh)).isTrue();
+        assertThat(provider.isRefreshToken(refresh)).isTrue();
+        Instant exp = provider.getExpiration(refresh);
+        assertThat(exp).isAfter(Instant.now());
+    }
+}
+package ru.katacan.registrationoffice.jwt;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
