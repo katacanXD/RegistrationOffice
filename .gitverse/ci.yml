@@ -1,0 +1,26 @@
+# GitVerse CI configuration (generic runner)
+# Adjust runner image and settings according to your GitVerse environment
+
+stages:
+  - build
+
+build:
+  stage: build
+  image: eclipse-temurin:21-jdk
+  before_script:
+    - echo "Preparing workspace"
+  script:
+    - cd backend
+    - chmod +x gradlew || true
+    - ./gradlew test jacocoTestReport --no-daemon
+  artifacts:
+    when: always
+    paths:
+      - backend/build/reports/tests
+      - backend/build/reports/jacoco/test/html
+    expire_in: 7 days
+  cache:
+    key: "gradle-cache"
+    paths:
+      - backend/.gradle/
+      - backend/build/
