@@ -15,7 +15,7 @@ class GlobalExceptionHandlerTest {
 
         ResponseEntity<ErrorResponseDto> resp = handler.handleBadRequest(ex);
 
-        assertThat(resp.getStatusCodeValue()).isEqualTo(400);
+        assertThat(resp.getStatusCode().value()).isEqualTo(400);
         assertThat(resp.getBody()).isNotNull();
         assertThat(resp.getBody().getMessage()).isEqualTo("Некорректно");
     }
