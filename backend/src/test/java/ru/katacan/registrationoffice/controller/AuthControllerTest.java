@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.katacan.registrationoffice.dto.LoginRequestDto;
@@ -38,6 +39,11 @@ class AuthControllerTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         AuthController controller = new AuthController(authService, userRepository, userMapper);
+        ReflectionTestUtils.setField(controller, "refreshCookieName", "refresh_token");
+        ReflectionTestUtils.setField(controller, "cookieSecure", false);
+        ReflectionTestUtils.setField(controller, "cookieSameSite", "Lax");
+        ReflectionTestUtils.setField(controller, "cookiePath", "/api/v1/auth");
+        ReflectionTestUtils.setField(controller, "refreshTtlSeconds", 1209600L);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
     }
 
@@ -71,6 +77,6 @@ class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isOk())
-                .andExpect(header().exists("Set-Cookie"));
+                .andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("refresh_token=refresh-token")));
     }
 }
