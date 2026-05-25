@@ -65,9 +65,9 @@ jobs:
       - name: Deploy via SSH + rsync + Docker
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          DEPLOY_HOST: "178.154.216.17"
-          DEPLOY_USER: "nabotov"
-          DEPLOY_PATH: "/home/nabotov/RegistrationOffice"
+          DEPLOY_HOST: "158.160.216.91"
+          DEPLOY_USER: "l1m3ow"
+          DEPLOY_PATH: "/home/l1m3ow/RegistrationOffice"
 
           DB_NAME: ${{ secrets.DB_NAME }}
           DB_USER: ${{ secrets.DB_USER }}
