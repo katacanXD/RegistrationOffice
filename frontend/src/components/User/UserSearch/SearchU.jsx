@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../context/AuthContext';
 import { useApp } from '../../../context/AppContext';
+import '../UserMain/MainU.css';
 import './SearchU.css';
 import myLogo from '../Foto/Icon.png';
 import myAvatar from '../Foto/Account.png';
@@ -120,13 +121,13 @@ export default function SearchU() {
             />
           </div>
 
-          {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+          {error && <p className="page-error">{error}</p>}
 
           <div className="doctors-grid">
             {loading ? (
-              <p style={{ color: '#A5B4FC', textAlign: 'center', gridColumn: '1/-1' }}>Загрузка врачей...</p>
+              <p className="page-hint doctors-status">Загрузка врачей...</p>
             ) : doctors.length === 0 ? (
-              <p style={{ color: '#A5B4FC', textAlign: 'center', gridColumn: '1/-1' }}>Врачей не найдено</p>
+              <p className="page-hint doctors-status">Врачей не найдено</p>
             ) : (
               doctors.map(doc => (
                 <Link

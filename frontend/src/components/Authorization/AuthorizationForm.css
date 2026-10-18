@@ -1,116 +1,154 @@
 .auth-screen {
-  background-color: #e4e6ff;
   min-height: 100vh;
   width: 100%;
-  padding: 40px 0;
+  padding: 32px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(240, 245, 255, 0.96) 0%, rgba(226, 232, 255, 0.96) 100%);
 }
 
 .authorization-container {
   display: flex;
   flex-direction: column;
-  max-width: 591px;
-  margin: 125px auto 0;
-  padding: 28px 38px 34px;
-  border: none;
-  border-radius: 20px;
-  background-color: #fbfcff;
+  width: min(100%, 560px);
+  margin: 0 auto;
+  padding: 36px 40px 32px;
+  border: 1px solid rgba(196, 206, 255, 0.7);
+  border-radius: 28px;
+  background: rgba(251, 252, 255, 0.92);
+  box-shadow: 0 18px 45px rgba(105, 123, 214, 0.14);
+  backdrop-filter: blur(10px);
 }
 
 .auth-title {
-  color: #8993ff;
-  margin-bottom: 24px;
+  margin: 0 0 26px;
   text-align: center;
-  font-size: 40px;
-  font-weight: 400;
+  font-size: clamp(26px, 4vw, 38px);
+  font-weight: 600;
   line-height: 1.2;
-  -webkit-text-stroke: 1px #8993ff;
+  letter-spacing: 0.08em;
+  color: #7582ea;
 }
 
 .authorization-container input[type='text'],
 .authorization-container input[type='password'] {
   display: block;
   width: 100%;
-  height: 50px;
+  min-height: 52px;
   margin-top: 7px;
   margin-bottom: 18px;
-  padding: 0 12px;
-  border: none;
-  border-radius: 15px;
-  background-color: #edeeff;
+  padding: 0 16px;
+  border: 1px solid #dbe2ff;
+  border-radius: 16px;
+  background-color: #f4f6ff;
+  color: #334155;
   font-size: 16px;
+  outline: none;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+.authorization-container input[type='text']:focus,
+.authorization-container input[type='password']:focus {
+  border-color: #8993ff;
+  box-shadow: 0 0 0 4px rgba(137, 147, 255, 0.16);
 }
 
 .authorization-container label {
-  color: #8993ff;
-  padding-left: 7px;
-  font-size: 18px;
+  display: block;
+  padding-left: 4px;
+  color: #7480a8;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .authorization-container button {
   display: block;
   width: 100%;
-  height: 50px;
+  min-height: 52px;
   color: #ffffff;
   border: none;
-  border-radius: 15px;
-  background-color: #8993ff;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #8993ff 0%, #7582ea 100%);
   cursor: pointer;
-  font-size: 18px;
+  font-size: 17px;
+  font-weight: 600;
+  box-shadow: 0 12px 24px rgba(117, 130, 234, 0.25);
 }
 
 .authorization-container button:hover {
-  background-color: #7580ef;
+  transform: translateY(-1px);
+  box-shadow: 0 16px 30px rgba(117, 130, 234, 0.28);
 }
 
 .auth-error-input {
-  border: 1px solid red !important;
-  background-color: #ffebeb !important;
+  border-color: #ef6b6b !important;
+  background-color: #fff1f1 !important;
 }
 
 .field-error {
-  color: red;
+  color: #d04f4f;
   font-size: 12px;
-  margin-top: -16px;
+  margin-top: -14px;
   margin-bottom: 12px;
   padding-left: 7px;
 }
 
 .general-error {
-  background-color: #ffe0e0;
-  border: 1px solid red;
-  color: red;
-  padding: 12px;
-  border-radius: 10px;
+  background-color: #ffecec;
+  border: 1px solid #f0b7b7;
+  color: #b93838;
+  padding: 12px 14px;
+  border-radius: 14px;
   margin-bottom: 20px;
   font-size: 14px;
   text-align: center;
 }
 
 .no-account-link {
-  color: #8993ff;
+  display: inline-flex;
+  justify-content: center;
+  margin-top: 14px;
+  color: #7582ea;
   text-decoration: none;
   font-size: 14px;
-  margin-top: 12px;
+  font-weight: 600;
   text-align: center;
 }
 
 .no-account-link:hover {
   text-decoration: underline;
-  font-weight: bold;
+}
+
+.authorization-container form {
+  display: flex;
+  flex-direction: column;
+}
+
+.authorization-container button:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+  transform: none;
+}
+
+.authorization-container button:focus-visible,
+.no-account-link:focus-visible,
+.authorization-container input:focus-visible {
+  outline: 3px solid rgba(137, 147, 255, 0.28);
+  outline-offset: 2px;
 }
 
 @media (max-width: 700px) {
   .auth-screen {
-    padding: 20px 16px;
+    padding: 16px;
   }
 
   .authorization-container {
-    margin-top: 40px;
-    padding: 20px;
+    padding: 24px 18px 22px;
+    border-radius: 22px;
   }
 
   .auth-title {
-    font-size: 24px;
-    -webkit-text-stroke: 0;
+    letter-spacing: 0.06em;
   }
 }

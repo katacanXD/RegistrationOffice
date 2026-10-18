@@ -1,23 +1,26 @@
-/* Global Color Palette for ОПД System */
-
 :root {
-  /* Primary Colors */
-  --color-primary: #4C6AFF;           /* основной синий */
-  --color-primary-dark: #3B5ACF;      /* темный синий (hover) */
-  --color-primary-light: #94A3FF;     /* светлый синий */
+  --color-primary: #4c6aff;
+  --color-primary-hover: #3b5acf;
+  --color-primary-soft: #8993ff;
+  --color-primary-softest: #c7d2fe;
 
-  /* Accent Colors */
-  --color-accent-lighter: #A5B4FC;    /* светлый синий для границ */
-  --color-accent-medium: #7C8BFF;     /* средний синий для заголовков */
-  --color-accent-lightest: #C7D2FE;   /* очень светлый синий для текста */
+  --color-surface: #fbfcff;
+  --color-surface-muted: #f5f7ff;
+  --color-surface-accent: #eef2ff;
+  --color-surface-header: #f0f5f9;
+  --color-page: #e9edff;
 
-  /* Background Colors */
-  --color-bg-card: #F0F2FF;           /* фон карточки */
-  --color-bg-disabled: #E0E6FF;       /* фон для отключенных элементов */
-  --color-bg-page: #E4E6FF;           /* фон страницы (регистрация) */
-  --color-bg-header: #F0F5F9;         /* фон хедера */
-  --color-bg-white: #000000;          /* белый фон */
+  --color-text: #334155;
+  --color-text-muted: #7480a8;
+  --color-border: #e4e8ff;
+  --color-border-strong: #c8d1ff;
 
-  /* Error Colors */
-  --color-error: #FF8B8B;             /* красный для ошибок и удаления */
+  --color-error: #ef6b6b;
+  --color-error-soft: #ffe8e8;
+  --color-success: #3ea56b;
+  --color-success-soft: #e5f7ec;
+
+  --shadow-soft: 0 14px 40px rgba(76, 106, 255, 0.10);
+  --shadow-card: 0 18px 45px rgba(105, 123, 214, 0.14);
+  --shadow-popover: 0 16px 40px rgba(15, 23, 42, 0.12);
 }

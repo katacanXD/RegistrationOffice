@@ -6,10 +6,13 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  margin-bottom: 8px;
 }
 
 .selected-patient-tag {
-  color: #7883e6;
+  color: #7582ea;
   font-weight: 600;
 }
 
@@ -34,5 +37,12 @@
 .small-hint {
   color: #8d99d8;
   font-size: 12px;
+}
+
+@media (max-width: 700px) {
+  .registrar-top-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 

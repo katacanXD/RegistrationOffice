@@ -4,6 +4,10 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body,
 #root {
@@ -13,5 +17,30 @@ body,
 
 body {
   font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif;
-  background-color: #fbfcff;
+  background: radial-gradient(circle at top, #f7f8ff 0%, #eef2ff 42%, #e8ecff 100%);
+  color: #334155;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  transition: transform 0.15s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+a {
+  color: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
 }

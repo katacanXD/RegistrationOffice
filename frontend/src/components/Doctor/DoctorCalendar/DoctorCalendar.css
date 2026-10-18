@@ -8,23 +8,23 @@
 .doctor-container {
   width: 100%;
   max-width: 1000px;
-  padding: 24px;
+  padding: 28px 0 20px;
 }
 
 .cell.work-day {
-  background: #f3f5ff;
+  background: #f6f8ff;
 }
 
 .cell.past-day {
-  background: #f3f5ff;
-  color: #4c6aff;
+  background: #f6f8ff;
+  color: #7582ea;
   border: 1px solid #f0f2ff;
   opacity: 1;
   cursor: not-allowed;
 }
 
 .cell.has-bookings {
-  background: #d8effc;
+  background: #dff0fb;
 }
 
 .cell.no-work-day {
@@ -32,7 +32,7 @@
 }
 
 .time-item.booked {
-  background: #c4e8f7;
+  background: #dff0fb;
   color: #4f7f95;
   cursor: pointer;
 }
@@ -62,5 +62,11 @@
   text-align: left;
   width: 100%;
   cursor: pointer;
+}
+
+@media (max-width: 700px) {
+  .doctor-container {
+    padding: 18px 0 10px;
+  }
 }
 

@@ -3,20 +3,23 @@
   flex-direction: column;
   min-height: 100vh;
   font-family: 'Inter', Arial, sans-serif;
-  background-color: #fbfcff;
+  color: #334155;
+  background: transparent;
 }
 
 .main-header {
-  height: 70px;
-  background: #F0F5F9;
+  min-height: 76px;
+  background: rgba(240, 245, 249, 0.92);
+  backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 40px;
+  padding: 0 32px;
+  box-shadow: 0 1px 0 rgba(148, 163, 184, 0.12);
 }
 
 .header-link {
-  color: #6B7DD6;
+  color: #7582ea;
   font-size: 1.5rem;
   display: flex;
   align-items: center;
@@ -32,7 +35,8 @@
 
 .brand-name {
   font-weight: bold;
-  font-size: 20px;
+  font-size: 18px;
+  letter-spacing: 0.06em;
 }
 
 .user-avatar {
@@ -43,10 +47,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
 
 .user-avatar:hover {
-  transform: scale(1.1);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(117, 130, 234, 0.18);
 }
 
 .user-photo {
@@ -59,6 +66,7 @@
   flex: 1;
   display: flex;
   justify-content: center;
+  padding: 0 16px;
 }
 
 .container {
@@ -67,7 +75,7 @@
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 40px 20px;
+  padding: 40px 0 28px;
 }
 
 .policy-section {
@@ -82,10 +90,11 @@
   width: 100%;
   max-width: 472px;
   min-height: 112px;
-  background-color: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 0 15px #8d8fad40;
-  padding: 16px 18px;
+  background-color: rgba(255, 255, 255, 0.94);
+  border: 1px solid #e4e8ff;
+  border-radius: 18px;
+  box-shadow: 0 14px 34px rgba(105, 123, 214, 0.12);
+  padding: 18px 20px;
 }
 
 .policy-input-group {
@@ -107,18 +116,19 @@
 
 .btn-action-primary {
   padding: 12px 20px;
-  background: #6B7DD6;
+  background: linear-gradient(135deg, #8993ff 0%, #7582ea 100%);
   color: white;
   border: none;
-  border-radius: 15px;
+  border-radius: 16px;
   cursor: pointer;
   font-weight: 600;
   white-space: nowrap;
-  transition: background 0.2s;
+  box-shadow: 0 12px 24px rgba(117, 130, 234, 0.24);
 }
 
 .btn-action-primary:hover:not(:disabled) {
-  background: #5A6DB6;
+  transform: translateY(-1px);
+  box-shadow: 0 16px 30px rgba(117, 130, 234, 0.28);
 }
 
 .btn-action-primary:disabled {
@@ -130,23 +140,22 @@
 .btn-book-cta {
   width: 168px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: 14px;
   border: none;
   background: #ffffff;
-  box-shadow: 0 0 8px rgba(140, 143, 173, 0.2);
-  color: #8993ff;
+  box-shadow: 0 10px 24px rgba(140, 143, 173, 0.18);
+  color: #7582ea;
   font-family: Arial, 'Inter', sans-serif;
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: 1px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  -webkit-text-stroke: 0.2px #8993ff;
   transition: transform 0.15s ease, box-shadow 0.2s ease;
 }
 
 .btn-book-cta:hover:not(:disabled) {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(140, 143, 173, 0.25);
+  box-shadow: 0 14px 26px rgba(140, 143, 173, 0.24);
   background: #ffffff;
 }
 
@@ -181,28 +190,29 @@
 
 .field-label {
   display: block;
-  color: #6B7DD6;
+  color: #7480a8;
   margin-bottom: 10px;
-  font-size: 18px;
+  font-size: 15px;
+  font-weight: 600;
   text-align: left;
 }
 
 .soft-input {
   width: 100%;
-  height: 32px;
-  border: 1px solid #e4e8ff;
-  border-radius: 12px;
+  min-height: 44px;
+  border: 1px solid #dbe2ff;
+  border-radius: 14px;
   padding: 0 16px;
-  background: #edf0ff;
+  background: #f4f6ff;
   box-sizing: border-box;
   outline: none;
-  color: #6B7DD6;
-  font-size: 1.05rem;
+  color: #334155;
+  font-size: 1rem;
 }
 
 .soft-input:focus {
-  border-color: #c7cffd;
-  box-shadow: 0 0 0 2px rgba(137, 147, 255, 0.12);
+  border-color: #8993ff;
+  box-shadow: 0 0 0 4px rgba(137, 147, 255, 0.16);
 }
 
 .action-button {
@@ -218,8 +228,8 @@
 }
 
 .main-footer {
-  height: 100px;
-  background: #F0F5F9;
+  min-height: 88px;
+  background: rgba(240, 245, 249, 0.92);
 }
 
 .user-menu-container {
@@ -228,16 +238,17 @@
 
 .dropdown-menu {
   position: absolute;
-  top: 60px; 
+  top: 58px;
   right: 0;
   width: 280px;
   background-color: #ffffff;
-  border-radius: 25px; 
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 22px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
   padding: 15px 0;
   z-index: 1000;
   display: flex;
   flex-direction: column;
+  border: 1px solid #e5e9ff;
 }
 
 .dropdown-item {
@@ -250,30 +261,48 @@
 }
 
 .dropdown-item:hover {
-  transform: scale(1.05);
+  background: #f7f8ff;
 }
 
 .user-name {
-  color: #6B7DD6;
-  font-size: 1.2rem;
+  color: #5b67b7;
+  font-size: 1.05rem;
   font-weight: 500;
 }
 
 .dropdown-divider {
   height: 2px;
-  background-color: #6B7DD6;
+  background-color: #e4e8ff;
   margin: 5px 20px;
 }
 
 .logout-text {
-  color: #6B7DD6;
-  font-size: 1.1rem;
+  color: #5b67b7;
+  font-size: 1rem;
+}
+
+.logout-button {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.logout-button:focus-visible,
+.dropdown-item:focus-visible,
+.user-avatar:focus-visible,
+.btn-action-primary:focus-visible,
+.btn-book-cta:focus-visible,
+.soft-input:focus-visible {
+  outline: 3px solid rgba(137, 147, 255, 0.28);
+  outline-offset: 2px;
 }
 
 .small-avatar-circle, .logout-icon-circle {
   width: 50px;
   height: 50px;
-  background-color: #F0F2FF;
+  background-color: #f0f2ff;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -282,9 +311,26 @@
 }
 
 .exit-arrow {
-  color: #6B7DD6;
+  color: #7582ea;
   font-size: 1.5rem;
   font-weight: bold;
+}
+
+.page-hint,
+.page-error,
+.small-hint,
+.small-error {
+  text-align: center;
+}
+
+.page-hint,
+.small-hint {
+  color: #8d99d8;
+}
+
+.page-error,
+.small-error {
+  color: #d04f4f;
 }
 
 /* Контейнер для всех карточек */
@@ -294,22 +340,22 @@
   gap: 20px;
   width: 100%;
   max-width: 600px;
-  margin: 30px auto;
+  margin: 22px auto 0;
 }
 
 /* Сама карточка */
 .appointment-card {
-  background: white;
-  border-radius: 30px;
-  box-shadow: 0 10px 25px rgba(165, 180, 252, 0.2);
-  border: 1px solid #F0F2FF;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 28px;
+  box-shadow: 0 14px 32px rgba(165, 180, 252, 0.16);
+  border: 1px solid #f0f2ff;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 /* Верхняя часть карточки (видимая всегда) */
 .appointment-main {
-  padding: 25px 35px;
+  padding: 22px 28px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -317,30 +363,30 @@
 }
 
 .app-spec-title {
-  color: #8A9BD4;
-  font-size: 2rem;
+  color: #7e8ec9;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
   margin: 0;
   font-weight: 500;
 }
 
 .app-info-right {
   text-align: right;
-  color: #A2AFDC;
+  color: #a2afdc;
 }
 
 .app-date-text {
   display: block;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .app-time-text {
-  font-size: 2.2rem;
+  font-size: clamp(1.7rem, 3.2vw, 2.1rem);
   font-weight: bold;
 }
 
 .appointment-details {
-  padding: 0 35px 30px 35px;
-  border-top: 1px solid #F0F2FF;
+  padding: 0 28px 28px;
+  border-top: 1px solid #f0f2ff;
   padding-top: 20px;
   animation: slideDown 0.3s ease-out;
 }
@@ -355,14 +401,14 @@
 }
 
 .detail-label {
-  color: #D0D8E8;
+  color: #b8c2df;
   font-size: 0.8rem;
   display: block;
 }
 
 .detail-value {
-  color: #8A9BD4;
-  font-size: 1.1rem;
+  color: #6f7ec4;
+  font-size: 1rem;
   margin: 5px 0 0 0;
 }
 
@@ -375,32 +421,30 @@
 .btn-app-action {
   flex: 1;
   padding: 12px;
-  border-radius: 15px;
-  border: 1.5px solid #B3BFD9;
+  border-radius: 16px;
+  border: 1.5px solid #c9d2ef;
   background: white;
-  color: #8A9BD4;
+  color: #7e8ec9;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btn-app-delete {
-  background: #BCC0E2;
-  border-color: #BCC0E2;
-  color: #7582EA;
+  background: #eef1ff;
+  border-color: #e0e5ff;
+  color: #7582ea;
   border: none;
 }
 
 .btn-app-action:hover {
-  background: #F5F7FF;
+  background: #f7f8ff;
   transform: translateY(-2px);
 }
 
 .btn-app-delete:hover:not(:disabled) {
-  background: #BCC0E2;
-  border-color: #BCC0E2;
-  color: #7582EA;
-  filter: brightness(0.97);
+  background: #e6ebff;
+  border-color: #e0e5ff;
 }
 
 .app-info-left {
@@ -412,23 +456,23 @@
 .arrow-icon {
   width: 15px;
   height: 15px;
-  border-right: 3px solid #8A9BD4;
-  border-bottom: 3px solid #8A9BD4;
-  transform: rotate(45deg); /* Повернута вниз */
+  border-right: 3px solid #8a9bd4;
+  border-bottom: 3px solid #8a9bd4;
+  transform: rotate(45deg);
   transition: transform 0.3s ease;
   margin-left: 0px;
 }
 
 .arrow-icon.up {
-  transform: rotate(-135deg); /* Повернута вверх */
+  transform: rotate(-135deg);
 }
 
 .appointment-card {
   margin-bottom: 15px;
-  background: white;
-  border-radius: 35px;
-  box-shadow: 0 10px 30px rgba(165, 180, 252, 0.15);
-  border: 1px solid #F0F2FF;
+  background: rgba(255, 255, 255, 0.96);
+  border-radius: 28px;
+  box-shadow: 0 14px 32px rgba(165, 180, 252, 0.16);
+  border: 1px solid #f0f2ff;
 }
 
 .policy-display {
@@ -439,7 +483,7 @@
 }
 
 .policy-value {
-  background: linear-gradient(135deg, #E5E9F0 0%, #F0F2F7 100%);
+  background: linear-gradient(135deg, #eef1f8 0%, #f6f8ff 100%);
   border: 1px solid #e4e8ff;
   border-radius: 12px;
   min-height: 32px;
@@ -449,17 +493,39 @@
   justify-content: center;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #6B7DD6;
+  color: #7582ea;
   text-align: center;
   width: 100%;
   box-sizing: border-box;
 }
 
 @media (max-width: 700px) {
+  .main-header {
+    padding: 0 16px;
+  }
+
+  .container {
+    padding: 28px 0 20px;
+  }
+
+  .content {
+    padding: 0 12px;
+  }
+
+  .appointment-main,
+  .appointment-details {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
   .btn-book-cta {
     width: 100%;
     max-width: 168px;
     height: 42px;
     font-size: 16px;
+  }
+
+  .detail-buttons {
+    flex-direction: column;
   }
 }

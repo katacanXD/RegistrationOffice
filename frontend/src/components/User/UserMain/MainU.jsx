@@ -110,8 +110,7 @@ export default function MainU () {
 
                 <button
                   onClick={handleLogout}
-                  className="dropdown-item logout-link"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', textAlign: 'left' }}
+                  className="dropdown-item logout-link logout-button"
                 >
                   <div className="logout-icon-circle">
                     <span className="exit-arrow">→</span>
@@ -129,7 +128,7 @@ export default function MainU () {
 
           <div className="policy-section">
             {!policyLoaded ? (
-              <p style={{ color: '#A5B4FC', textAlign: 'center' }}>Загрузка полиса...</p>
+              <p className="page-hint">Загрузка полиса...</p>
             ) : userPolicy ? (
               <>
                 <div className="policy-panel">
@@ -157,7 +156,7 @@ export default function MainU () {
                       className="soft-input"
                       value={policyInput}
                       onChange={(e) => setPolicyInput(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && policyInput.trim() && handleSavePolicy()}
+                      onKeyDown={(e) => e.key === 'Enter' && policyInput.trim() && handleSavePolicy()}
                       disabled={policyLoading}
                     />
                   </div>
@@ -173,7 +172,7 @@ export default function MainU () {
             )}
           </div>
 
-          {error && <p style={{ color: 'red', textAlign: 'center', marginTop: '20px' }}>{error}</p>}
+          {error && <p className="page-error">{error}</p>}
 
           <div className="appointments-section">
             {appointments.length > 0 && (

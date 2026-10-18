@@ -7,6 +7,7 @@ import {
 import { ru } from 'date-fns/locale';
 import { useAuth } from '../../../context/AuthContext';
 import { useApp } from '../../../context/AppContext';
+import '../UserMain/MainU.css';
 import './CalendarU.css';
 import myLogo from '../Foto/Icon.png';
 import myAvatar from '../Foto/Account.png';
@@ -302,8 +303,8 @@ export default function CalendarU() {
               <div className="time-box">
                 <div className="time-header">{format(selectedDate, 'd MMMM', { locale: ru })}</div>
 
-                {error && <p style={{ color: 'red', fontSize: '12px' }}>{error}</p>}
-                {slotsLoading && <p style={{ color: '#A5B4FC', fontSize: '12px', textAlign: 'center' }}>Загрузка слотов...</p>}
+                {error && <p className="small-error calendar-status">{error}</p>}
+                {slotsLoading && <p className="small-hint calendar-status">Загрузка слотов...</p>}
 
                 {groupedSlots.before && groupedSlots.before.length > 0 && (
                     <div className="time-grid">
@@ -340,7 +341,7 @@ export default function CalendarU() {
                 )}
 
                 {(!groupedSlots.before && !groupedSlots.after) && !slotsLoading && (
-                    <p style={{ color: '#A5B4FC', fontSize: '12px', textAlign: 'center' }}>Нет свободных слотов</p>
+                    <p className="small-hint calendar-status">Нет свободных слотов</p>
                 )}
               </div>
             </div>
