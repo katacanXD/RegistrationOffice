@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Схема развёртывания RegistrationOffice</title>
+<style>
+  @page { size: A3 landscape; margin: 0; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { margin: 0; padding: 0; }
+  body { width: 1587px; height: 1123px; overflow: hidden; background: #fff;
+         font-family: "Segoe UI", Arial, sans-serif; color: #1f2d3d; }
+  .canvas { position: relative; width: 1587px; height: 1123px; background: #fff; }
+  .title { position: absolute; left: 60px; top: 24px; font-size: 31px; font-weight: 700; }
+  .subtitle { position: absolute; left: 62px; top: 66px; font-size: 14.5px; color: #55677a; }
+
+  .node { position: absolute; border: 2px solid #3f5f80; border-radius: 10px; background: #fff; padding: 10px 14px; }
+  .node .nm { font-size: 18px; font-weight: 700; color: #1f3a56; }
+  .node .tp { font-size: 12px; color: #2f6b9a; margin-top: 2px; }
+  .node .ds { font-size: 12px; line-height: 1.25; color: #35424f; margin-top: 5px; }
+  .vm { border: 2px dashed #6f86a4; border-radius: 12px; background: #fbfcfe; }
+  .docker { border: 2px dashed #8aa0bb; border-radius: 10px; background: #fff; }
+  .container { background: #f3f8fe; }
+  .volume { background: #f7f4ea; border-color: #a08a5a; }
+  .ext { background: #fcfcfd; border-color: #8a97a6; }
+
+  svg.links { position: absolute; left: 0; top: 0; z-index: 2; }
+  .lbl { position: absolute; z-index: 3; font-size: 12px; color: #2b3a49; background: #fff;
+         padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+
+  .panel { position: absolute; left: 60px; top: 900px; width: 1470px; height: 160px;
+           border: 1px solid #c9d5e1; background: #fbfcfe; border-radius: 10px; padding: 10px 16px; }
+  .panel h3 { margin: 0 0 6px; font-size: 15px; color: #1f3a56; }
+  .panel .r { font-size: 11.5px; line-height: 1.35; color: #33414f; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="title">Схема развёртывания: RegistrationOffice в Docker Compose</div>
+  <div class="subtitle">Команда 1 · ЭФБО-10-25 · 07.11.2026 · Yandex Cloud VM, Nginx, SPA, API, PostgreSQL</div>
+
+  <svg class="links" width="1587" height="1123" viewBox="0 0 1587 1123">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3b4a5a"/></marker></defs>
+
+    <line x1="360" y1="280" x2="480" y2="280" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+    <line x1="760" y1="310" x2="840" y2="430" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+    <line x1="760" y1="340" x2="780" y2="560" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+    <line x1="780" y1="575" x2="840" y2="575" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+    <line x1="1330" y1="260" x2="1280" y2="260" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+    <line x1="990" y1="630" x2="990" y2="690" stroke="#3b4a5a" stroke-width="1.8" stroke-dasharray="6 4"/>
+    <path d="M 480 370 L 450 370 L 450 690 L 480 690" stroke="#3b4a5a" stroke-width="1.8" stroke-dasharray="6 4" fill="none"/>
+  </svg>
+
+  <div class="lbl" style="left:370px; top:250px;">HTTPS</div>
+  <div class="lbl" style="left:770px; top:355px;">/</div>
+  <div class="lbl" style="left:765px; top:400px;">/api</div>
+  <div class="lbl" style="left:790px; top:552px;">JDBC</div>
+  <div class="lbl" style="left:1080px; top:235px;">ssh + rsync</div>
+
+  <div class="node ext" style="left:60px; top:200px; width:300px; height:130px;">
+    <div class="nm">Браузер пользователя</div><div class="tp">[Узел развёртывания]</div>
+    <div class="ds">Chrome, Firefox, Safari, Edge; SPA и HTTPS</div>
+  </div>
+
+  <div class="node vm" style="left:380px; top:120px; width:900px; height:740px;">
+    <div class="nm" style="position:absolute; left:16px; top:10px; font-size:18px;">Yandex Cloud VM</div>
+    <div class="tp" style="position:absolute; left:16px; top:36px; font-size:12px;">Ubuntu, Docker Engine, Docker Compose</div>
+
+    <div class="node docker" style="left:40px; top:70px; width:820px; height:640px;">
+      <div class="nm" style="position:absolute; left:14px; top:8px; font-size:16px;">Docker network (private)</div>
+
+      <div class="node container" style="left:60px; top:60px; width:280px; height:120px;">
+        <div class="nm">nginx</div><div class="tp">[Контейнер: nginx:1.27-alpine]</div>
+        <div class="ds">80/443, TLS, reverse proxy: / → frontend, /api → backend</div>
+      </div>
+
+      <div class="node container" style="left:420px; top:200px; width:300px; height:110px;">
+        <div class="nm">frontend</div><div class="tp">[Контейнер: Nginx + сборка Vite]</div>
+        <div class="ds">Статические файлы SPA, порт 80</div>
+      </div>
+
+      <div class="node container" style="left:60px; top:330px; width:300px; height:110px;">
+        <div class="nm">backend</div><div class="tp">[Контейнер: Java 21, Spring Boot]</div>
+        <div class="ds">API, порт 8080; JWT, правила, CSV, отчёт</div>
+      </div>
+
+      <div class="node container" style="left:420px; top:330px; width:300px; height:110px;">
+        <div class="nm">postgres</div><div class="tp">[Контейнер: postgres:16-alpine]</div>
+        <div class="ds">Порт 5432; пользователи, слоты, записи, журнал, токены</div>
+      </div>
+
+      <div class="node volume" style="left:420px; top:500px; width:300px; height:100px;">
+        <div class="nm">volume postgres_data</div><div class="tp">[Хранилище Docker]</div>
+        <div class="ds">Данные PostgreSQL между перезапусками</div>
+      </div>
+
+      <div class="node volume" style="left:60px; top:500px; width:300px; height:100px;">
+        <div class="nm">volume letsencrypt</div><div class="tp">[Хранилище Docker]</div>
+        <div class="ds">Сертификаты Let's Encrypt для nginx</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="node ext" style="left:1330px; top:190px; width:210px; height:140px;">
+    <div class="nm">GitVerse CI/CD</div><div class="tp">[Внешняя система]</div>
+    <div class="ds">Сборка, тесты, rsync и перезапуск compose на VM</div>
+  </div>
+
+  <div class="panel">
+    <h3>Что важно на схеме</h3>
+    <div class="r">
+      Наружу открыт только nginx (80/443); backend, frontend и postgres находятся в приватной Docker-сети. Nginx терминирует TLS и маршрутизирует запросы: `/` — в frontend, `/api/v1/**` — в backend. Backend обращается к postgres по JDBC. Данные и сертификаты вынесены в Docker volumes. CI/CD GitVerse доставляет изменения на VM по ssh/rsync и перезапускает compose. На схеме нет внешних МИС, SMS и оплаты: их нет в MVP. Число экземпляров и балансировка не показаны — это следующий уровень эксплуатации.
+    </div>
+  </div>
+</div>
+</body>
+</html>
