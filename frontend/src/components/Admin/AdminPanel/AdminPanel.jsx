@@ -13,6 +13,10 @@ const importTargets = [
   { key: 'work-slots', label: 'Слоты CSV' },
 ];
 
+const toIsoDate = (date) => date.toISOString().slice(0, 10);
+const defaultReportFrom = toIsoDate(new Date());
+const defaultReportTo = toIsoDate(new Date(Date.now() + 6 * 24 * 60 * 60 * 1000));
+
 export default function AdminPanel() {
   const navigate = useNavigate();
   const { logout } = useAuth();
@@ -23,6 +27,8 @@ export default function AdminPanel() {
     fetchUsers,
     updateUserRoleAndSpeciality,
     importCsv,
+    fetchUtilizationReport,
+    exportUtilizationCsv,
   } = useApp();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -30,6 +36,12 @@ export default function AdminPanel() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [importResult, setImportResult] = useState('');
+  const [reportFrom, setReportFrom] = useState(defaultReportFrom);
+  const [reportTo, setReportTo] = useState(defaultReportTo);
+  const [reportSpeciality, setReportSpeciality] = useState('');
+  const [reportRows, setReportRows] = useState([]);
+  const [reportTotals, setReportTotals] = useState(null);
+  const [reportMessage, setReportMessage] = useState('');
 
   useEffect(() => {
     const load = async () => {
@@ -75,6 +87,38 @@ export default function AdminPanel() {
     const result = await updateUserRoleAndSpeciality(user.user_id ?? user.userId, payload);
     if (result.success) {
       await fetchUsers(searchText, page, 10);
+    }
+  };
+
+  const reportParams = () => ({
+    from: reportFrom,
+    to: reportTo,
+    speciality: reportSpeciality.trim() || undefined,
+  });
+
+  const handleBuildReport = async () => {
+    const result = await fetchUtilizationReport(reportParams());
+    if (!result.success) {
+      setReportRows([]);
+      setReportTotals(null);
+      setReportMessage(result.error);
+      return;
+    }
+
+    const report = result.report;
+    setReportRows(report.rows || []);
+    setReportTotals({
+      totalSlots: report.total_slots,
+      totalBooked: report.total_booked,
+      totalUtilization: report.total_utilization,
+    });
+    setReportMessage(`Период: ${report.from} — ${report.to}. Строк: ${(report.rows || []).length}`);
+  };
+
+  const handleExportReport = async () => {
+    const result = await exportUtilizationCsv(reportParams());
+    if (!result.success) {
+      setReportMessage(result.error);
     }
   };
 
@@ -124,6 +168,66 @@ export default function AdminPanel() {
               ))}
             </div>
             {importResult && <p className="small-hint">{importResult}</p>}
+          </section>
+
+          <section className="admin-card">
+            <h3>Загрузка расписания</h3>
+            <div className="report-filters">
+              <label>
+                С
+                <input type="date" value={reportFrom} onChange={(event) => setReportFrom(event.target.value)} />
+              </label>
+              <label>
+                По
+                <input type="date" value={reportTo} onChange={(event) => setReportTo(event.target.value)} />
+              </label>
+              <label>
+                Специальность
+                <input
+                  type="text"
+                  placeholder="например, Терапевт"
+                  value={reportSpeciality}
+                  onChange={(event) => setReportSpeciality(event.target.value)}
+                />
+              </label>
+              <button className="btn-action-primary" onClick={handleBuildReport}>Построить</button>
+              <button className="btn-action-primary" onClick={handleExportReport}>Экспорт CSV</button>
+            </div>
+
+            {reportMessage && <p className="small-hint">{reportMessage}</p>}
+
+            {reportRows.length > 0 && (
+              <div className="report-table">
+                <div className="report-row report-head">
+                  <span>Врач</span>
+                  <span>Дата</span>
+                  <span>Слотов</span>
+                  <span>Занято</span>
+                  <span>Утилизация</span>
+                </div>
+                {reportRows.map((row) => (
+                  <div className="report-row" key={`${row.doctor_id}-${row.date}`}>
+                    <span>
+                      {row.doctor_fio}
+                      <small>{row.speciality}</small>
+                    </span>
+                    <span>{row.date}</span>
+                    <span>{row.slots_total}</span>
+                    <span>{row.slots_booked}</span>
+                    <span>{Math.round((row.utilization || 0) * 100)}%</span>
+                  </div>
+                ))}
+                {reportTotals && (
+                  <div className="report-row report-total">
+                    <span>Итого</span>
+                    <span>—</span>
+                    <span>{reportTotals.totalSlots}</span>
+                    <span>{reportTotals.totalBooked}</span>
+                    <span>{Math.round((reportTotals.totalUtilization || 0) * 100)}%</span>
+                  </div>
+                )}
+              </div>
+            )}
           </section>
 
           <section className="admin-card">

@@ -7,6 +7,8 @@ public interface UserService {
     PatientListDto searchPatients(String search, Pageable pageable);
     UserListDto searchUsers(String search, Pageable pageable);
 
+    PatientCreatedDto createPatient(CreatePatientRequestDto request);
+
     UserInfoDto getCurrentUser(String login);
     SuccessResponseDto changeOwnPassword(String login, ChangePasswordRequestDto request);
 

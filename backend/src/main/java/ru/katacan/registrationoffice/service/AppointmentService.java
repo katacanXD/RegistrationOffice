@@ -8,10 +8,26 @@ import java.util.Optional;
 
 public interface AppointmentService {
     CreateAppointmentResponseDto createAppointment(CreateAppointmentRequestDto request);
+
+    CreateAppointmentResponseDto createAppointment(CreateAppointmentRequestDto request, String actorLogin);
+
     CreateAppointmentResponseDto createOwnAppointment(String login, CreateOwnAppointmentRequestDto request);
+
     UpdateAppointmentResponseDto updateAppointment(Long appointmentId,
                                                    UpdateAppointmentRequestDto request);
+
+    UpdateAppointmentResponseDto updateAppointment(Long appointmentId,
+                                                   UpdateAppointmentRequestDto request,
+                                                   String actorLogin);
+
     CancelAppointmentResponseDto cancelAppointment(Long appointmentId);
+
+    CancelAppointmentResponseDto cancelAppointment(Long appointmentId,
+                                                   CancelAppointmentRequestDto request,
+                                                   String actorLogin);
+
+    List<AppointmentOperationDto> getAppointmentHistory(Long appointmentId);
+
     Optional<Appointment> getAppointmentById(Long appointmentId);
     AppointmentDetailDto getDetailAppointmentById(Long appointmentId);
     AppointmentShortDto getShortAppointmentById(Long appointmentId);

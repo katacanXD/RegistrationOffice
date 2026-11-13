@@ -42,5 +42,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u FROM User u WHERE " +
             ":search IS NULL OR LOWER(u.fullName) LIKE LOWER(CONCAT('%', :search, '%'))")
     Page<User> searchUsers(@Param("search") String search, Pageable pageable);
+
+    @Query("SELECT u FROM User u WHERE u.role.name = 'doctor' " +
+            "AND (:speciality IS NULL OR LOWER(u.speciality) = LOWER(:speciality)) " +
+            "ORDER BY u.fullName")
+    java.util.List<User> findDoctorsForReport(@Param("speciality") String speciality);
 }
 

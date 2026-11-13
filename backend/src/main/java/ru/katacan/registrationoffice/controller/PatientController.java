@@ -9,7 +9,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.katacan.registrationoffice.dto.PatientDashboardDto;
+import ru.katacan.registrationoffice.dto.PatientCreatedDto;
 import ru.katacan.registrationoffice.dto.PatientListDto;
+import ru.katacan.registrationoffice.dto.CreatePatientRequestDto;
 import ru.katacan.registrationoffice.dto.PolicyRequestDto;
 import ru.katacan.registrationoffice.service.UserService;
 
@@ -54,5 +56,14 @@ public class PatientController {
             Pageable pageable) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(userService.searchPatients(search, pageable));
+    }
+
+    @PreAuthorize("hasAnyAuthority('admin', 'registrar')")
+    @PostMapping
+    public ResponseEntity<PatientCreatedDto> createPatient(
+            @Valid @RequestBody CreatePatientRequestDto request
+    ) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(userService.createPatient(request));
     }
 }

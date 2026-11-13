@@ -2,6 +2,7 @@ package ru.katacan.registrationoffice.dto;
 
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
@@ -14,4 +15,7 @@ public class UpdateAppointmentRequestDto {
 
     @Pattern(regexp = "^(booked|canceled|completed)$", message = "Статус должен быть одним из: booked, canceled, completed")
     private String status;        // можно добавить смену статуса
+
+    @Size(max = 255, message = "Причина переноса не должна превышать 255 символов")
+    private String reason;
 }

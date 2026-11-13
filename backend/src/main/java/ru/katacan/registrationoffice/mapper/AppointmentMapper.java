@@ -60,6 +60,7 @@ public class AppointmentMapper {
                         .speciality(doctor != null ? doctor.getSpeciality() : null)
                         .address(CLINIC_ADDRESS)
                         .build())
+                .replayed(false)
                 .build();
     }
 
