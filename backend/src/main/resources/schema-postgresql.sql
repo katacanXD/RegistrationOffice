@@ -1,6 +1,12 @@
 CREATE INDEX IF NOT EXISTS idx_t_appointments_doctor_slot
     ON t_appointments (f_doctor_id, f_slot_datetime)//
 
+CREATE INDEX IF NOT EXISTS idx_t_appointments_patient_slot
+    ON t_appointments (f_patient_id, f_slot_datetime)//
+
+CREATE INDEX IF NOT EXISTS idx_t_appointment_operations_appointment
+    ON t_appointment_operations (f_appointment_id, f_occurred_at)//
+
 CREATE OR REPLACE FUNCTION enforce_active_appointment_uniqueness()
 RETURNS TRIGGER
 LANGUAGE plpgsql
