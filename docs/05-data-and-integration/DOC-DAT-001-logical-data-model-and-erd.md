@@ -2,7 +2,7 @@
 
 | Версия | Статус | Дата обновления |
 |--------|--------|-----------------|
-| v1.2   | Draft  | 2026-04-18      |
+| v1.3   | Actual | 2026-11-07      |
 
 О документе: логическая модель данных системы RegistrationOffice — реальные сущности backend, их атрибуты и связи.
 
@@ -10,7 +10,6 @@
 
 Основано
 на: [кейсе проекта](../98-source-materials/Кейс.md), [user stories](../02-requirements/DOC-REQ-001-user-stories.md).
-
 ---
 
 ## Авторы документа
@@ -23,6 +22,7 @@
 - [v0.1] [2026-04-08] (Чернышов): первичная ER-диаграмма.
 - [v0.2] [2026-04-10] (Чернышов, Наботов): добавлены таблицы users и roles для JWT.
 - [v1.0] [2026-04-12] (Чернышов): добавлены атрибуты для пользователей, обновлены связи.
+- [v1.3] [2026-11-07] (Чернышов): добавлен журнал операций `t_appointment_operations`, триггеры и индексы.
 ---
 
 ## ER-диаграмма (текстовое представление)
@@ -62,7 +62,23 @@
                 │ f_slot_datetime         │
                 │ f_status_id FK          │
                 └─────────────────────────┘
+
+                ┌──────────────────────────────┐
+                │ t_appointment_operations     │
+                ├──────────────────────────────┤
+                │ f_operation_id PK            │
+                │ f_appointment_id FK          │
+                │ f_actor_id FK                │
+                │ f_operation_type             │
+                │ f_occurred_at                │
+                │ f_reason                     │
+                │ f_old_slot_datetime          │
+                │ f_new_slot_datetime          │
+                │ f_old_status / f_new_status  │
+                └──────────────────────────────┘
 ```
+
+`t_appointment_operations.f_appointment_id` ссылается на `t_appointments`, `f_actor_id` — на `t_users`; на диаграмме связи показаны отдельными строками ниже.
 
 ### Ключевая модель
 
@@ -72,6 +88,7 @@
 - Номер полиса пациента хранится в `t_users.f_policy_number`.
 - `t_work_slots` хранит исходные рабочие интервалы врача.
 - `t_appointments` хранит записи на приём.
+- `t_appointment_operations` хранит журнал создания, переноса и отмены записи: тип операции, актора, время, причину и старые/новые значения.
 - `t_refresh_tokens` хранит refresh token в виде хэша.
 
 ## Сущности и связи
@@ -84,6 +101,8 @@
 | `t_users` → `t_appointments` (patient) | 1 : N | у пациента много записей                                  |
 | `t_dict_status` → `t_appointments`     | 1 : N | статус выбирается из словаря                              |
 | `t_users` → `t_refresh_tokens`         | 1 : N | у пользователя может быть несколько токенов после ротации |
+| `t_appointments` → `t_appointment_operations` | 1 : N | у записи несколько операций журнала                |
+| `t_users` → `t_appointment_operations` (actor) | 1 : N | пользователь — актор операций (может быть `null` для системных) |
 
 ## Нормализация
 
@@ -99,14 +118,19 @@
 |------------------------------------------|--------------------------------------------------|
 | `f_login` уникален                       | UNIQUE на `t_users.f_login`                      |
 | `f_token_hash` уникален                  | UNIQUE на `t_refresh_tokens.f_token_hash`        |
-| `status ∈ {booked, canceled, completed}` | словарь статусов                                 |
-| `(doctor_id, slot_datetime)` уникальны   | бизнес-ограничение на уровне appointment service |
+| `status ∈ {booked, canceled, completed}` | словарь статусов + проверка сервиса               |
+| `(doctor_id, slot_datetime)` уникальны среди активных | триггер `trg_enforce_active_appointment_uniqueness` |
+| `(patient_id, slot_datetime)` уникальны среди активных | триггер `trg_enforce_patient_slot_uniqueness` |
 | `slot_datetime` попадает в рабочий слот  | бизнес-валидация backend                         |
+| `operation_type ∈ {created, rescheduled, canceled}` | проверка сервиса; в БД нет CHECK |
+| индексы журнала и поиска конфликтов      | `idx_t_appointments_doctor_slot`, `idx_t_appointments_patient_slot`, `idx_t_appointment_operations_appointment` |
 
 ## Примечания по backend-реализации
 
 - refresh token передается только через `HttpOnly` cookie `refresh_token`;
 - access token возвращается в JSON при логине и refresh;
 - runtime JSON использует `snake_case` благодаря `spring.jackson.property-naming-strategy=SNAKE_CASE`;
-- в текущей модели нет отдельных таблиц `doctors` и `patients` — это пользовательские роли.
+- в текущей модели нет отдельных таблиц `doctors` и `patients` — это пользовательские роли;
+- причина отмены/переноса хранится в `t_appointment_operations.f_reason` и может быть `null`;
+- отчёт утилизации не хранится: вычисляется по `t_work_slots` и `t_appointments`.
 

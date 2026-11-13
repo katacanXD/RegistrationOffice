@@ -1,0 +1,57 @@
+erDiagram
+    t_dict_role ||--o{ t_users : "f_role_id"
+    t_dict_status ||--o{ t_appointments : "f_status_id"
+    t_users ||--o{ t_work_slots : "f_doctor_id"
+    t_users ||--o{ t_appointments : "f_doctor_id (doctor)"
+    t_users ||--o{ t_appointments : "f_patient_id (patient)"
+    t_users ||--o{ t_refresh_tokens : "f_user_id"
+    t_work_slots ||..o{ t_appointments : "logical only: doctor_id + slot_datetime (no FK)"
+
+    t_dict_role {
+        bigint f_role_id PK "identity"
+        varchar f_role_name "50, not null, unique"
+    }
+
+    t_dict_status {
+        bigint f_status_id PK "identity"
+        varchar f_status_name "50, not null, unique"
+    }
+
+    t_users {
+        bigint f_users_id PK "identity"
+        varchar f_login "255, not null, unique"
+        varchar f_fio "255, not null"
+        varchar f_password "255, not null, BCrypt hash"
+        varchar f_policy_number "30, null"
+        bigint f_role_id FK "not null"
+        varchar f_speciality_name "255, null"
+    }
+
+    t_work_slots {
+        bigint f_work_slots_id PK "identity"
+        bigint f_doctor_id FK "not null"
+        date f_date "not null"
+        time f_start_time "not null"
+        time f_end_time "not null"
+        int f_slot_minutes "not null"
+        time f_break_start "null"
+        time f_break_end "null"
+    }
+
+    t_appointments {
+        bigint f_appoint_id PK "identity"
+        bigint f_doctor_id FK "not null"
+        bigint f_patient_id FK "not null"
+        timestamp f_slot_datetime "not null, no tz"
+        bigint f_status_id FK "not null"
+    }
+
+    t_refresh_tokens {
+        bigint f_token_id PK "identity"
+        varchar f_token_hash "512, not null, unique"
+        bigint f_user_id FK "not null"
+        timestamptz f_expiry_date "not null"
+        timestamptz f_created_at "not null, immutable"
+        timestamptz f_revoked_at "null"
+        varchar f_replaced_by_token_hash "512, null, not FK"
+    }

@@ -4,6 +4,10 @@
 
 Сервис решает проблему «окон» в расписании врачей, двойного бронирования и отсутствия прозрачной отчётности. Пациенты записываются на приём через веб-интерфейс, регистратура управляет записями всех врачей, администратор видит загрузку и экспортирует отчёты в CSV.
 
+| Версия | Статус | Дата обновления |
+|---|---|---|
+| v0.3 | Actual | 2026-11-07 |
+
 **Ссылка на Демо:** https://registration-office.ru  
 **Ссылка на Kaiten:** https://myoprlove.yougile.com/team/efcc60ee0048/EMIAS-2.0?lang=ru  
 **Ссылка на Figma:** https://www.figma.com/design/dhSpD9QDRP79l77V0HJsWv/%D0%9E%D0%9F%D0%94?node-id=0-1&p=f&t=QOJygsnFG9sZETfO-0
@@ -28,11 +32,14 @@
 
 ## Что умеет система
 
-- **Расписание:** администратор задаёт рабочие интервалы врачей (дата, время, длительность слота, перерывы). Слоты генерируются автоматически.
-- **Запись:** пациент или регистратор выбирает врача, дату и свободный слот. Система проверяет 5 валидаций (врач существует, пациент существует, слот в интервале, не перерыв, не занят).
-- **Перенос/отмена:** запись можно перенести на другой свободный слот или отменить с указанием причины.
-- **Отчёт:** утилизация расписания по врачу/дате/специальности. Экспорт CSV.
+- **Расписание:** администратор задаёт рабочие интервалы врачей через CSV-импорт (дата, время, длительность слота, перерывы). Слоты генерируются автоматически.
+- **Запись:** пациент или регистратор выбирает врача, дату и свободный слот. Проверяются: существование врача и пациента, будущее время, попадание в рабочий интервал, отсутствие перерыва, занятость слота врача и отсутствие другой активной записи пациента на это время.
+- **Идемпотентность:** повторный запрос того же пациента на тот же слот возвращает существующую запись, а не создаёт вторую.
+- **Перенос/отмена:** запись можно перенести на другой свободный слот или отменить; причина отмены/переноса принимается API и попадает в журнал.
+- **Журнал операций:** `t_appointment_operations` хранит `created` / `rescheduled` / `canceled`, актора, время, причину и старые/новые значения.
+- **Отчёт:** утилизация расписания по врачу/дате/специальности; вкладка «Загрузка расписания» в админке и экспорт CSV.
 - **Роли:** пациент, врач, регистратура, администратор. JWT-аутентификация.
+- **Ограничения UI:** причина отмены и создание пациента пока доступны через API; кнопки в веб-клиенте — следующая итерация.
 
 ---
 
@@ -51,13 +58,18 @@
 - Модель данных (JPA сущности): `backend/src/main/java/ru/katacan/registrationoffice/entity`
 - DTO и мапперы: `backend/src/main/java/ru/katacan/registrationoffice/dto`, `backend/src/main/java/ru/katacan/registrationoffice/mapper`
 - Конфигурация приложения: `backend/src/main/resources/application.properties`
+- Схема, индексы и триггеры: `backend/src/main/resources/schema-postgresql.sql`
+- Отчёт утилизации: `backend/src/main/java/ru/katacan/registrationoffice/service/impl/UtilizationServiceImpl.java`
 - Контейнеризация и прокси: `backend/Dockerfile`, `frontend/Dockerfile`, `frontend/nginx/default.conf`, `docker-compose.yml`, `deploy/nginx/default.conf`
 
 ## Что важно помнить про backend
 
 - все публичные JSON-поля идут в `snake_case`;
 - refresh token передается и обновляется через `HttpOnly` cookie `refresh_token`, а не в теле ответа;
-- frontend и backend разворачиваются отдельными контейнерами, а `nginx` проксирует `/api/v1/**` и отдает SPA.
+- frontend и backend разворачиваются отдельными контейнерами, а `nginx` проксирует `/api/v1/**` и отдает SPA;
+- журнал операций — отдельная таблица `t_appointment_operations`, не поле записи;
+- причина отмены/переноса необязательна: если не передана, в журнале `null`;
+- отчёт утилизации вычисляется по слотам и активным записям, отдельно не хранится.
 
 ---
 
@@ -81,8 +93,10 @@ git clone https://gitverse.ru/KatacanXD/RegistrationOffice.git
 cd RegistrationOffice
 cp .env.example .env
 docker-compose up -d --build
-curl http://localhost:8080/api/v1/auth/me
+curl -I http://localhost/
 ```
+
+Проверка API: `http://localhost/swagger-ui/`. Локальный backend без Docker: Java 21, PostgreSQL 16, переменные из `.env.example`.
 
 ---
 
@@ -109,7 +123,7 @@ curl http://localhost:8080/api/v1/auth/me
 | ER-диаграмма | [DOC-DAT-001](05-data-and-integration/DOC-DAT-001-logical-data-model-and-erd.md) |
 | Словарь данных | [DOC-DAT-002](05-data-and-integration/DOC-DAT-002-data-dictionary-and-validation-rules.md) |
 | REST API | [DOC-DAT-003](05-data-and-integration/DOC-DAT-003-api-specification.md) |
-| DFD | [DOC-DAT-004](05-data-and-integration/DOC-DAT-004.md) |
+| DFD | [DOC-DAT-004](05-data-and-integration/DOC-DAT-004-dfd.md) |
 | Маппинг данных | [DOC-DAT-005](05-data-and-integration/DAT-005-data-mapping.md) |
 | SQL-запросы к БД | [DOC-DAT-006](05-data-and-integration/DAT-006-sql-queries.md) |
 | Финальная спецификация | [DOC-SPC-001](06-final-specification/DOC-SPC-001-final-technical-specification.md) |

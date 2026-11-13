@@ -2,7 +2,7 @@
 
 | Версия | Статус | Дата обновления |
 |---|---|---|
-| v1.2 | Draft | 2026-04-18 |
+| v1.3 | Actual | 2026-11-07 |
 
 ## Целевой контур
 
@@ -22,10 +22,10 @@
 
 ## Карта backend-модулей
 
-- `controller/auth`, `controller/users`, `controller/patients`, `controller/doctors`, `controller/appointments`, `controller/admins`
-- `service` и `service/impl`
+- `controller/auth`, `controller/users`, `controller/patients`, `controller/doctors`, `controller/appointments`, `controller/admins`, `controller/reports`
+- `service` и `service/impl` (включая `UtilizationServiceImpl`)
 - `mapper`
-- `entity`
+- `entity` (включая `AppointmentOperation`)
 - `repository`
 - `config`, `security`, `jwt`
 
@@ -40,8 +40,8 @@
 
 - public calendar/slots доступны без авторизации;
 - `GET /api/v1/doctors` требует авторизацию, но доступен пациенту, регистратору, администратору и врачу по своим правам;
-- CSV import/export обслуживается только `admin`;
-- отдельного отчётного экрана в frontend нет.
+- CSV import/export и отчёт утилизации обслуживаются только `admin`;
+- отчёт утилизации — вкладка «Загрузка расписания» в админке, отдельного роута нет.
 
 ## Связь с кодом
 
