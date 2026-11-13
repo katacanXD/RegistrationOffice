@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Первичная модель данных RegistrationOffice</title>
+<style>
+  @page { size: A3 landscape; margin: 0; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { margin: 0; padding: 0; }
+  body { width: 1587px; height: 1123px; overflow: hidden; background: #fff;
+         font-family: "Segoe UI", Arial, sans-serif; color: #1f2d3d; }
+  .canvas { position: relative; width: 1587px; height: 1123px; background: #fff; }
+  .title { position: absolute; left: 60px; top: 26px; font-size: 33px; font-weight: 700; letter-spacing: -0.4px; }
+  .subtitle { position: absolute; left: 62px; top: 72px; font-size: 16px; color: #55677a; }
+
+  .ent { position: absolute; background: #fff; border: 2px solid #3f5f80; border-radius: 7px; overflow: hidden; }
+  .ent .hd { background: #eaf2fb; border-bottom: 1px solid #b9cbe0; padding: 7px 12px;
+             font-size: 18px; font-weight: 700; color: #1f3a56; }
+  .ent .at { padding: 5px 12px; font-size: 13.5px; line-height: 1.3; color: #2c3a48; }
+  .ent .at b { color: #1f3a56; }
+  .ent .tag { display: inline-block; font-size: 10.5px; font-weight: 700; color: #fff; background: #3f5f80;
+              border-radius: 3px; padding: 0 4px; margin-right: 6px; vertical-align: 1px; }
+
+  svg.links { position: absolute; left: 0; top: 0; z-index: 2; }
+  .lbl { position: absolute; z-index: 3; font-size: 14px; color: #2b3a49; background: #fff;
+         padding: 1px 5px; border-radius: 3px; white-space: nowrap; }
+
+  .panel { position: absolute; border: 1px solid #c9d5e1; background: #fbfcfe; border-radius: 10px; padding: 12px 18px; }
+  .panel h3 { margin: 0 0 8px; font-size: 16px; color: #1f3a56; }
+  .panel .r { font-size: 12.5px; line-height: 1.35; color: #33414f; }
+  .legend { left: 60px; top: 790px; width: 500px; height: 250px; }
+  .rules { left: 600px; top: 780px; width: 960px; height: 300px; }
+  .rules .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 26px; }
+  .note { font-size: 12px; color: #5a6b7d; font-style: italic; margin-top: 6px; }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <div class="title">Первичная модель данных: база данных RegistrationOffice</div>
+  <div class="subtitle">ПЗ №7 · нотация «вороньей лапки» · Команда 1 · ЭФБО-10-25 · 07.11.2026</div>
+
+  <svg class="links" width="1587" height="1123" viewBox="0 0 1587 1123">
+    <defs>
+      <marker id="none"></marker>
+    </defs>
+
+    <!-- 1. Пользователь — Токен: 1 (две черты) — 0..N (кружок + лапка) -->
+    <line x1="210" y1="420" x2="210" y2="300" stroke="#3b4a5a" stroke-width="1.8"/>
+    <line x1="202" y1="412" x2="218" y2="412" stroke="#3b4a5a" stroke-width="1.8"/>
+    <line x1="202" y1="404" x2="218" y2="404" stroke="#3b4a5a" stroke-width="1.8"/>
+    <circle cx="210" cy="312" r="5.5" fill="none" stroke="#3b4a5a" stroke-width="1.8"/>
+    <path d="M 210 300 L 200 290 M 210 300 L 210 290 M 210 300 L 220 290" stroke="#3b4a5a" stroke-width="1.8" fill="none"/>
+
+    <!-- 2. Пользователь — Рабочий слот: 1 — 0..N -->
+    <path d="M 440 420 L 440 250 L 600 250" stroke="#3b4a5a" stroke-width="1.8" fill="none"/>
+    <line x1="432" y1="412" x2="448" y2="412" stroke="#3b4a5a" stroke-width="1.8"/>
+    <line x1="432" y1="404" x2="448" y2="404" stroke="#3b4a5a" stroke-width="1.8"/>
+    <circle cx="588" cy="250" r="5.5" fill="none" stroke="#3b4a5a" stroke-width="1.8"/>
+    <path d="M 600 250 L 590 240 M 600 250 L 600 240 M 600 250 L 610 240" stroke="#3b4a5a" stroke-width="1.8" fill="none"/>
+
+    <!-- 3. Пользователь — Запись: 1 — 0..N (врач/пациент) -->
+    <line x1="440" y1="520" x2="600" y2="520" stroke="#3b4a5a" stroke-width="1.8"/>
+    <line x1="448" y1="512" x2="448" y2="528" stroke="#3b4a5a" stroke-width="1.8"/>
+    <line x1="456" y1="512" x2="456" y2="528" stroke="#3b4a5a" stroke-width="1.8"/>
+    <circle cx="588" cy="520" r="5.5" fill="none" stroke="#3b4a5a" stroke-width="1.8"/>
+    <path d="M 600 520 L 590 510 M 600 520 L 600 510 M 600 520 L 610 510" stroke="#3b4a5a" stroke-width="1.8" fill="none"/>
+
+    <!-- 4. Запись — Операция: 1 — 1..N -->
+    <line x1="980" y1="520" x2="1100" y2="520" stroke="#3b4a5a" stroke-width="1.8"/>
+    <line x1="988" y1="512" x2="988" y2="528" stroke="#3b4a5a" stroke-width="1.8"/>
+    <line x1="996" y1="512" x2="996" y2="528" stroke="#3b4a5a" stroke-width="1.8"/>
+    <line x1="1088" y1="512" x2="1088" y2="528" stroke="#3b4a5a" stroke-width="1.8"/>
+    <path d="M 1100 520 L 1090 510 M 1100 520 L 1100 510 M 1100 520 L 1110 510" stroke="#3b4a5a" stroke-width="1.8" fill="none"/>
+
+    <!-- 5. Пользователь (актор) — Операция: 1 — 0..N -->
+    <path d="M 420 690 L 420 760 L 1100 760 L 1100 720" stroke="#3b4a5a" stroke-width="1.8" fill="none"/>
+    <line x1="412" y1="698" x2="428" y2="698" stroke="#3b4a5a" stroke-width="1.8"/>
+    <line x1="412" y1="706" x2="428" y2="706" stroke="#3b4a5a" stroke-width="1.8"/>
+    <circle cx="1100" cy="732" r="5.5" fill="none" stroke="#3b4a5a" stroke-width="1.8"/>
+    <path d="M 1100 720 L 1090 730 M 1100 720 L 1100 730 M 1100 720 L 1110 730" stroke="#3b4a5a" stroke-width="1.8" fill="none"/>
+  </svg>
+
+  <div class="lbl" style="left:225px; top:350px;">владеет →</div>
+  <div class="lbl" style="left:462px; top:220px;">ведёт →</div>
+  <div class="lbl" style="left:462px; top:486px;">врач / пациент →</div>
+  <div class="lbl" style="left:998px; top:486px;">фиксируется в →</div>
+  <div class="lbl" style="left:600px; top:730px;">актор →</div>
+
+  <!-- Токен обновления -->
+  <div class="ent" style="left:60px; top:110px; width:360px; height:190px;">
+    <div class="hd">Токен обновления</div>
+    <div class="at"><span class="tag">PK</span><b>номер токена</b></div>
+    <div class="at">хэш</div>
+    <div class="at">пользователь</div>
+    <div class="at">срок действия</div>
+    <div class="at">создан, отозван</div>
+    <div class="at">заменён на</div>
+  </div>
+
+  <!-- Рабочий слот -->
+  <div class="ent" style="left:600px; top:110px; width:360px; height:230px;">
+    <div class="hd">Рабочий слот</div>
+    <div class="at"><span class="tag">PK</span><b>номер слота</b></div>
+    <div class="at">врач</div>
+    <div class="at">дата</div>
+    <div class="at">начало, конец</div>
+    <div class="at">длительность</div>
+    <div class="at">перерыв</div>
+  </div>
+
+  <!-- Пользователь -->
+  <div class="ent" style="left:60px; top:420px; width:380px; height:270px;">
+    <div class="hd">Пользователь</div>
+    <div class="at"><span class="tag">PK</span><b>номер пользователя</b></div>
+    <div class="at">логин</div>
+    <div class="at">ФИО</div>
+    <div class="at">хэш пароля</div>
+    <div class="at">полис</div>
+    <div class="at">роль</div>
+    <div class="at">специальность</div>
+  </div>
+
+  <!-- Запись -->
+  <div class="ent" style="left:600px; top:420px; width:380px; height:220px;">
+    <div class="hd">Запись</div>
+    <div class="at"><span class="tag">PK</span><b>номер записи</b></div>
+    <div class="at">врач</div>
+    <div class="at">пациент</div>
+    <div class="at">дата и время</div>
+    <div class="at">статус</div>
+  </div>
+
+  <!-- Операция записи -->
+  <div class="ent" style="left:1100px; top:420px; width:420px; height:300px;">
+    <div class="hd">Операция записи</div>
+    <div class="at"><span class="tag">PK</span><b>номер операции</b></div>
+    <div class="at">запись</div>
+    <div class="at">тип: created / rescheduled / canceled</div>
+    <div class="at">актор</div>
+    <div class="at">когда</div>
+    <div class="at">причина</div>
+    <div class="at">старое / новое время</div>
+    <div class="at">старый / новый статус</div>
+  </div>
+
+  <div class="panel legend">
+    <h3>Легенда</h3>
+    <div class="r" style="margin-bottom:7px;">
+      <svg width="36" height="18" style="vertical-align:-4px; margin-right:8px;"><line x1="2" y1="9" x2="34" y2="9" stroke="#3b4a5a" stroke-width="1.8"/><line x1="24" y1="2" x2="24" y2="16" stroke="#3b4a5a" stroke-width="1.8"/><line x1="30" y1="2" x2="30" y2="16" stroke="#3b4a5a" stroke-width="1.8"/></svg>
+      ровно один
+    </div>
+    <div class="r" style="margin-bottom:7px;">
+      <svg width="36" height="18" style="vertical-align:-4px; margin-right:8px;"><line x1="2" y1="9" x2="20" y2="9" stroke="#3b4a5a" stroke-width="1.8"/><circle cx="23" cy="9" r="4.5" fill="none" stroke="#3b4a5a" stroke-width="1.8"/><line x1="31" y1="2" x2="31" y2="16" stroke="#3b4a5a" stroke-width="1.8"/></svg>
+      ноль или один
+    </div>
+    <div class="r" style="margin-bottom:7px;">
+      <svg width="36" height="18" style="vertical-align:-4px; margin-right:8px;"><line x1="2" y1="9" x2="18" y2="9" stroke="#3b4a5a" stroke-width="1.8"/><circle cx="21" cy="9" r="4.5" fill="none" stroke="#3b4a5a" stroke-width="1.8"/><path d="M 27 9 L 36 2 M 27 9 L 36 9 M 27 9 L 36 16" stroke="#3b4a5a" stroke-width="1.8" fill="none"/></svg>
+      ноль или много
+    </div>
+    <div class="r" style="margin-bottom:7px;">
+      <svg width="36" height="18" style="vertical-align:-4px; margin-right:8px;"><line x1="2" y1="9" x2="36" y2="9" stroke="#3b4a5a" stroke-width="1.8"/><line x1="25" y1="2" x2="25" y2="16" stroke="#3b4a5a" stroke-width="1.8"/><path d="M 25 9 L 36 2 M 25 9 L 36 9 M 25 9 L 36 16" stroke="#3b4a5a" stroke-width="1.8" fill="none"/></svg>
+      один или много
+    </div>
+    <div class="r" style="margin-bottom:5px;">PK — идентификатор экземпляра</div>
+    <div class="r">→ в подписи — в какую сторону читать связь</div>
+  </div>
+
+  <div class="panel rules">
+    <h3>Правила данных</h3>
+    <div class="cols r">
+      <div>П1. Логин не повторяется.</div>
+      <div>П2. Роль — из допустимого перечня.</div>
+      <div>П3. Статус — booked / canceled / completed.</div>
+      <div>П4. Хэш токена не повторяется.</div>
+      <div>П5. На пару «врач + время» — не больше одной активной записи.</div>
+      <div>П6. На пару «пациент + время» — не больше одной активной записи.</div>
+      <div>П7. Время записи входит в рабочий слот и не попадает в перерыв.</div>
+      <div>П8. У записи всегда есть врач, пациент и статус.</div>
+      <div>П9. У операции всегда есть запись; актор может быть пустым; причина — если передана.</div>
+      <div>П10. Полис уникален — не реализовано, открытый вопрос.</div>
+      <div>П11. У врача есть хотя бы один слот — не гарантируется БД, открытый вопрос.</div>
+      <div>П12. Специальность — из справочника; сейчас свободная строка, открытый вопрос.</div>
+    </div>
+    <div class="note">Роль и статус — атрибуты с допустимыми значениями; физически вынесены в t_dict_role и t_dict_status. Отчёт утилизации и свободные слоты вычисляются, отдельно не хранятся.</div>
+  </div>
+
+</div>
+</body>
+</html>

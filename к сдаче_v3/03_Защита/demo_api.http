@@ -1,0 +1,90 @@
+@base = http://localhost:8080/api/v1
+@patientToken = PASTE_PATIENT_ACCESS_TOKEN
+@registrarToken = PASTE_REGISTRAR_ACCESS_TOKEN
+@adminToken = PASTE_ADMIN_ACCESS_TOKEN
+@doctorId = 1
+@otherDoctorId = 2
+@slot = 2026-11-20T09:00:00
+@appointmentId = 1
+
+### 1. Вход пациентом
+POST {{base}}/auth/login
+Content-Type: application/json
+
+{
+  "login": "patient_001",
+  "password": "password123"
+}
+
+### 2. Создать запись пациентом
+POST {{base}}/appointments/me
+Authorization: Bearer {{patientToken}}
+Content-Type: application/json
+
+{
+  "doctor_id": {{doctorId}},
+  "slot_datetime": "{{slot}}"
+}
+
+### 3. Повторить тот же запрос (идемпотентность)
+POST {{base}}/appointments/me
+Authorization: Bearer {{patientToken}}
+Content-Type: application/json
+
+{
+  "doctor_id": {{doctorId}},
+  "slot_datetime": "{{slot}}"
+}
+
+### 4. Запись к другому врачу на то же время (пересечение)
+POST {{base}}/appointments/me
+Authorization: Bearer {{patientToken}}
+Content-Type: application/json
+
+{
+  "doctor_id": {{otherDoctorId}},
+  "slot_datetime": "{{slot}}"
+}
+
+### 5. Перенести запись
+PATCH {{base}}/appointments/{{appointmentId}}
+Authorization: Bearer {{patientToken}}
+Content-Type: application/json
+
+{
+  "slot_datetime": "2026-11-20T10:00:00",
+  "reason": "Просьба пациента"
+}
+
+### 6. Отменить с причиной
+DELETE {{base}}/appointments/{{appointmentId}}
+Authorization: Bearer {{patientToken}}
+Content-Type: application/json
+
+{
+  "reason": "Пациент заболел"
+}
+
+### 7. История операций
+GET {{base}}/appointments/{{appointmentId}}/history
+Authorization: Bearer {{patientToken}}
+
+### 8. Создать пациента регистратором
+POST {{base}}/patients
+Authorization: Bearer {{registrarToken}}
+Content-Type: application/json
+
+{
+  "login": "patient_002",
+  "fio": "Петров Пётр Петрович",
+  "policy_number": "1234567890123457",
+  "password": "tempPass123"
+}
+
+### 9. Отчёт утилизации
+GET {{base}}/reports/utilization?from=2026-11-13&to=2026-11-20&doctorId={{doctorId}}
+Authorization: Bearer {{adminToken}}
+
+### 10. Экспорт отчёта CSV
+GET {{base}}/reports/utilization/export?from=2026-11-13&to=2026-11-20&doctorId={{doctorId}}
+Authorization: Bearer {{adminToken}}

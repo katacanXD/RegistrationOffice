@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Архитектурные проекции и трассировка</title>
+<style>
+  @page { size: A3 landscape; margin: 0; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { margin: 0; padding: 0; }
+  body { width: 1587px; height: 1123px; overflow: hidden; background: #fff;
+         font-family: "Segoe UI", Arial, sans-serif; color: #1f2d3d; }
+  .canvas { position: relative; width: 1587px; height: 1123px; background: #fff; }
+  .title { position: absolute; left: 60px; top: 24px; font-size: 31px; font-weight: 700; }
+  .subtitle { position: absolute; left: 62px; top: 66px; font-size: 14.5px; color: #55677a; }
+
+  .panel { position: absolute; border: 1px solid #c9d5e1; background: #fbfcfe; border-radius: 10px; padding: 10px 14px; }
+  .panel h3 { margin: 0 0 7px; font-size: 15px; color: #1f3a56; }
+  .panel .r { font-size: 11.5px; line-height: 1.3; color: #33414f; }
+
+  .box { position: absolute; border: 2px solid #3f5f80; border-radius: 7px; background: #fff; padding: 7px 9px; }
+  .box .nm { font-size: 12.5px; font-weight: 700; color: #1f3a56; line-height: 1.15; }
+  .box .tp { font-size: 10px; color: #2f6b9a; margin-top: 2px; }
+  .sys { background: #eaf2fb; border-radius: 9px; text-align: center; }
+  .sys .nm { font-size: 18px; }
+  .sub { background: #f3f8fe; }
+  .doc { background: #f7f4ea; border-color: #a08a5a; }
+
+  svg.links { position: absolute; left: 0; top: 0; z-index: 2; }
+  .lbl { position: absolute; z-index: 3; font-size: 10px; color: #5a6b7d; background: #fff; padding: 0 3px; }
+
+  .matrix { position: absolute; left: 60px; top: 930px; width: 1470px; height: 150px;
+            border: 1px solid #c9d5e1; background: #fbfcfe; border-radius: 10px; padding: 8px 14px; }
+  .matrix table { width: 100%; border-collapse: collapse; font-size: 10.8px; }
+  .matrix td, .matrix th { border-bottom: 1px solid #e4eaf4; padding: 3px 4px; text-align: left; color: #33414f; }
+  .matrix th { color: #1f3a56; font-size: 11px; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="title">Архитектурные проекции и трассировка требований</div>
+  <div class="subtitle">Команда 1 · ЭФБО-10-25 · 07.11.2026 · по схеме преподавателя: система → подсистемы → требования/UC → документ; Ст / Дин / Про</div>
+
+  <div class="panel" style="left:60px; top:110px; width:540px; height:800px;">
+    <h3>Декомпозиция и трассировка</h3>
+    <div class="r">Система разбивается на подсистемы; каждая подсистема реализует функциональные требования и Use Case; в тексте ПЗ у каждого требования есть реализующий модуль.</div>
+  </div>
+
+  <div class="sys box" style="left:210px; top:210px; width:240px; height:54px;"><div class="nm">RegistrationOffice</div><div class="tp">[Программная система]</div></div>
+
+  <div class="sub box" style="left:80px; top:320px; width:150px; height:70px;"><div class="nm">Доступ и роли</div><div class="tp">FR-01</div></div>
+  <div class="sub box" style="left:245px; top:320px; width:150px; height:70px;"><div class="nm">Записи</div><div class="tp">FR-05…FR-10, FR-15</div></div>
+  <div class="sub box" style="left:410px; top:320px; width:150px; height:70px;"><div class="nm">Расписание</div><div class="tp">FR-04, FR-11</div></div>
+  <div class="sub box" style="left:80px; top:410px; width:150px; height:70px;"><div class="nm">Пользователи</div><div class="tp">FR-02, FR-03, FR-12</div></div>
+  <div class="sub box" style="left:245px; top:410px; width:150px; height:70px;"><div class="nm">CSV</div><div class="tp">FR-13</div></div>
+  <div class="sub box" style="left:410px; top:410px; width:150px; height:70px;"><div class="nm">Отчётность</div><div class="tp">FR-14</div></div>
+  <div class="sub box" style="left:245px; top:500px; width:150px; height:70px;"><div class="nm">Токены</div><div class="tp">FR-16</div></div>
+
+  <div class="box" style="left:80px; top:620px; width:480px; height:80px; background:#fff;">
+    <div class="nm">Use Case: UC-1…UC-6</div>
+    <div class="tp">Требования связаны с UC; UC связаны с подсистемами и документами ПЗ №3–7</div>
+  </div>
+  <div class="doc box" style="left:80px; top:730px; width:480px; height:80px;">
+    <div class="nm">Документ: ПЗ №1 / ПЗ №2 / ТЗ</div>
+    <div class="tp">Текст, таблицы и диаграммы; ссылки на репозиторий</div>
+  </div>
+
+  <div class="panel" style="left:620px; top:110px; width:900px; height:260px;">
+    <h3>Обязательные схемы</h3>
+    <div class="r">
+      <b>Структурно-функциональная схема</b> — `СФС_RegistrationOffice_A3.pdf`: подсистемы и функции.<br>
+      <b>Схема информационных потоков (DFD)</b> — `DFD_RegistrationOffice_A3.pdf`: внешние сущности, процессы P1–P7, хранилища D1–D4, потоки F1–F15 и границы доверия.
+    </div>
+  </div>
+
+  <div class="panel" style="left:620px; top:390px; width:430px; height:300px;">
+    <h3>Модели и разделы ПЗ</h3>
+    <div class="r">
+      <b>Прецеденты использования:</b> UC-1…UC-6, матрица актор × UC, два ключевых сценария.<br><br>
+      <b>Назначение разработки:</b> запись на приём, расписание, роли, CSV, отчёт.<br><br>
+      <b>Функциональные требования:</b> FR-01…FR-16, каждый связан с UC, компонентом и сущностью.<br><br>
+      <b>Нефункциональные:</b> НФТ-1…НФТ-6, проверяемые формулировки и статус.
+    </div>
+  </div>
+
+  <div class="panel" style="left:1070px; top:390px; width:450px; height:300px;">
+    <h3>Три проекции</h3>
+    <div class="r">
+      <b>Ст (статика):</b> C4-контекст, контейнеры, компоненты; ERD и правила данных.<br><br>
+      <b>Дин (динамика):</b> sequence UC-1 «Записаться на приём»; проверка слота, пересечения, журнала.<br><br>
+      <b>Про (процессы/развёртывание):</b> DFD; Docker Compose: nginx, frontend, backend, postgres, volumes.
+    </div>
+  </div>
+
+  <div class="matrix">
+    <table>
+      <tr><th>Требование</th><th>UC</th><th>Подсистема / компонент</th><th>Сущность</th><th>Проверка</th><th>Раздел ПЗ</th></tr>
+      <tr><td>FR-01 вход и роли</td><td>все</td><td>Доступ и роли / Вход и права</td><td>Пользователь, Токен</td><td>тест входа</td><td>4.1</td></tr>
+      <tr><td>FR-05 запись</td><td>UC-1</td><td>Записи</td><td>Запись</td><td>автотест</td><td>4.2</td></tr>
+      <tr><td>FR-08 отмена</td><td>UC-3</td><td>Записи</td><td>Запись, Операция</td><td>тест отмены</td><td>4.2</td></tr>
+      <tr><td>FR-09 идемпотентность</td><td>UC-1</td><td>Записи</td><td>Запись</td><td>тест повтора</td><td>4.2</td></tr>
+      <tr><td>FR-14 отчёт</td><td>UC-6</td><td>Отчётность</td><td>Слот, Запись</td><td>тест расчёта</td><td>4.4</td></tr>
+      <tr><td>FR-16 очистка токенов</td><td>вход</td><td>Токены / Очистка</td><td>Токен</td><td>тест планировщика</td><td>4.5</td></tr>
+    </table>
+  </div>
+
+  <svg class="links" width="1587" height="1123" viewBox="0 0 1587 1123">
+    <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#3b4a5a"/></marker></defs>
+    <line x1="330" y1="264" x2="330" y2="300" stroke="#3b4a5a" stroke-width="1.6"/>
+    <line x1="155" y1="300" x2="485" y2="300" stroke="#3b4a5a" stroke-width="1.6"/>
+    <path d="M 155 300 L 155 320 M 320 300 L 320 320 M 485 300 L 485 320 M 155 390 L 155 410 M 320 390 L 320 410 M 485 390 L 485 410 M 320 480 L 320 500" stroke="#3b4a5a" stroke-width="1.6" fill="none" marker-end="url(#ah)"/>
+    <line x1="330" y1="570" x2="330" y2="620" stroke="#3b4a5a" stroke-width="1.6" marker-end="url(#ah)"/>
+    <line x1="330" y1="700" x2="330" y2="730" stroke="#3b4a5a" stroke-width="1.6" marker-end="url(#ah)"/>
+  </svg>
+</div>
+</body>
+</html>

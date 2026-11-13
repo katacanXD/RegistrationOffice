@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Диаграмма компонентов API RegistrationOffice</title>
+<style>
+  @page { size: A3 landscape; margin: 0; }
+  * { box-sizing: border-box; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body { margin: 0; padding: 0; }
+  body { width: 1587px; height: 1123px; overflow: hidden; background: #fff;
+         font-family: "Segoe UI", Arial, sans-serif; color: #1f2d3d; }
+  .canvas { position: relative; width: 1587px; height: 1123px; background: #fff; }
+  .title { position: absolute; left: 60px; top: 26px; font-size: 32px; font-weight: 700; letter-spacing: -0.4px; }
+  .subtitle { position: absolute; left: 62px; top: 70px; font-size: 15px; color: #55677a; }
+
+  .boundary { position: absolute; left: 400px; top: 150px; width: 850px; height: 750px;
+              border: 2px dashed #6f86a4; border-radius: 12px; }
+  .b-title { position: absolute; left: 18px; top: -14px; background: #fff; padding: 0 10px;
+             font-size: 16px; font-weight: 700; color: #3f5f80; }
+
+  .cont, .comp, .store, .ext { position: absolute; background: #fff; border: 2px solid #3f5f80; border-radius: 8px; padding: 10px 14px; }
+  .cont { background: #fff; }
+  .comp { background: #f3f8fe; }
+  .store { background: #f3f8fe; border-radius: 12px; }
+  .ext { background: #fcfcfd; border-color: #8a97a6; }
+  .cont .nm, .comp .nm, .store .nm, .ext .nm { font-size: 18px; font-weight: 700; line-height: 1.15; }
+  .cont .tp, .comp .tp, .store .tp, .ext .tp { font-size: 12.5px; color: #2f6b9a; margin-top: 3px; }
+  .cont .ds, .comp .ds, .store .ds, .ext .ds { font-size: 12px; line-height: 1.22; color: #35424f; margin-top: 5px; }
+
+  svg.links { position: absolute; left: 0; top: 0; z-index: 2; }
+  .lbl { position: absolute; z-index: 3; font-size: 12.5px; color: #2b3a49; background: #fff;
+         padding: 1px 4px; border-radius: 3px; white-space: nowrap; }
+
+  .panel { position: absolute; border: 1px solid #c9d5e1; background: #fbfcfe; border-radius: 10px; padding: 10px 16px; }
+  .panel h3 { margin: 0 0 6px; font-size: 15px; color: #1f3a56; }
+  .panel .r { font-size: 11.5px; line-height: 1.3; color: #33414f; }
+  .legend { left: 60px; top: 880px; width: 480px; height: 200px; }
+  .notes { left: 560px; top: 930px; width: 980px; height: 150px; }
+</style>
+</head>
+<body>
+<div class="canvas">
+
+  <div class="title">Диаграмма компонентов: API RegistrationOffice</div>
+  <div class="subtitle">ПЗ №6 · модель C4 · Команда 1 · ЭФБО-10-25 · 07.11.2026</div>
+
+  <div class="boundary"><div class="b-title">API RegistrationOffice [Контейнер: Java 21, Spring Boot, предварительно]</div></div>
+
+  <svg class="links" width="1587" height="1123" viewBox="0 0 1587 1123">
+    <defs>
+      <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b4a5a"/>
+      </marker>
+    </defs>
+
+    <!-- SPA → API запросов -->
+    <line x1="360" y1="455" x2="620" y2="290" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+
+    <!-- API запросов → правила/безопасность -->
+    <line x1="620" y1="290" x2="550" y2="340" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+    <line x1="820" y1="290" x2="820" y2="340" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+    <line x1="1020" y1="290" x2="1100" y2="340" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+
+    <!-- API → Пользователи (обход слева) -->
+    <path d="M 620 250 L 410 250 L 410 560 L 420 560" stroke="#3b4a5a" stroke-width="1.8" fill="none" marker-end="url(#ah)"/>
+
+    <!-- API → CSV (щель между колонками) -->
+    <path d="M 700 290 L 690 290 L 690 540 L 720 540" stroke="#3b4a5a" stroke-width="1.8" fill="none" marker-end="url(#ah)"/>
+
+    <!-- API → Отчётность -->
+    <path d="M 1020 290 L 1020 540 L 1050 540" stroke="#3b4a5a" stroke-width="1.8" fill="none" marker-end="url(#ah)"/>
+
+    <!-- Записи → Расписание -->
+    <line x1="1020" y1="390" x2="1050" y2="390" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+
+    <!-- Записи → Пользователи -->
+    <line x1="720" y1="440" x2="680" y2="520" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+
+    <!-- Записи → БД (обход справа) -->
+    <path d="M 1020 430 L 1030 430 L 1030 470 L 1290 470" stroke="#3b4a5a" stroke-width="1.8" fill="none" marker-end="url(#ah)"/>
+
+    <!-- Расписание → БД -->
+    <line x1="1230" y1="390" x2="1290" y2="390" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+
+    <!-- Пользователи → БД (обход снизу) -->
+    <path d="M 680 620 L 680 660 L 1290 660 L 1290 520" stroke="#3b4a5a" stroke-width="1.8" fill="none" marker-end="url(#ah)"/>
+
+    <!-- Вход и права → БД (обход слева/снизу) -->
+    <path d="M 680 390 L 700 390 L 700 680 L 1290 680 L 1290 440" stroke="#3b4a5a" stroke-width="1.8" fill="none" marker-end="url(#ah)"/>
+
+    <!-- CSV → Записи/Расписание/Пользователи -->
+    <line x1="720" y1="540" x2="720" y2="480" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+    <line x1="1020" y1="540" x2="1050" y2="460" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+    <line x1="720" y1="560" x2="680" y2="560" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+
+    <!-- Отчётность → Записи/Расписание -->
+    <line x1="1050" y1="540" x2="1050" y2="460" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+    <line x1="1140" y1="520" x2="1140" y2="440" stroke="#3b4a5a" stroke-width="1.8" marker-end="url(#ah)"/>
+
+    <!-- Очистка → Вход и права (обход слева) -->
+    <path d="M 720 740 L 400 740 L 400 390 L 420 390" stroke="#3b4a5a" stroke-width="1.8" fill="none" marker-end="url(#ah)"/>
+  </svg>
+
+  <div class="lbl" style="left:370px; top:330px;">JSON/HTTPS</div>
+  <div class="lbl" style="left:545px; top:300px;">проверяет</div>
+  <div class="lbl" style="left:830px; top:310px;">создаёт</div>
+  <div class="lbl" style="left:1060px; top:305px;">слоты</div>
+  <div class="lbl" style="left:365px; top:455px;">профиль</div>
+  <div class="lbl" style="left:635px; top:500px;">CSV</div>
+  <div class="lbl" style="left:1025px; top:500px;">отчёт</div>
+  <div class="lbl" style="left:1038px; top:468px;">SQL</div>
+  <div class="lbl" style="left:430px; top:710px;">токены</div>
+
+  <!-- SPA -->
+  <div class="ext" style="left:60px; top:400px; width:300px; height:120px;">
+    <div class="nm">Сайт записи</div><div class="tp">[Контейнер: React 19, Vite, предварительно]</div>
+    <div class="ds">Работает в браузере; вызывает API по JSON/HTTPS</div>
+  </div>
+
+  <!-- API запросов -->
+  <div class="comp" style="left:620px; top:210px; width:400px; height:80px;">
+    <div class="nm">API запросов</div><div class="tp">[Компонент: Spring MVC, предварительно]</div>
+    <div class="ds">Принимает запросы SPA, передаёт правилам</div>
+  </div>
+
+  <!-- Вход и права -->
+  <div class="comp" style="left:420px; top:340px; width:260px; height:150px;">
+    <div class="nm">Вход и права</div><div class="tp">[Компонент: Spring Security, предварительно]</div>
+    <div class="ds">JWT, роли, вход, refresh</div>
+  </div>
+
+  <!-- Записи -->
+  <div class="comp" style="left:720px; top:340px; width:300px; height:150px;">
+    <div class="nm">Записи</div><div class="tp">[Компонент: Spring Bean, предварительно]</div>
+    <div class="ds">Создание, перенос, отмена; идемпотентность; пересечение; журнал операций</div>
+  </div>
+
+  <!-- Расписание -->
+  <div class="comp" style="left:1050px; top:340px; width:180px; height:110px;">
+    <div class="nm">Расписание</div><div class="tp">[Компонент: Spring Bean, предварительно]</div>
+    <div class="ds">Слоты и календарь</div>
+  </div>
+
+  <!-- Пользователи -->
+  <div class="comp" style="left:420px; top:520px; width:260px; height:100px;">
+    <div class="nm">Пользователи</div><div class="tp">[Компонент: Spring Bean, предварительно]</div>
+    <div class="ds">Пользователи, пациенты, врачи, полис</div>
+  </div>
+
+  <!-- CSV -->
+  <div class="comp" style="left:720px; top:520px; width:300px; height:100px;">
+    <div class="nm">CSV-обмен</div><div class="tp">[Компонент: Spring Bean, предварительно]</div>
+    <div class="ds">Импорт/экспорт врачей, пациентов, записей, слотов</div>
+  </div>
+
+  <!-- Отчётность -->
+  <div class="comp" style="left:1050px; top:520px; width:180px; height:100px;">
+    <div class="nm">Отчётность</div><div class="tp">[Компонент: Spring Bean, предварительно]</div>
+    <div class="ds">Утилизация и CSV</div>
+  </div>
+
+  <!-- Очистка токенов -->
+  <div class="comp" style="left:720px; top:700px; width:300px; height:90px;">
+    <div class="nm">Очистка токенов</div><div class="tp">[Компонент: планировщик, предварительно]</div>
+    <div class="ds">Удаляет истёкшие refresh-токены</div>
+  </div>
+
+  <!-- DB -->
+  <div class="store" style="left:1290px; top:400px; width:240px; height:140px;">
+    <div class="nm">База данных</div><div class="tp">[Контейнер: PostgreSQL 16, предварительно]</div>
+    <div class="ds">Пользователи, слоты, записи, журнал, токены</div>
+  </div>
+
+  <div class="panel legend">
+    <h3>Легенда</h3>
+    <div class="r" style="margin-bottom:4px;"><b>Синий прямоугольник</b> — компонент API</div>
+    <div class="r" style="margin-bottom:4px;"><b>Серая рамка</b> — другой контейнер (снаружи)</div>
+    <div class="r" style="margin-bottom:4px;"><b>Скруглённый прямоугольник</b> — хранилище</div>
+    <div class="r" style="margin-bottom:4px;"><b>Стрелка</b> — вызов; подпись говорит, что делает источник</div>
+    <div class="r" style="margin-bottom:4px;">[Компонент: технология, предварительно] — тип и технология</div>
+    <div class="r">У связей между компонентами технология не указывается</div>
+  </div>
+
+  <div class="panel notes">
+    <h3>Что не показано и почему</h3>
+    <div class="r">Классы, пакеты и вспомогательный код — ниже уровня компонентов. Таблицы и SQL — модель данных (ПЗ №7). Фреймворк — технология в скобках. Люди и внешние системы с компонентами напрямую не связаны: работают через SPA. «Статические файлы» с компонентами не связаны. Отдельного слоя «Доступ к данным» нет: к БД обращаются компоненты, отвечающие за данные; репозитории — код внутри них.</div>
+  </div>
+
+</div>
+</body>
+</html>
