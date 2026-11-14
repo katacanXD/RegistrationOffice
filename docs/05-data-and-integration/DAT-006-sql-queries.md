@@ -2,13 +2,13 @@
 
 | Версия | Статус | Дата создания | Дата обновления |
 |--------|--------|---------------|-----------------|
-| v0.2   | Draft  | 2026-04-10    | 2026-04-18      |
+| v0.3   | Actual | 2026-04-10    | 2026-11-07      |
 
 О документе: основные SQL-шаблоны для текущей схемы `t_users`, `t_work_slots`, `t_appointments`.
 
 Для кого: backend-разработчики, тестировщик.
 
-Основано на: [ERD](DOC-DAT-001-erd.md), [API](DOC-DAT-003-api-specification.md).
+Основано на: [ERD](DOC-DAT-001-logical-data-model-and-erd.md), [API](DOC-DAT-003-api-specification.md).
 
 ---
 
@@ -24,18 +24,18 @@
 
 ## Запрос 1: Получить список врачей с фильтрацией
 ```text
-SELECT u.id AS doctor_id,
-       u.full_name AS fio,
-       u.speciality
+SELECT u.f_users_id AS doctor_id,
+       u.f_fio AS fio,
+       u.f_speciality_name AS speciality
 FROM t_users u
 JOIN t_dict_role r ON r.f_role_id = u.f_role_id
 WHERE r.f_role_name = 'doctor'
   AND (
       :search IS NULL OR :search = ''
-      OR LOWER(u.full_name) LIKE LOWER(CONCAT('%', :search, '%'))
-      OR LOWER(COALESCE(u.speciality, '')) LIKE LOWER(CONCAT('%', :search, '%'))
+      OR LOWER(u.f_fio) LIKE LOWER(CONCAT('%', :search, '%'))
+      OR LOWER(COALESCE(u.f_speciality_name, '')) LIKE LOWER(CONCAT('%', :search, '%'))
   )
-ORDER BY u.full_name;
+ORDER BY u.f_fio;
 ```
 
 ## Запрос 2: Получить доступные слоты врача на дату
@@ -59,10 +59,11 @@ ORDER BY gs.slot_time;
 
 ```text
 SELECT COUNT(*) AS cnt
-FROM t_appointments
-WHERE f_doctor_id = :doctor_id
-  AND f_slot_datetime = :slot_datetime
-  AND f_status_id = (SELECT f_status_id FROM t_dict_status WHERE f_status_name = 'booked');
+FROM t_appointments a
+JOIN t_dict_status s ON s.f_status_id = a.f_status_id
+WHERE a.f_doctor_id = :doctor_id
+  AND a.f_slot_datetime = :slot_datetime
+  AND s.f_status_name <> 'canceled';
 ```
 
 ## Запрос 4: Расписание врача на день
@@ -112,4 +113,39 @@ WHERE (
     OR LOWER(COALESCE(u.f_speciality_name, '')) LIKE LOWER(CONCAT('%', :search, '%'))
 )
 ORDER BY u.f_fio;
+```
+
+## Запрос 7: Отчёт утилизации по врачу и дате
+
+```text
+SELECT a.f_doctor_id,
+       a.f_slot_datetime::date AS date,
+       COUNT(*) AS slots_booked
+FROM t_appointments a
+JOIN t_dict_status s ON s.f_status_id = a.f_status_id
+WHERE a.f_doctor_id = :doctor_id
+  AND a.f_slot_datetime::date = :date
+  AND s.f_status_name <> 'canceled'
+GROUP BY a.f_doctor_id, a.f_slot_datetime::date;
+```
+
+> Полный расчёт `slots_total` и утилизации выполняет `UtilizationServiceImpl` на Java: он генерирует слоты тем же `SlotGenerator`, что и запись, поэтому SQL выше — только вспомогательная выборка занятых слотов.
+
+## Запрос 8: Журнал операций записи
+
+```text
+SELECT o.f_operation_id,
+       o.f_operation_type,
+       o.f_occurred_at,
+       o.f_reason,
+       o.f_old_slot_datetime,
+       o.f_new_slot_datetime,
+       o.f_old_status,
+       o.f_new_status,
+       u.f_login AS actor_login,
+       u.f_fio AS actor_fio
+FROM t_appointment_operations o
+LEFT JOIN t_users u ON u.f_users_id = o.f_actor_id
+WHERE o.f_appointment_id = :appointment_id
+ORDER BY o.f_occurred_at, o.f_operation_id;
 ```

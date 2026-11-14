@@ -2,7 +2,7 @@
 
 | Версия | Статус | Дата обновления |
 |---|---|---|
-| v1.2 | Draft | 2026-04-18 |
+| v1.3 | Actual | 2026-11-07 |
 
 ## Правила контрактов
 
@@ -17,7 +17,8 @@
 - `users`: профиль пользователя, смена пароля, админский CRUD;
 - `patients`: кабинет пациента, список пациентов;
 - `doctors`: поиск врачей, календарь, слоты, расписание;
-- `appointments`: создание, просмотр, обновление, отмена;
+- `appointments`: создание, просмотр, обновление, отмена, журнал операций;
+- `reports`: отчёт утилизации и CSV-экспорт;
 - `admins`: CSV import/export.
 
 ## Аутентификация и профиль
@@ -92,6 +93,27 @@ GET /api/v1/patients?search=&page=0&size=10
 Authorization: Bearer <access_token>
 → 200 OK
 { "patients": [ { "user_id": 123, "fio": "...", "policy_number": "1234567890123456" } ], "total_found": 1, "total_elements": 1, "total_pages": 1, "current_page": 0 }
+
+POST /api/v1/patients
+Authorization: Bearer <access_token>   // admin или registrar
+{ "login": "patient_002", "fio": "Петров Пётр Петрович", "policy_number": "1234567890123457", "password": "tempPass123" }
+→ 201 Created
+{ "patient_id": 124, "login": "patient_002", "fio": "Петров Пётр Петрович", "policy_number": "1234567890123457", "message": "Пациент успешно создан" }
+```
+
+## Отчёты
+
+```http
+GET /api/v1/reports/utilization?from=2026-11-07&to=2026-11-13&speciality=Терапевт
+Authorization: Bearer <access_token>   // admin
+→ 200 OK
+{ "from": "2026-11-07", "to": "2026-11-13", "rows": [ { "doctor_id": 10, "doctor_fio": "...", "speciality": "Терапевт", "date": "2026-11-07", "slots_total": 8, "slots_booked": 3, "utilization": 0.375 } ], "total_slots": 8, "total_booked": 3, "total_utilization": 0.375 }
+
+GET /api/v1/reports/utilization/export?from=2026-11-07&to=2026-11-13
+Authorization: Bearer <access_token>   // admin
+→ 200 OK, text/csv
+doctor_id,date,slots_total,slots_booked,utilization
+10,2026-11-07,8,3,0.3750
 ```
 
 ## Врачи и расписание
@@ -129,7 +151,11 @@ POST /api/v1/appointments
 Authorization: Bearer <access_token>
 { "doctor_id": 10, "patient_id": 123, "slot_datetime": "2026-04-01T09:00:00" }
 → 201 Created
-{ "appointment_id": 501, "message": "Запись успешно создана на 1 апреля, 09:00", "details": { "doctor_fio": "Врач Тестовый 001", "speciality": "Терапевт", "address": "г. Москва, ул. Менделеева, д. 15с2" } }
+{ "appointment_id": 501, "message": "Запись успешно создана на 1 апреля, 09:00", "details": { "doctor_fio": "Врач Тестовый 001", "speciality": "Терапевт", "address": "г. Москва, ул. Менделеева, д. 15с2" }, "replayed": false }
+
+// повтор того же пациента на тот же слот
+→ 200 OK
+{ "appointment_id": 501, "message": "Запись уже существует", "replayed": true }
 
 POST /api/v1/appointments/me
 Authorization: Bearer <access_token>
@@ -149,14 +175,20 @@ Authorization: Bearer <access_token>
 
 PATCH /api/v1/appointments/{appointment_id}
 Authorization: Bearer <access_token>
-{ "slot_datetime": "2026-04-01T10:00:00" }
+{ "slot_datetime": "2026-04-01T10:00:00", "reason": "Просьба пациента" }
 → 200 OK
 { "doctor_id": 10, "slot_datetime": "2026-04-01T10:00:00", "status": "booked", "message": "..." }
 
 DELETE /api/v1/appointments/{appointment_id}
 Authorization: Bearer <access_token>
+{ "reason": "Пациент заболел" }
 → 200 OK
 { "appointment_id": 501, "status": "canceled", "message": "Запись к врачу (Терапевт) отменена" }
+
+GET /api/v1/appointments/{appointment_id}/history
+Authorization: Bearer <access_token>
+→ 200 OK
+[ { "operation_id": 1, "appointment_id": 501, "operation_type": "created", "actor_login": "registrar_1", "actor_fio": "...", "occurred_at": "2026-04-01T08:00:00Z", "reason": null, "old_slot_datetime": null, "new_slot_datetime": "2026-04-01T09:00:00", "old_status": null, "new_status": "booked" } ]
 ```
 
 ## Администрирование CSV

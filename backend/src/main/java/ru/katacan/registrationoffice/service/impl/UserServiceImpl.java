@@ -8,6 +8,7 @@ import ru.katacan.registrationoffice.entity.User;
 import ru.katacan.registrationoffice.exception.BadCredentialsException;
 import ru.katacan.registrationoffice.exception.BadRequestException;
 import ru.katacan.registrationoffice.exception.ResourceNotFoundException;
+import ru.katacan.registrationoffice.exception.SystemConfigurationException;
 import ru.katacan.registrationoffice.mapper.UserMapper;
 import ru.katacan.registrationoffice.repository.DictRoleRepository;
 import ru.katacan.registrationoffice.repository.UserRepository;
@@ -71,6 +72,41 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
 
         return userMapper.toDoctorList(doctorDtos, doctorPage);
+    }
+
+    @Override
+    public PatientCreatedDto createPatient(CreatePatientRequestDto request) {
+        if (request == null) {
+            throw new BadRequestException("Тело запроса не должно быть пустым");
+        }
+
+        String login = LoginNormalizer.normalize(request.getLogin());
+        if (userRepository.existsByLoginIgnoreCase(login)) {
+            throw new BadRequestException("Пользователь с таким логином уже существует");
+        }
+
+        DictRole patientRole = dictRoleRepository.findByName("patient")
+                .orElseThrow(() -> new SystemConfigurationException("Роль patient не найдена"));
+
+        User patient = new User();
+        patient.setLogin(login);
+        patient.setFullName(request.getFio().trim());
+        patient.setPassword(passwordEncoder.encode(request.getPassword()));
+        patient.setRole(patientRole);
+
+        if (request.getPolicyNumber() != null && !request.getPolicyNumber().isBlank()) {
+            patient.setPolicyNumber(request.getPolicyNumber().trim());
+        }
+
+        User saved = userRepository.save(patient);
+
+        return PatientCreatedDto.builder()
+                .patientId(saved.getId())
+                .login(saved.getLogin())
+                .fio(saved.getFullName())
+                .policyNumber(saved.getPolicyNumber())
+                .message("Пациент успешно создан")
+                .build();
     }
 
     @Override

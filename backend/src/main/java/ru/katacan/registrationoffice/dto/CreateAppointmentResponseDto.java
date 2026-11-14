@@ -9,6 +9,7 @@ public class CreateAppointmentResponseDto {
     private Long appointmentId;
     private String message;
     private AppointmentDetailsDto details;
+    private Boolean replayed;
 
     @Data
     @Builder

@@ -2,7 +2,7 @@
 
 | Версия | Статус | Дата обновления |
 |---|---|---|
-| v1.0 | Draft | 2026-04-17 |
+| v1.1 | Actual | 2026-11-07 |
 
 О документе: компактный обзор API-контуров backend RegistrationOffice без повторения полного JSON-контракта.
 
@@ -24,6 +24,7 @@
 - `patients`: `/api/v1/patients/*`
 - `doctors`: `/api/v1/doctors/*`
 - `appointments`: `/api/v1/appointments/*`
+- `reports`: `/api/v1/reports/*`
 - `admins`: `/api/v1/admins/*`
 
 ## Ключевые endpoint'ы
@@ -47,6 +48,7 @@
 - `GET /api/v1/patients/me/dashboard`
 - `PATCH /api/v1/patients/me/policy`
 - `GET /api/v1/patients`
+- `POST /api/v1/patients` — создание пациента регистратором/администратором
 
 ### Doctors / schedule
 
@@ -63,8 +65,14 @@
 - `POST /api/v1/appointments/me`
 - `GET /api/v1/appointments/{appointmentId}`
 - `GET /api/v1/appointments/detail/{appointmentId}`
+- `GET /api/v1/appointments/{appointmentId}/history` — журнал операций
 - `PATCH /api/v1/appointments/{appointmentId}`
-- `DELETE /api/v1/appointments/{appointmentId}`
+- `DELETE /api/v1/appointments/{appointmentId}` — причина отмены в теле (опционально)
+
+### Reports
+
+- `GET /api/v1/reports/utilization?from=yyyy-MM-dd&to=yyyy-MM-dd&doctorId=&speciality=`
+- `GET /api/v1/reports/utilization/export` — CSV
 
 ### Admin CSV
 
@@ -85,7 +93,7 @@
 
 ## Коды ответов
 
-- `200`, `201` — успешно;
+- `200`, `201` — успешно; `201` — запись создана, `200` — идемпотентный повтор вернул существующую;
 - `400` — ошибка валидации;
 - `401` — не авторизован;
 - `403` — недостаточно прав;

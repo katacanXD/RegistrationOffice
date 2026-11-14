@@ -23,7 +23,7 @@
 | DOC-DAT-001  | ER-диаграмма                     | v1.2   | [erd](../05-data-and-integration/DOC-DAT-001-logical-data-model-and-erd.md)                             |
 | DOC-DAT-002  | Словарь данных                   | v1.2   | [data-dictionary](../05-data-and-integration/DOC-DAT-002-data-dictionary-and-validation-rules.md)     |
 | DOC-DAT-003  | REST API спецификация            | v1.0   | [api-specification](../05-data-and-integration/DOC-DAT-003-api-specification.md) |
-| DOC-DAT-004  | DFD                              | v0.1   | [dfd](../05-data-and-integration/DOC-DAT-004.md)                             |
+| DOC-DAT-004  | DFD                              | v0.1   | [dfd](../05-data-and-integration/DOC-DAT-004-dfd.md)                             |
 | DOC-DAT-005  | Таблица маппинга данных          | v0.2   | [data-mapping](../05-data-and-integration/DAT-005-data-mapping.md)           |
 
 ## Ключевые результаты CP3

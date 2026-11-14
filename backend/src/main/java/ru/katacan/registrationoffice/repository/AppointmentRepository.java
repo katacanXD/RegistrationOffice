@@ -39,6 +39,22 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
             @Param("doctor") User doctor,
             @Param("slotDateTime") LocalDateTime slotDateTime);
 
+    @Query("SELECT a FROM Appointment a " +
+            "WHERE a.doctor = :doctor AND a.slotDateTime = :slotDateTime " +
+            "AND a.status.name <> 'canceled' " +
+            "ORDER BY a.id ASC")
+    List<Appointment> findActiveByDoctorAndSlot(
+            @Param("doctor") User doctor,
+            @Param("slotDateTime") LocalDateTime slotDateTime);
+
+    @Query("SELECT CASE WHEN COUNT(a) > 0 THEN true ELSE false END FROM Appointment a " +
+            "WHERE a.patient = :patient AND a.slotDateTime = :slotDateTime " +
+            "AND a.status.name <> 'canceled' AND a.id <> :excludeId")
+    boolean existsActiveAppointmentForPatient(
+            @Param("patient") User patient,
+            @Param("slotDateTime") LocalDateTime slotDateTime,
+            @Param("excludeId") Long excludeId);
+
     @Query("SELECT a FROM Appointment a WHERE a.doctor.id = :doctorId " +
             "AND DATE(a.slotDateTime) = :date")
     List<Appointment> findByDoctorIdAndDate(

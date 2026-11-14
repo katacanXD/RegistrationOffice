@@ -159,6 +159,14 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponseDto.builder().message(message).build());
     }
 
+    @ExceptionHandler(PatientScheduleConflictException.class)
+    public ResponseEntity<ErrorResponseDto> handlePatientScheduleConflict(PatientScheduleConflictException e) {
+        String message = resolveMessage(e.getMessage(), "У пациента уже есть запись на это время");
+        log.debug("Patient schedule conflict: {}", message);
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponseDto.builder().message(message).build());
+    }
+
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<ErrorResponseDto> handleBadRequest(BadRequestException e) {
         String message = resolveMessage(e.getMessage(), BAD_REQUEST_MESSAGE);

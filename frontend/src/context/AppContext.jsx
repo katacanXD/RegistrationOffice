@@ -17,6 +17,7 @@ export function AppProvider({ children }) {
   const [error, setError] = useState(null);
   const [userPolicy, setUserPolicy] = useState(null);
   const [rescheduleAppointmentId, setRescheduleAppointmentId] = useState(null);
+  const [utilizationReport, setUtilizationReport] = useState(null);
 
   // Получить список записей пациента
   const fetchAppointments = useCallback(async () => {
@@ -372,6 +373,59 @@ export function AppProvider({ children }) {
      }
    }, []);
 
+   // Отчёт утилизации расписания
+   const fetchUtilizationReport = useCallback(async ({ from, to, doctorId, speciality } = {}) => {
+     setLoading(true);
+     setError(null);
+     try {
+       const params = {};
+       if (from) params.from = from;
+       if (to) params.to = to;
+       if (doctorId) params.doctorId = doctorId;
+       if (speciality) params.speciality = speciality;
+
+       const response = await apiClient.get('/reports/utilization', { params });
+       setUtilizationReport(response.data);
+       return { success: true, report: response.data };
+     } catch (err) {
+       const message = err.response?.data?.message || 'Ошибка построения отчёта';
+       setError(message);
+       return { success: false, error: message };
+     } finally {
+       setLoading(false);
+     }
+   }, []);
+
+   const exportUtilizationCsv = useCallback(async ({ from, to, doctorId, speciality } = {}) => {
+     setError(null);
+     try {
+       const params = {};
+       if (from) params.from = from;
+       if (to) params.to = to;
+       if (doctorId) params.doctorId = doctorId;
+       if (speciality) params.speciality = speciality;
+
+       const response = await apiClient.get('/reports/utilization/export', {
+         params,
+         responseType: 'blob',
+       });
+       const blob = new Blob([response.data], { type: 'text/csv;charset=utf-8' });
+       const url = window.URL.createObjectURL(blob);
+       const link = document.createElement('a');
+       link.href = url;
+       link.download = `utilization_${from || 'period'}_${to || 'period'}.csv`;
+       document.body.appendChild(link);
+       link.click();
+       link.remove();
+       window.URL.revokeObjectURL(url);
+       return { success: true };
+     } catch (err) {
+       const message = err.response?.data?.message || 'Ошибка экспорта отчёта';
+       setError(message);
+       return { success: false, error: message };
+     }
+   }, []);
+
    return (
     <AppContext.Provider
       value={{
@@ -391,6 +445,7 @@ export function AppProvider({ children }) {
         userPolicy,
         rescheduleAppointmentId,
         setRescheduleAppointmentId,
+        utilizationReport,
         fetchAppointments,
         fetchDoctors,
         fetchDoctorSlots,
@@ -409,6 +464,8 @@ export function AppProvider({ children }) {
         fetchUsers,
         updateUserRoleAndSpeciality,
         importCsv,
+        fetchUtilizationReport,
+        exportUtilizationCsv,
       }}
     >
       {children}

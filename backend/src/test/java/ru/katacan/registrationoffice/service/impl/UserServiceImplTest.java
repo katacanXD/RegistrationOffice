@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import ru.katacan.registrationoffice.dto.CreatePatientRequestDto;
+import ru.katacan.registrationoffice.dto.PatientCreatedDto;
 import ru.katacan.registrationoffice.dto.UpdateUserRequestDto;
 import ru.katacan.registrationoffice.dto.UpdateUserResponseDto;
 import ru.katacan.registrationoffice.entity.DictRole;
@@ -105,6 +107,35 @@ class UserServiceImplTest {
         assertEquals("doctor", result.getRole());
         assertNull(result.getPolicyNumber());
         verify(userRepository).save(existingUser);
+    }
+
+    @Test
+    void createPatient_creates_patient_with_policy() {
+        CreatePatientRequestDto request = new CreatePatientRequestDto();
+        request.setLogin("newpatient");
+        request.setFio("Новый Пациент");
+        request.setPolicyNumber("1234567890123456");
+        request.setPassword("password123");
+
+        DictRole patientRole = new DictRole();
+        patientRole.setName("patient");
+
+        when(userRepository.existsByLoginIgnoreCase("newpatient")).thenReturn(false);
+        when(dictRoleRepository.findByName("patient")).thenReturn(Optional.of(patientRole));
+        when(passwordEncoder.encode("password123")).thenReturn("hash");
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User saved = invocation.getArgument(0);
+            saved.setId(10L);
+            return saved;
+        });
+
+        PatientCreatedDto result = userService.createPatient(request);
+
+        assertEquals(10L, result.getPatientId());
+        assertEquals("newpatient", result.getLogin());
+        assertEquals("Новый Пациент", result.getFio());
+        assertEquals("1234567890123456", result.getPolicyNumber());
+        verify(userRepository).save(any(User.class));
     }
 
     private static User userWithRole(Long id, String roleName, String policyNumber, String speciality) {
